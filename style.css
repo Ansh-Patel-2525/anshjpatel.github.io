@@ -40,12 +40,13 @@ nav a:hover {
 }
 
 .profile-pic {
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  object-fit: cover;
+  width: 220px;
+  height: auto;
+  border-radius: 6px;
+  object-fit: contain;
   margin-bottom: 20px;
 }
+
 
 .hero h1 {
   font-size: 2.5rem;
