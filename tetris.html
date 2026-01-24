@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tetris - Ansh Patel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="game-header">
+    <div class="game-header-content">
+      <h1>🧱 Tetris</h1>
+      <div class="header-links">
+        <a href="widgets.html" class="back-link">← Back to Widgets</a>
+        <a href="index.html" class="back-link">🏠 Home</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="game-container">
+    <div class="game-card">
+      <div class="game-info">
+        <span>Score: <strong id="tetrisScore">0</strong></span>
+        <span>Level: <strong id="tetrisLevel">1</strong></span>
+      </div>
+      <canvas id="tetrisCanvas" width="240" height="400"></canvas>
+      <p id="tetrisStatus" class="game-status">Press Start to Play</p>
+      <button onclick="startTetris()" class="widget-btn">Start Game</button>
+      <p class="game-instruction">Arrow Keys: Move/Rotate | Space: Drop</p>
+    </div>
+  </main>
+
+  <script>
+    // Prevent arrow keys and space from scrolling
+    window.addEventListener("keydown", function(e) {
+      if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].indexOf(e.key) > -1) {
+        e.preventDefault();
+      }
+    }, false);
+
+    let tetrisGame = {
+      canvas: document.getElementById('tetrisCanvas'),
+      ctx: document.getElementById('tetrisCanvas').getContext('2d'),
+      board: [],
+      currentPiece: null,
+      score: 0,
+      level: 1,
+      gameLoop: null,
+      running: false,
+      blockSize: 20,
+      cols: 12,
+      rows: 20
+    };
+
+    const tetrisPieces = [
+      [[1,1,1,1]], [[1,1],[1,1]], [[0,1,0],[1,1,1]],
+      [[1,0,0],[1,1,1]], [[0,0,1],[1,1,1]],
+      [[0,1,1],[1,1,0]], [[1,1,0],[0,1,1]]
+    ];
+
+    const tetrisColors = ['#00f0f0', '#f0f000', '#a000f0', '#f0a000', '#0000f0', '#00f000', '#f00000'];
+
+    document.addEventListener('keydown', (e) => {
+      if (!tetrisGame.running) return;
+      
+      if (e.key === 'ArrowLeft') {
+        moveTetrisPiece(-1, 0);
+      } else if (e.key === 'ArrowRight') {
+        moveTetrisPiece(1, 0);
+      } else if (e.key === 'ArrowDown') {
+        moveTetrisPiece(0, 1);
+      } else if (e.key === 'ArrowUp') {
+        rotateTetrisPiece();
+      } else if (e.key === ' ') {
+        dropTetrisPiece();
+      }
+    });
+
+    function startTetris() {
+      if (tetrisGame.running) return;
+      
+      tetrisGame.board = Array(tetrisGame.rows).fill().map(() => Array(tetrisGame.cols).fill(0));
+      tetrisGame.score = 0;
+      tetrisGame.level = 1;
+      tetrisGame.running = true;
+      
+      document.getElementById('tetrisScore').textContent = '0';
+      document.getElementById('tetrisLevel').textContent = '1';
+      document.getElementById('tetrisStatus').textContent = 'Playing...';
+      
+      spawnTetrisPiece();
+      
+      tetrisGame.gameLoop = setInterval(() => {
+        moveTetrisPiece(0, 1);
+        drawTetris();
+      }, 500);
+    }
+
+    function spawnTetrisPiece() {
+      const index = Math.floor(Math.random() * tetrisPieces.length);
+      tetrisGame.currentPiece = {
+        shape: tetrisPieces[index],
+        color: tetrisColors[index],
+        x: Math.floor(tetrisGame.cols / 2) - 1,
+        y: 0
+      };
+      
+      if (checkTetrisCollision(0, 0)) {
+        gameOverTetris();
+      }
+    }
+
+    function moveTetrisPiece(dx, dy) {
+      if (!tetrisGame.currentPiece) return;
+      
+      if (!checkTetrisCollision(dx, dy)) {
+        tetrisGame.currentPiece.x += dx;
+        tetrisGame.currentPiece.y += dy;
+      } else if (dy > 0) {
+        mergeTetrisPiece();
+        clearTetrisLines();
+        spawnTetrisPiece();
+      }
+    }
+
+    function rotateTetrisPiece() {
+      if (!tetrisGame.currentPiece) return;
+      
+      const rotated = tetrisGame.currentPiece.shape[0].map((_, i) =>
+        tetrisGame.currentPiece.shape.map(row => row[i]).reverse()
+      );
+      
+      const oldShape = tetrisGame.currentPiece.shape;
+      tetrisGame.currentPiece.shape = rotated;
+      
+      if (checkTetrisCollision(0, 0)) {
+        tetrisGame.currentPiece.shape = oldShape;
+      }
+    }
+
+    function dropTetrisPiece() {
+      while (!checkTetrisCollision(0, 1)) {
+        tetrisGame.currentPiece.y++;
+      }
+      mergeTetrisPiece();
+      clearTetrisLines();
+      spawnTetrisPiece();
+    }
+
+    function checkTetrisCollision(dx, dy) {
+      if (!tetrisGame.currentPiece) return false;
+      
+      for (let y = 0; y < tetrisGame.currentPiece.shape.length; y++) {
+        for (let x = 0; x < tetrisGame.currentPiece.shape[y].length; x++) {
+          if (tetrisGame.currentPiece.shape[y][x]) {
+            const newX = tetrisGame.currentPiece.x + x + dx;
+            const newY = tetrisGame.currentPiece.y + y + dy;
+            
+            if (newX < 0 || newX >= tetrisGame.cols || newY >= tetrisGame.rows) {
+              return true;
+            }
+            
+            if (newY >= 0 && tetrisGame.board[newY][newX]) {
+              return true;
+            }
+          }
+        }
+      }
+      return false;
+    }
+
+    function mergeTetrisPiece() {
+      tetrisGame.currentPiece.shape.forEach((row, y) => {
+        row.forEach((value, x) => {
+          if (value) {
+            const boardY = tetrisGame.currentPiece.y + y;
+            const boardX = tetrisGame.currentPiece.x + x;
+            if (boardY >= 0) {
+              tetrisGame.board[boardY][boardX] = tetrisGame.currentPiece.color;
+            }
+          }
+        });
+      });
+    }
+
+    function clearTetrisLines() {
+      let linesCleared = 0;
+      
+      for (let y = tetrisGame.rows - 1; y >= 0; y--) {
+        if (tetrisGame.board[y].every(cell => cell !== 0)) {
+          tetrisGame.board.splice(y, 1);
+          tetrisGame.board.unshift(Array(tetrisGame.cols).fill(0));
+          linesCleared++;
+          y++;
+        }
+      }
+      
+      if (linesCleared > 0) {
+        tetrisGame.score += linesCleared * 100 * tetrisGame.level;
+        document.getElementById('tetrisScore').textContent = tetrisGame.score;
+        
+        tetrisGame.level = Math.floor(tetrisGame.score / 500) + 1;
+        document.getElementById('tetrisLevel').textContent = tetrisGame.level;
+      }
+    }
+
+    function drawTetris() {
+      tetrisGame.ctx.fillStyle = '#000';
+      tetrisGame.ctx.fillRect(0, 0, 240, 400);
+      
+      tetrisGame.board.forEach((row, y) => {
+        row.forEach((cell, x) => {
+          if (cell) {
+            tetrisGame.ctx.fillStyle = cell;
+            tetrisGame.ctx.fillRect(x * tetrisGame.blockSize, y * tetrisGame.blockSize, 
+              tetrisGame.blockSize - 1, tetrisGame.blockSize - 1);
+          }
+        });
+      });
+      
+      if (tetrisGame.currentPiece) {
+        tetrisGame.ctx.fillStyle = tetrisGame.currentPiece.color;
+        tetrisGame.currentPiece.shape.forEach((row, y) => {
+          row.forEach((value, x) => {
+            if (value) {
+              tetrisGame.ctx.fillRect(
+                (tetrisGame.currentPiece.x + x) * tetrisGame.blockSize,
+                (tetrisGame.currentPiece.y + y) * tetrisGame.blockSize,
+                tetrisGame.blockSize - 1, tetrisGame.blockSize - 1
+              );
+            }
+          });
+        });
+      }
+    }
+
+    function gameOverTetris() {
+      clearInterval(tetrisGame.gameLoop);
+      tetrisGame.running = false;
+      document.getElementById('tetrisStatus').textContent = `Game Over! Final Score: ${tetrisGame.score}`;
+    }
+  </script>
+
+</body>
+</html>

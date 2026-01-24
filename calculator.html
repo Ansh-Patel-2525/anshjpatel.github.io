@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Calculator - Ansh Patel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="game-header">
+    <div class="game-header-content">
+      <h1>🔢 Calculator</h1>
+      <div class="header-links">
+        <a href="widgets.html" class="back-link">← Back to Widgets</a>
+        <a href="index.html" class="back-link">🏠 Home</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="game-container">
+    <div class="game-card">
+      <div class="calc-container">
+        <input type="text" id="calcDisplay" readonly placeholder="0">
+        <div class="calculator">
+          <button onclick="press('7')" class="calc-btn">7</button>
+          <button onclick="press('8')" class="calc-btn">8</button>
+          <button onclick="press('9')" class="calc-btn">9</button>
+          <button onclick="press('/')" class="calc-btn operator">/</button>
+
+          <button onclick="press('4')" class="calc-btn">4</button>
+          <button onclick="press('5')" class="calc-btn">5</button>
+          <button onclick="press('6')" class="calc-btn">6</button>
+          <button onclick="press('*')" class="calc-btn operator">×</button>
+
+          <button onclick="press('1')" class="calc-btn">1</button>
+          <button onclick="press('2')" class="calc-btn">2</button>
+          <button onclick="press('3')" class="calc-btn">3</button>
+          <button onclick="press('-')" class="calc-btn operator">−</button>
+
+          <button onclick="press('0')" class="calc-btn">0</button>
+          <button onclick="press('.')" class="calc-btn">.</button>
+          <button onclick="calculate()" class="calc-btn equals">=</button>
+          <button onclick="press('+')" class="calc-btn operator">+</button>
+
+          <button class="calc-btn clear" onclick="clearCalc()">Clear</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let expression = "";
+    const display = document.getElementById("calcDisplay");
+
+    function press(value) {
+      expression += value;
+      display.value = expression;
+    }
+
+    function calculate() {
+      try {
+        expression = eval(expression).toString();
+        display.value = expression;
+      } catch {
+        expression = "";
+        display.value = "Error";
+        setTimeout(() => {
+          display.value = "";
+        }, 1500);
+      }
+    }
+
+    function clearCalc() {
+      expression = "";
+      display.value = "";
+    }
+
+    // Keyboard support
+    document.addEventListener('keydown', (e) => {
+      if (e.key >= '0' && e.key <= '9' || e.key === '.') {
+        press(e.key);
+      } else if (e.key === '+' || e.key === '-' || e.key === '*' || e.key === '/') {
+        press(e.key);
+      } else if (e.key === 'Enter') {
+        calculate();
+      } else if (e.key === 'Escape' || e.key === 'Delete') {
+        clearCalc();
+      } else if (e.key === 'Backspace') {
+        expression = expression.slice(0, -1);
+        display.value = expression;
+      }
+    });
+  </script>
+
+</body>
+</html>

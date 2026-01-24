@@ -10,79 +10,123 @@
 
   <header class="widgets-header">
     <div class="widgets-hero">
-      <h1>Widgets</h1>
+      <h1>Widgets Hub</h1>
+      <p>Choose from games and useful apps</p>
       <a href="index.html" class="back-link">← Back to Home</a>
     </div>
   </header>
 
   <main class="widgets-container">
 
-    <div class="widgets-grid">
+    <!-- Games Section -->
+    <section class="widget-section">
+      <h2 class="section-title">🎮 Games</h2>
+      <div class="widgets-grid">
+        
+        <a href="tictactoe.html" class="widget-link-card">
+          <div class="widget-icon">⭕</div>
+          <h3>Tic Tac Toe</h3>
+          <p>Classic two-player strategy game</p>
+        </a>
 
-      <!-- Tic Tac Toe -->
-      <div class="widget-card ttt-card">
-        <div class="widget-header">
-          <span class="widget-icon">🎮</span>
-          <h2>Tic Tac Toe</h2>
-        </div>
-        <div id="ticTacToe" class="tic-tac-toe"></div>
-        <p id="tttStatus" class="game-status"></p>
-        <button onclick="resetTicTacToe()" class="widget-btn">New Game</button>
+        <a href="guess.html" class="widget-link-card">
+          <div class="widget-icon">🎲</div>
+          <h3>Number Guessing</h3>
+          <p>Guess the secret number from 1-10</p>
+        </a>
+
+        <a href="snake.html" class="widget-link-card">
+          <div class="widget-icon">🐍</div>
+          <h3>Snake</h3>
+          <p>Eat food and grow without hitting walls</p>
+        </a>
+
+        <a href="tetris.html" class="widget-link-card">
+          <div class="widget-icon">🧱</div>
+          <h3>Tetris</h3>
+          <p>Clear lines by stacking falling blocks</p>
+        </a>
+
+        <a href="shooter.html" class="widget-link-card">
+          <div class="widget-icon">🚀</div>
+          <h3>Space Shooter</h3>
+          <p>Defend against incoming alien invaders</p>
+        </a>
+
       </div>
+    </section>
 
-      <!-- Calculator -->
-      <div class="widget-card calc-card">
-        <div class="widget-header">
-          <span class="widget-icon">🔢</span>
-          <h2>Calculator</h2>
-        </div>
-        <div class="calc-container">
-          <input type="text" id="calcDisplay" readonly placeholder="0">
-          <div class="calculator">
-            <button onclick="press('7')" class="calc-btn">7</button>
-            <button onclick="press('8')" class="calc-btn">8</button>
-            <button onclick="press('9')" class="calc-btn">9</button>
-            <button onclick="press('/')" class="calc-btn operator">/</button>
+    <!-- Apps Section -->
+    <section class="widget-section">
+      <h2 class="section-title">⚙️ Apps</h2>
+      <div class="widgets-grid">
+        
+        <a href="calculator.html" class="widget-link-card">
+          <div class="widget-icon">🔢</div>
+          <h3>Calculator</h3>
+          <p>Perform basic arithmetic calculations</p>
+        </a>
 
-            <button onclick="press('4')" class="calc-btn">4</button>
-            <button onclick="press('5')" class="calc-btn">5</button>
-            <button onclick="press('6')" class="calc-btn">6</button>
-            <button onclick="press('*')" class="calc-btn operator">×</button>
+        <a href="timer.html" class="widget-link-card">
+          <div class="widget-icon">⏱️</div>
+          <h3>Timer</h3>
+          <p>Set countdown timers with presets</p>
+        </a>
 
-            <button onclick="press('1')" class="calc-btn">1</button>
-            <button onclick="press('2')" class="calc-btn">2</button>
-            <button onclick="press('3')" class="calc-btn">3</button>
-            <button onclick="press('-')" class="calc-btn operator">−</button>
-
-            <button onclick="press('0')" class="calc-btn">0</button>
-            <button onclick="press('.')" class="calc-btn">.</button>
-            <button onclick="calculate()" class="calc-btn equals">=</button>
-            <button onclick="press('+')" class="calc-btn operator">+</button>
-
-            <button class="calc-btn clear" onclick="clearCalc()">Clear</button>
-          </div>
-        </div>
       </div>
-
-      <!-- Guessing Game -->
-      <div class="widget-card guess-card">
-        <div class="widget-header">
-          <span class="widget-icon">🎲</span>
-          <h2>Number Guessing</h2>
-        </div>
-        <p class="game-instruction">Guess a number between 1 and 10</p>
-        <div class="guess-input-group">
-          <input type="number" id="guessInput" min="1" max="10" placeholder="?">
-          <button onclick="checkGuess()" class="widget-btn">Guess</button>
-        </div>
-        <p id="guessResult" class="guess-result"></p>
-        <button onclick="resetGuess()" class="widget-btn-secondary">New Game</button>
-      </div>
-
-    </div>
+    </section>
 
   </main>
 
-  <script src="script.js"></script>
+  <style>
+    .widget-section {
+      margin-bottom: 4rem;
+    }
+
+    .widget-link-card {
+      background: white;
+      border-radius: 20px;
+      padding: 2.5rem 2rem;
+      box-shadow: var(--shadow-lg);
+      transition: all 0.3s ease;
+      text-decoration: none;
+      color: var(--text-dark);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      cursor: pointer;
+      border: 3px solid transparent;
+    }
+
+    .widget-link-card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--shadow-xl);
+      border-color: var(--primary);
+    }
+
+    .widget-link-card .widget-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      transition: transform 0.3s ease;
+    }
+
+    .widget-link-card:hover .widget-icon {
+      transform: scale(1.2) rotate(5deg);
+    }
+
+    .widget-link-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+    }
+
+    .widget-link-card p {
+      color: var(--text-light);
+      font-size: 0.95rem;
+      margin: 0;
+    }
+  </style>
+
 </body>
 </html>

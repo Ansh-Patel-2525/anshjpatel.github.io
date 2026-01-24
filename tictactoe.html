@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tic Tac Toe - Ansh Patel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="game-header">
+    <div class="game-header-content">
+      <h1>⭕ Tic Tac Toe</h1>
+      <div class="header-links">
+        <a href="widgets.html" class="back-link">← Back to Widgets</a>
+        <a href="index.html" class="back-link">🏠 Home</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="game-container">
+    <div class="game-card">
+      <div id="ticTacToe" class="tic-tac-toe"></div>
+      <p id="tttStatus" class="game-status"></p>
+      <button onclick="resetTicTacToe()" class="widget-btn">New Game</button>
+    </div>
+  </main>
+
+  <script>
+    const board = document.getElementById("ticTacToe");
+    let currentPlayer = "X";
+    let gameActive = true;
+    let gameState = ["", "", "", "", "", "", "", "", ""];
+
+    const winningCombos = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8],
+      [0, 3, 6], [1, 4, 7], [2, 5, 8],
+      [0, 4, 8], [2, 4, 6]
+    ];
+
+    function createBoard() {
+      board.innerHTML = "";
+      currentPlayer = "X";
+      gameActive = true;
+      gameState = ["", "", "", "", "", "", "", "", ""];
+
+      for (let i = 0; i < 9; i++) {
+        const cell = document.createElement("div");
+        cell.dataset.index = i;
+
+        cell.onclick = () => {
+          if (!gameActive || gameState[i] !== "") return;
+
+          gameState[i] = currentPlayer;
+          cell.textContent = currentPlayer;
+
+          if (checkWinner()) {
+            setTimeout(() => {
+              updateStatus(`🎉 Player ${currentPlayer} wins!`);
+              gameActive = false;
+            }, 300);
+            return;
+          }
+
+          if (!gameState.includes("")) {
+            setTimeout(() => {
+              updateStatus("🤝 It's a draw!");
+              gameActive = false;
+            }, 300);
+            return;
+          }
+
+          currentPlayer = currentPlayer === "X" ? "O" : "X";
+          updateStatus(`Player ${currentPlayer}'s turn`);
+        };
+
+        board.appendChild(cell);
+      }
+      
+      updateStatus("Player X's turn");
+    }
+
+    function checkWinner() {
+      return winningCombos.some(combo => {
+        return combo.every(index => gameState[index] === currentPlayer);
+      });
+    }
+
+    function updateStatus(message) {
+      document.getElementById("tttStatus").textContent = message;
+    }
+
+    function resetTicTacToe() {
+      createBoard();
+    }
+
+    createBoard();
+  </script>
+
+</body>
+</html>

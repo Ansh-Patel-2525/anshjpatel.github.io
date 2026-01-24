@@ -1,7 +1,6 @@
 /* =====================
    GLOBAL STYLES
 ===================== */
-
 * {
   margin: 0;
   padding: 0;
@@ -37,7 +36,6 @@ body {
 /* =====================
    NAVIGATION
 ===================== */
-
 nav {
   position: fixed;
   top: 0;
@@ -113,7 +111,6 @@ nav a.nav-highlight::after {
 /* =====================
    HERO SECTION
 ===================== */
-
 .hero {
   position: relative;
   min-height: 100vh;
@@ -266,20 +263,13 @@ nav a.nav-highlight::after {
 }
 
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* =====================
    MAIN CONTENT
 ===================== */
-
 .container {
   max-width: 1000px;
   margin: 0 auto;
@@ -338,10 +328,18 @@ nav a.nav-highlight::after {
   line-height: 1.8;
 }
 
+.section-title {
+  color: var(--text-dark);
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  padding-left: 1rem;
+  border-left: 5px solid var(--primary);
+}
+
 /* =====================
    PROJECTS
 ===================== */
-
 .project-highlight {
   background: linear-gradient(135deg, #f6f8fb 0%, #e9ecf5 100%);
   padding: 2rem;
@@ -375,7 +373,6 @@ nav a.nav-highlight::after {
 /* =====================
    SKILLS
 ===================== */
-
 .skills-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -415,7 +412,6 @@ nav a.nav-highlight::after {
 /* =====================
    CONTACT
 ===================== */
-
 .contact-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -477,7 +473,6 @@ nav a.nav-highlight::after {
 /* =====================
    FOOTER
 ===================== */
-
 footer {
   text-align: center;
   padding: 2rem;
@@ -495,7 +490,6 @@ footer {
 /* =====================
    WIDGETS PAGE
 ===================== */
-
 .widgets-header {
   background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #c026d3 100%);
   color: white;
@@ -556,7 +550,7 @@ footer {
 
 .widgets-container {
   max-width: 1200px;
-  margin: -2rem auto 0;
+  margin: 2rem auto 0;
   padding: 0 2rem 4rem;
   position: relative;
   z-index: 20;
@@ -598,49 +592,6 @@ footer {
   margin: 0;
 }
 
-/* =====================
-   TIC TAC TOE
-===================== */
-
-.tic-tac-toe {
-  display: grid;
-  grid-template-columns: repeat(3, 90px);
-  gap: 10px;
-  justify-content: center;
-  margin: 1.5rem auto;
-}
-
-.tic-tac-toe div {
-  width: 90px;
-  height: 90px;
-  font-size: 2.5rem;
-  font-weight: bold;
-  background: linear-gradient(135deg, #f6f8fb 0%, #e9ecf5 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  color: var(--primary);
-  border: 2px solid transparent;
-}
-
-.tic-tac-toe div:hover {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  color: white;
-  transform: scale(1.05);
-  box-shadow: var(--shadow-md);
-}
-
-.game-status {
-  text-align: center;
-  margin: 1rem 0;
-  font-weight: 600;
-  color: var(--primary);
-  font-size: 1.1rem;
-}
-
 .widget-btn {
   width: 100%;
   padding: 0.75rem;
@@ -680,9 +631,59 @@ footer {
 }
 
 /* =====================
+   GAMES (TIC TAC TOE, SNAKE, TETRIS, SHOOTER)
+===================== */
+.tic-tac-toe {
+  display: grid;
+  grid-template-columns: repeat(3, 90px);
+  gap: 10px;
+  justify-content: center;
+  margin: 1.5rem auto;
+}
+
+.tic-tac-toe div {
+  width: 90px;
+  height: 90px;
+  font-size: 2.5rem;
+  font-weight: bold;
+  background: linear-gradient(135deg, #f6f8fb 0%, #e9ecf5 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: var(--primary);
+  border: 2px solid transparent;
+}
+
+.tic-tac-toe div:hover {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  transform: scale(1.05);
+  box-shadow: var(--shadow-md);
+}
+
+.game-status {
+  text-align: center;
+  margin: 1rem 0;
+  font-weight: 600;
+  color: var(--primary);
+  font-size: 1.1rem;
+}
+
+canvas {
+  border: 3px solid var(--primary);
+  border-radius: 10px;
+  background: #000;
+  display: block;
+  margin: 1.5rem auto;
+  box-shadow: var(--shadow-md);
+}
+
+/* =====================
    CALCULATOR
 ===================== */
-
 .calc-container {
   max-width: 320px;
   margin: 0 auto;
@@ -755,7 +756,6 @@ footer {
 /* =====================
    GUESSING GAME
 ===================== */
-
 .game-instruction {
   text-align: center;
   color: var(--text-light);
@@ -797,9 +797,159 @@ footer {
 }
 
 /* =====================
+   TIMER
+===================== */
+.timer-container {
+  text-align: center;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.timer-display {
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  font-family: 'Courier New', monospace;
+  margin: 1.5rem 0;
+  padding: 1.5rem;
+  background: var(--bg-light);
+  border-radius: 15px;
+  transition: all 0.3s ease;
+}
+
+.timer-inputs {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.timer-input {
+  width: 70px;
+  padding: 0.75rem;
+  font-size: 1.3rem;
+  text-align: center;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.timer-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
+}
+
+.timer-inputs span {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--text-light);
+}
+
+.timer-controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.timer-controls button {
+  flex: 1;
+}
+
+.timer-presets {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.preset-btn {
+  padding: 0.75rem;
+  background: var(--bg-light);
+  color: var(--text-dark);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.preset-btn:hover {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* =====================
+   GAME PAGE STYLES
+===================== */
+.game-header {
+  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #c026d3 100%);
+  color: white;
+  padding: 2rem 2rem 1.5rem;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  box-shadow: var(--shadow-md);
+}
+
+.game-header-content {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.game-header h1 {
+  font-size: 2rem;
+  margin: 0;
+}
+
+.header-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.game-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 120px 2rem 4rem;
+  min-height: 100vh;
+}
+
+.game-card {
+  background: white;
+  border-radius: 20px;
+  padding: 3rem 2rem;
+  box-shadow: var(--shadow-xl);
+  text-align: center;
+}
+
+.game-info {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: var(--bg-light);
+  border-radius: 10px;
+  font-size: 0.95rem;
+}
+
+.game-info strong {
+  color: var(--primary);
+  font-size: 1.2rem;
+  margin-left: 0.5rem;
+}
+
+/* =====================
    RESPONSIVE
 ===================== */
-
 @media (max-width: 768px) {
   .nav-content {
     flex-direction: column;
@@ -840,5 +990,52 @@ footer {
 
   .widgets-grid {
     grid-template-columns: 1fr;
+  }
+
+  #snakeCanvas {
+    width: 250px;
+    height: 250px;
+  }
+
+  #tetrisCanvas {
+    width: 200px;
+    height: 350px;
+  }
+
+  #shooterCanvas {
+    width: 250px;
+    height: 350px;
+  }
+
+  .game-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .game-header-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .header-links {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .game-container {
+    padding: 140px 1rem 2rem;
+  }
+
+  canvas {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .timer-display {
+    font-size: 2.5rem;
+  }
+
+  .timer-input {
+    width: 60px;
+    font-size: 1.1rem;
   }
 }

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Space Shooter - Ansh Patel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="game-header">
+    <div class="game-header-content">
+      <h1>🚀 Space Shooter</h1>
+      <div class="header-links">
+        <a href="widgets.html" class="back-link">← Back to Widgets</a>
+        <a href="index.html" class="back-link">🏠 Home</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="game-container">
+    <div class="game-card">
+      <div class="game-info">
+        <span>Score: <strong id="shooterScore">0</strong></span>
+        <span>Lives: <strong id="shooterLives">3</strong></span>
+      </div>
+      <canvas id="shooterCanvas" width="300" height="400"></canvas>
+      <p id="shooterStatus" class="game-status">Press Start to Play</p>
+      <button onclick="startShooter()" class="widget-btn">Start Game</button>
+      <p class="game-instruction">Arrow Keys: Move | Space: Shoot</p>
+    </div>
+  </main>
+
+  <script>
+    // Prevent arrow keys and space from scrolling
+    window.addEventListener("keydown", function(e) {
+      if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].indexOf(e.key) > -1) {
+        e.preventDefault();
+      }
+    }, false);
+
+    let shooterGame = {
+      canvas: document.getElementById('shooterCanvas'),
+      ctx: document.getElementById('shooterCanvas').getContext('2d'),
+      player: {x: 135, y: 350, width: 30, height: 30, speed: 5},
+      bullets: [],
+      enemies: [],
+      score: 0,
+      lives: 3,
+      gameLoop: null,
+      running: false,
+      keys: {},
+      enemySpawnRate: 100
+    };
+
+    document.addEventListener('keydown', (e) => {
+      shooterGame.keys[e.key] = true;
+      if (e.key === ' ' && shooterGame.running) {
+        shootBullet();
+      }
+    });
+
+    document.addEventListener('keyup', (e) => {
+      shooterGame.keys[e.key] = false;
+    });
+
+    function startShooter() {
+      if (shooterGame.running) return;
+      
+      shooterGame.player = {x: 135, y: 350, width: 30, height: 30, speed: 5};
+      shooterGame.bullets = [];
+      shooterGame.enemies = [];
+      shooterGame.score = 0;
+      shooterGame.lives = 3;
+      shooterGame.running = true;
+      
+      document.getElementById('shooterScore').textContent = '0';
+      document.getElementById('shooterLives').textContent = '3';
+      document.getElementById('shooterStatus').textContent = 'Playing...';
+      
+      let frameCount = 0;
+      
+      shooterGame.gameLoop = setInterval(() => {
+        updateShooter();
+        drawShooter();
+        
+        frameCount++;
+        if (frameCount % shooterGame.enemySpawnRate === 0) {
+          spawnEnemy();
+        }
+      }, 1000 / 60);
+    }
+
+    function updateShooter() {
+      if (shooterGame.keys['ArrowLeft'] && shooterGame.player.x > 0) {
+        shooterGame.player.x -= shooterGame.player.speed;
+      }
+      if (shooterGame.keys['ArrowRight'] && shooterGame.player.x < 270) {
+        shooterGame.player.x += shooterGame.player.speed;
+      }
+      
+      shooterGame.bullets = shooterGame.bullets.filter(bullet => {
+        bullet.y -= 7;
+        return bullet.y > 0;
+      });
+      
+      shooterGame.enemies = shooterGame.enemies.filter(enemy => {
+        enemy.y += 2;
+        
+        if (enemy.y > 350 && 
+            enemy.x < shooterGame.player.x + 30 &&
+            enemy.x + 30 > shooterGame.player.x) {
+          shooterGame.lives--;
+          document.getElementById('shooterLives').textContent = shooterGame.lives;
+          
+          if (shooterGame.lives <= 0) {
+            gameOverShooter();
+          }
+          return false;
+        }
+        
+        return enemy.y < 400;
+      });
+      
+      shooterGame.bullets.forEach((bullet, bIndex) => {
+        shooterGame.enemies.forEach((enemy, eIndex) => {
+          if (bullet.x > enemy.x && bullet.x < enemy.x + 30 &&
+              bullet.y > enemy.y && bullet.y < enemy.y + 30) {
+            shooterGame.bullets.splice(bIndex, 1);
+            shooterGame.enemies.splice(eIndex, 1);
+            shooterGame.score += 10;
+            document.getElementById('shooterScore').textContent = shooterGame.score;
+          }
+        });
+      });
+    }
+
+    function drawShooter() {
+      shooterGame.ctx.fillStyle = '#000';
+      shooterGame.ctx.fillRect(0, 0, 300, 400);
+      
+      shooterGame.ctx.fillStyle = '#fff';
+      for (let i = 0; i < 50; i++) {
+        const x = (i * 37) % 300;
+        const y = (i * 71) % 400;
+        shooterGame.ctx.fillRect(x, y, 1, 1);
+      }
+      
+      shooterGame.ctx.fillStyle = '#00f0f0';
+      shooterGame.ctx.fillRect(shooterGame.player.x, shooterGame.player.y, 30, 30);
+      shooterGame.ctx.fillStyle = '#0088ff';
+      shooterGame.ctx.beginPath();
+      shooterGame.ctx.moveTo(shooterGame.player.x + 15, shooterGame.player.y);
+      shooterGame.ctx.lineTo(shooterGame.player.x, shooterGame.player.y + 30);
+      shooterGame.ctx.lineTo(shooterGame.player.x + 30, shooterGame.player.y + 30);
+      shooterGame.ctx.fill();
+      
+      shooterGame.ctx.fillStyle = '#f0f000';
+      shooterGame.bullets.forEach(bullet => {
+        shooterGame.ctx.fillRect(bullet.x, bullet.y, 3, 10);
+      });
+      
+      shooterGame.ctx.fillStyle = '#f00000';
+      shooterGame.enemies.forEach(enemy => {
+        shooterGame.ctx.fillRect(enemy.x, enemy.y, 30, 30);
+      });
+    }
+
+    function shootBullet() {
+      shooterGame.bullets.push({
+        x: shooterGame.player.x + 13,
+        y: shooterGame.player.y
+      });
+    }
+
+    function spawnEnemy() {
+      shooterGame.enemies.push({
+        x: Math.random() * 270,
+        y: 0
+      });
+    }
+
+    function gameOverShooter() {
+      clearInterval(shooterGame.gameLoop);
+      shooterGame.running = false;
+      document.getElementById('shooterStatus').textContent = `Game Over! Final Score: ${shooterGame.score}`;
+    }
+  </script>
+
+</body>
+</html>

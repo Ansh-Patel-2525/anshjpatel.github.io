@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Number Guessing - Ansh Patel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="game-header">
+    <div class="game-header-content">
+      <h1>🎲 Number Guessing</h1>
+      <div class="header-links">
+        <a href="widgets.html" class="back-link">← Back to Widgets</a>
+        <a href="index.html" class="back-link">🏠 Home</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="game-container">
+    <div class="game-card">
+      <p class="game-instruction">Guess a number between 1 and 10</p>
+      <div class="guess-input-group">
+        <input type="number" id="guessInput" min="1" max="10" placeholder="?" autofocus>
+        <button onclick="checkGuess()" class="widget-btn">Guess</button>
+      </div>
+      <p id="guessResult" class="guess-result"></p>
+      <button onclick="resetGuess()" class="widget-btn-secondary">New Game</button>
+    </div>
+  </main>
+
+  <script>
+    let secretNumber = Math.floor(Math.random() * 10) + 1;
+    let guessCount = 0;
+
+    function checkGuess() {
+      const guessInput = document.getElementById("guessInput");
+      const result = document.getElementById("guessResult");
+      const guess = Number(guessInput.value);
+      
+      if (guess < 1 || guess > 10 || isNaN(guess)) {
+        result.textContent = "⚠️ Please enter a number between 1 and 10";
+        result.style.color = "var(--error)";
+        return;
+      }
+
+      guessCount++;
+
+      if (guess === secretNumber) {
+        result.textContent = `🎉 Correct! You got it in ${guessCount} ${guessCount === 1 ? 'try' : 'tries'}!`;
+        result.style.color = "var(--success)";
+        guessInput.disabled = true;
+      } else if (guess < secretNumber) {
+        result.textContent = "📈 Too low! Try a higher number";
+        result.style.color = "var(--primary)";
+      } else {
+        result.textContent = "📉 Too high! Try a lower number";
+        result.style.color = "var(--primary)";
+      }
+
+      guessInput.value = "";
+      guessInput.focus();
+    }
+
+    function resetGuess() {
+      secretNumber = Math.floor(Math.random() * 10) + 1;
+      guessCount = 0;
+      document.getElementById("guessInput").value = "";
+      document.getElementById("guessInput").disabled = false;
+      document.getElementById("guessResult").textContent = "";
+      document.getElementById("guessInput").focus();
+    }
+
+    document.getElementById("guessInput").addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') checkGuess();
+    });
+  </script>
+
+</body>
+</html>
