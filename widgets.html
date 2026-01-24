@@ -2,74 +2,88 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Widgets | Ansh Patel</title>
+  <title>Widgets - Ansh Patel</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<nav>
-  <ul>
-    <li><a href="index.html">Home</a></li>
-    <li><a href="index.html#about">About</a></li>
-    <li><a href="index.html#projects">Projects</a></li>
-    <li><a href="index.html#skills">Skills</a></li>
-    <li><a href="index.html#contact">Contact</a></li>
-    <li><a href="widgets.html">Widgets</a></li>
-  </ul>
-</nav>
-
-<main class="container">
-
-  <section>
-    <h2>Interactive Widgets</h2>
-
-    <div class="widget">
-      <h3>Tic Tac Toe</h3>
-      <div id="ticTacToe" class="tic-tac-toe"></div>
-      <button onclick="resetTicTacToe()">Reset</button>
+  <header class="widgets-header">
+    <div class="widgets-hero">
+      <h1>Interactive Widgets</h1>
+      <p>Explore interactive demos and mini-applications</p>
+      <a href="index.html" class="back-link">← Back to Home</a>
     </div>
+  </header>
 
-    <div class="widget">
-      <h3>Calculator</h3>
-      <input type="text" id="calcDisplay" readonly>
-      <div class="calculator">
-        <button onclick="press('7')">7</button>
-        <button onclick="press('8')">8</button>
-        <button onclick="press('9')">9</button>
-        <button onclick="press('/')">/</button>
+  <main class="widgets-container">
 
-        <button onclick="press('4')">4</button>
-        <button onclick="press('5')">5</button>
-        <button onclick="press('6')">6</button>
-        <button onclick="press('*')">*</button>
+    <div class="widgets-grid">
 
-        <button onclick="press('1')">1</button>
-        <button onclick="press('2')">2</button>
-        <button onclick="press('3')">3</button>
-        <button onclick="press('-')">-</button>
-
-        <button onclick="press('0')">0</button>
-        <button onclick="press('.')">.</button>
-        <button onclick="calculate()">=</button>
-        <button onclick="press('+')">+</button>
-
-        <button onclick="clearCalc()" class="wide">Clear</button>
+      <!-- Tic Tac Toe -->
+      <div class="widget-card ttt-card">
+        <div class="widget-header">
+          <span class="widget-icon">🎮</span>
+          <h2>Tic Tac Toe</h2>
+        </div>
+        <div id="ticTacToe" class="tic-tac-toe"></div>
+        <p id="tttStatus" class="game-status"></p>
+        <button onclick="resetTicTacToe()" class="widget-btn">New Game</button>
       </div>
+
+      <!-- Calculator -->
+      <div class="widget-card calc-card">
+        <div class="widget-header">
+          <span class="widget-icon">🔢</span>
+          <h2>Calculator</h2>
+        </div>
+        <div class="calc-container">
+          <input type="text" id="calcDisplay" readonly placeholder="0">
+          <div class="calculator">
+            <button onclick="press('7')" class="calc-btn">7</button>
+            <button onclick="press('8')" class="calc-btn">8</button>
+            <button onclick="press('9')" class="calc-btn">9</button>
+            <button onclick="press('/')" class="calc-btn operator">/</button>
+
+            <button onclick="press('4')" class="calc-btn">4</button>
+            <button onclick="press('5')" class="calc-btn">5</button>
+            <button onclick="press('6')" class="calc-btn">6</button>
+            <button onclick="press('*')" class="calc-btn operator">×</button>
+
+            <button onclick="press('1')" class="calc-btn">1</button>
+            <button onclick="press('2')" class="calc-btn">2</button>
+            <button onclick="press('3')" class="calc-btn">3</button>
+            <button onclick="press('-')" class="calc-btn operator">−</button>
+
+            <button onclick="press('0')" class="calc-btn">0</button>
+            <button onclick="press('.')" class="calc-btn">.</button>
+            <button onclick="calculate()" class="calc-btn equals">=</button>
+            <button onclick="press('+')" class="calc-btn operator">+</button>
+
+            <button class="calc-btn clear" onclick="clearCalc()">Clear</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Guessing Game -->
+      <div class="widget-card guess-card">
+        <div class="widget-header">
+          <span class="widget-icon">🎲</span>
+          <h2>Number Guessing</h2>
+        </div>
+        <p class="game-instruction">Guess a number between 1 and 10</p>
+        <div class="guess-input-group">
+          <input type="number" id="guessInput" min="1" max="10" placeholder="?">
+          <button onclick="checkGuess()" class="widget-btn">Guess</button>
+        </div>
+        <p id="guessResult" class="guess-result"></p>
+        <button onclick="resetGuess()" class="widget-btn-secondary">New Game</button>
+      </div>
+
     </div>
 
-    <div class="widget">
-      <h3>Number Guessing Game</h3>
-      <p>Guess a number between 1 and 10</p>
-      <input type="number" id="guessInput">
-      <button onclick="checkGuess()">Guess</button>
-      <p id="guessResult"></p>
-    </div>
+  </main>
 
-  </section>
-
-</main>
-
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

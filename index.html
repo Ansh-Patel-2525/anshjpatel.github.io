@@ -10,59 +10,133 @@
 
   <!-- Navigation -->
   <nav>
-  <ul>
-    <li><a href="#about">About</a></li>
-    <li><a href="#projects">Projects</a></li>
-    <li><a href="#skills">Skills</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="widgets.html">Widgets</a></li>
-  </ul>
-</nav>
+    <div class="nav-content">
+      <div class="logo">AP</div>
+      <ul>
+        <li><a href="#about">About</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><a href="widgets.html" class="nav-highlight">Widgets</a></li>
+      </ul>
+    </div>
+  </nav>
 
   <!-- Hero -->
   <header class="hero">
-    <img src="profile.JPG" alt="Ansh Patel" class="profile-pic">
-    <h1>Ansh Patel</h1>
-    <p class="subtitle">MMath student at the University of Warwick</p>
+    <div class="hero-background"></div>
+    <div class="hero-content">
+      <div class="profile-wrapper">
+        <img src="profile.JPG" alt="Ansh Patel" class="profile-pic">
+        <div class="profile-glow"></div>
+      </div>
+      <h1 class="hero-title">Ansh Patel</h1>
+      <p class="subtitle">MMath student at the University of Warwick</p>
+      <div class="hero-cta">
+        <a href="#contact" class="btn-primary">Get in Touch</a>
+        <a href="#projects" class="btn-secondary">View Work</a>
+      </div>
+    </div>
+    <div class="scroll-indicator">
+      <span></span>
+    </div>
   </header>
 
   <main class="container">
 
-    <section id="about">
+    <section id="about" class="section-card">
+      <div class="section-icon">👨‍🎓</div>
       <h2>About Me</h2>
       <p>
         My name is Ansh Patel and I am a final year MMath (Master of Mathematics)
-        student at the University of Warwick.
+        student at the University of Warwick. Passionate about applying advanced
+        mathematical concepts to solve real-world problems through computational
+        methods and analytical thinking.
       </p>
     </section>
 
-    <section id="projects">
+    <section id="projects" class="section-card">
+      <div class="section-icon">🔬</div>
       <h2>Projects</h2>
-      <p>
-        My current dissertation focuses on <em>Asymptotic Analysis of Boundary Conditions
-        for Sound Propagation in Flow over Acoustic Linings</em>.
-      </p>
+      <div class="project-highlight">
+        <h3>Current Dissertation</h3>
+        <p>
+          <em>Asymptotic Analysis of Boundary Conditions
+          for Sound Propagation in Flow over Acoustic Linings</em>
+        </p>
+        <div class="project-tags">
+          <span class="tag">Asymptotic Analysis</span>
+          <span class="tag">Acoustics</span>
+          <span class="tag">Fluid Dynamics</span>
+        </div>
+      </div>
     </section>
 
-    <section id="skills">
+    <section id="skills" class="section-card">
+      <div class="section-icon">💻</div>
       <h2>Skills</h2>
-      <p>
-        Python, C, R, LaTeX, Excel, PowerPoint. Parallel computing using OpenMP and MPI,
-        numerical analysis, mathematical modelling, and scientific writing.
-      </p>
+      <div class="skills-grid">
+        <div class="skill-category">
+          <h3>Programming</h3>
+          <div class="skill-tags">
+            <span>Python</span>
+            <span>C</span>
+            <span>R</span>
+          </div>
+        </div>
+        <div class="skill-category">
+          <h3>Tools</h3>
+          <div class="skill-tags">
+            <span>LaTeX</span>
+            <span>Excel</span>
+            <span>PowerPoint</span>
+          </div>
+        </div>
+        <div class="skill-category">
+          <h3>Specializations</h3>
+          <div class="skill-tags">
+            <span>OpenMP</span>
+            <span>MPI</span>
+            <span>Numerical Analysis</span>
+            <span>Mathematical Modelling</span>
+          </div>
+        </div>
+      </div>
     </section>
     
-    <section id="contact">
+    <section id="contact" class="section-card contact-section">
+      <div class="section-icon">📬</div>
       <h2>Contact</h2>
-      <p>
-        Phone: +44 74401 xxxxx<br>
-        Email: xxxxx@gmail.com
-      </p>
+      <div class="contact-grid">
+        <div class="contact-item">
+          <span class="contact-icon">📱</span>
+          <div>
+            <h4>Phone</h4>
+            <p>+44 74401 xxxxx</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <span class="contact-icon">✉️</span>
+          <div>
+            <h4>Email</h4>
+            <p>xxxxx@gmail.com</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <span class="contact-icon">💼</span>
+          <div>
+            <h4>LinkedIn</h4>
+            <a href="https://linkedin.com/in/ansh-patel-9b6665266" target="_blank">
+              View Profile
+            </a>
+          </div>
+        </div>
+      </div>
     </section>
 
     <footer>
-      © 2026 Ansh Patel<br>
-      Website created on 21/01/2026 at 13:45
+      <p>© 2026 Ansh Patel</p>
+      <p class="footer-meta">Website created on 21/01/2026 at 13:45</p>
     </footer>
 
   </main>
