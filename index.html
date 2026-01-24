@@ -14,11 +14,12 @@
       <li><a href="#about">About</a></li>
       <li><a href="#projects">Projects</a></li>
       <li><a href="#skills">Skills</a></li>
+      <li><a href="#widgets">Widgets</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
   </nav>
 
-  <!-- Hero Section -->
+  <!-- Hero -->
   <header class="hero">
     <img src="profile.JPG" alt="Ansh Patel" class="profile-pic">
     <h1>Ansh Patel</h1>
@@ -30,27 +31,75 @@
     <section id="about">
       <h2>About Me</h2>
       <p>
-        My name is Ansh Patel and I am a final year MMath (Master of Mathematics) student
-        at the University of Warwick. 
+        My name is Ansh Patel and I am a final year MMath (Master of Mathematics)
+        student at the University of Warwick.
       </p>
     </section>
 
     <section id="projects">
       <h2>Projects</h2>
       <p>
-        My current dissertation focuses on <em>Asymptotic Analysis of Boundary Conditions for
-        Sound Propagation in Flow over Acoustic Linings</em>. This work involves mathematical
-        analysis of acoustic wave behaviour in the presence of flow and boundary effects.
+        My current dissertation focuses on <em>Asymptotic Analysis of Boundary Conditions
+        for Sound Propagation in Flow over Acoustic Linings</em>.
       </p>
     </section>
 
     <section id="skills">
       <h2>Skills</h2>
       <p>
-        I have experience using Python, C, R, LaTeX, Excel, and PowerPoint for mathematical
-        analysis, computation, and presentation. I am also familiar with parallel
-        programming concepts, including OpenMP and MPI, for performance optimisation.
+        Python, C, R, LaTeX, Excel, PowerPoint. Parallel computing using OpenMP and MPI,
+        numerical analysis, mathematical modelling, and scientific writing.
       </p>
+    </section>
+
+    <section id="widgets">
+      <h2>Widgets</h2>
+
+      <!-- Tic Tac Toe -->
+      <div class="widget">
+        <h3>Tic Tac Toe</h3>
+        <div id="ticTacToe" class="tic-tac-toe"></div>
+        <button onclick="resetTicTacToe()">Reset</button>
+      </div>
+
+      <!-- Calculator -->
+      <div class="widget">
+        <h3>Calculator</h3>
+        <input type="text" id="calcDisplay" readonly>
+        <div class="calculator">
+          <button onclick="press('7')">7</button>
+          <button onclick="press('8')">8</button>
+          <button onclick="press('9')">9</button>
+          <button onclick="press('/')">/</button>
+
+          <button onclick="press('4')">4</button>
+          <button onclick="press('5')">5</button>
+          <button onclick="press('6')">6</button>
+          <button onclick="press('*')">*</button>
+
+          <button onclick="press('1')">1</button>
+          <button onclick="press('2')">2</button>
+          <button onclick="press('3')">3</button>
+          <button onclick="press('-')">-</button>
+
+          <button onclick="press('0')">0</button>
+          <button onclick="press('.')">.</button>
+          <button onclick="calculate()">=</button>
+          <button onclick="press('+')">+</button>
+
+          <button onclick="clearCalc()" class="wide">Clear</button>
+        </div>
+      </div>
+
+      <!-- Guessing Game -->
+      <div class="widget">
+        <h3>Number Guessing Game</h3>
+        <p>Guess a number between 1 and 10</p>
+        <input type="number" id="guessInput">
+        <button onclick="checkGuess()">Guess</button>
+        <p id="guessResult"></p>
+      </div>
+
     </section>
 
     <section id="contact">
@@ -68,5 +117,6 @@
 
   </main>
 
+  <script src="script.js"></script>
 </body>
 </html>
