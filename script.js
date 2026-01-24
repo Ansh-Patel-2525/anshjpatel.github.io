@@ -1,21 +1,57 @@
-/* Tic Tac Toe */
+/* =======================
+   TIC TAC TOE
+======================= */
+
 const board = document.getElementById("ticTacToe");
 let currentPlayer = "X";
+let gameActive = true;
+
+const winningCombos = [
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8],
+  [0, 3, 6],
+  [1, 4, 7],
+  [2, 5, 8],
+  [0, 4, 8],
+  [2, 4, 6]
+];
 
 function createBoard() {
   board.innerHTML = "";
   currentPlayer = "X";
+  gameActive = true;
 
   for (let i = 0; i < 9; i++) {
     const cell = document.createElement("div");
+    cell.dataset.index = i;
+
     cell.onclick = () => {
-      if (cell.textContent === "") {
-        cell.textContent = currentPlayer;
-        currentPlayer = currentPlayer === "X" ? "O" : "X";
+      if (!gameActive || cell.textContent !== "") return;
+
+      cell.textContent = currentPlayer;
+
+      if (checkWinner()) {
+        alert(`Player ${currentPlayer} wins!`);
+        gameActive = false;
+        return;
       }
+
+      currentPlayer = currentPlayer === "X" ? "O" : "X";
     };
+
     board.appendChild(cell);
   }
+}
+
+function checkWinner() {
+  const cells = document.querySelectorAll(".tic-tac-toe div");
+
+  return winningCombos.some(combo => {
+    return combo.every(index => {
+      return cells[index].textContent === currentPlayer;
+    });
+  });
 }
 
 function resetTicTacToe() {
@@ -24,7 +60,10 @@ function resetTicTacToe() {
 
 createBoard();
 
-/* Calculator */
+/* =======================
+   CALCULATOR
+======================= */
+
 let expression = "";
 
 function press(value) {
@@ -47,8 +86,11 @@ function clearCalc() {
   document.getElementById("calcDisplay").value = "";
 }
 
-/* Guessing Game */
-const secretNumber = Math.floor(Math.random() * 10) + 1;
+/* =======================
+   NUMBER GUESSING GAME
+======================= */
+
+let secretNumber = Math.floor(Math.random() * 10) + 1;
 
 function checkGuess() {
   const guess = Number(document.getElementById("guessInput").value);
