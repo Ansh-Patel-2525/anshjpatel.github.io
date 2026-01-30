@@ -143,6 +143,57 @@
       color: white;
       font-weight: bold;
     }
+
+    /* Video overlay styles */
+    .video-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .video-overlay.active {
+      display: flex;
+    }
+
+    .video-container {
+      position: relative;
+      width: 90%;
+      max-width: 1200px;
+    }
+
+    .video-container video {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    .close-video {
+      position: absolute;
+      top: -40px;
+      right: 0;
+      background: white;
+      color: black;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    .close-video:hover {
+      background: #f0f0f0;
+      transform: scale(1.05);
+    }
   </style>
 </head>
 <body>
@@ -156,7 +207,7 @@
       <div class="stats-grid">
         <div class="stat-box">
           <div class="stat-label">Hash Rate</div>
-          <div class="stat-value">871.71 EH/s</div>
+          <div class="stat-value">1.21 TH/s</div>
         </div>
         <div class="stat-box">
           <div class="stat-label">BTC Mined</div>
@@ -190,6 +241,17 @@
     </div>
   </div>
 
+  <!-- Video Overlay -->
+  <div class="video-overlay" id="videoOverlay">
+    <div class="video-container">
+      <button class="close-video" onclick="closeVideo()">✕ Close</button>
+      <video id="rickrollVideo" controls autoplay>
+        <source src="rickroll.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+  </div>
+
   <script>
     function startMining() {
       // Show mining animation
@@ -210,12 +272,41 @@
         
         if (progress >= 100) {
           clearInterval(interval);
-          // Redirect to rickroll after progress completes
+          // Show video after progress completes
           setTimeout(() => {
-            window.location.href = 'https://www.youtube.com/watch?v=QDia3e12czc';
+            showVideo();
           }, 500);
         }
       }, 50);
+    }
+
+    function showVideo() {
+      const overlay = document.getElementById('videoOverlay');
+      const video = document.getElementById('rickrollVideo');
+      
+      overlay.classList.add('active');
+      video.play();
+    }
+
+    function closeVideo() {
+      const overlay = document.getElementById('videoOverlay');
+      const video = document.getElementById('rickrollVideo');
+      
+      overlay.classList.remove('active');
+      video.pause();
+      video.currentTime = 0;
+      
+      // Reset the miner
+      const animation = document.getElementById('miningAnimation');
+      const progressFill = document.getElementById('progressFill');
+      const button = document.querySelector('.mine-button');
+      
+      animation.classList.remove('active');
+      progressFill.style.width = '0%';
+      progressFill.textContent = '0%';
+      button.disabled = false;
+      button.style.opacity = '1';
+      button.style.cursor = 'pointer';
     }
   </script>
 
