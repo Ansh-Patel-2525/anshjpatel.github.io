@@ -5,6 +5,135 @@
   <title>Widgets - Ansh Patel</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Header */
+    .widgets-header {
+      padding: 2rem 1rem;
+      text-align: center;
+      color: white;
+    }
+
+    .widgets-header h1 {
+      margin: 0;
+      font-size: 2rem;
+    }
+
+    .widgets-header p {
+      margin: 0.5rem 0 0 0;
+      font-size: 1rem;
+    }
+
+    .widgets-header .back-link {
+      display: inline-block;
+      margin-top: 1rem;
+      color: inherit;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .widgets-header .back-link:hover {
+      transform: translateX(-5px);
+    }
+
+    /* Section Titles */
+    .section-title {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: inherit;
+      padding-left: 0.5rem;
+    }
+
+    /* Two-column layout */
+    .widgets-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      padding: 1rem;
+      justify-content: center;
+    }
+
+    .widget-section {
+      flex: 1 1 300px; /* grow/shrink, min-width 300px */
+      display: flex;
+      flex-direction: column;
+    }
+
+    .section-title {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    /* Vertical list inside each column */
+    .widgets-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    /* List items */
+    .widget-link-card {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      background: white;
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      text-decoration: none;
+      color: inherit;
+      box-shadow: var(--shadow-md, 0 2px 5px rgba(0,0,0,0.1));
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+      cursor: pointer;
+    }
+
+    .widget-link-card:hover {
+      transform: translateX(5px);
+      border-color: var(--primary, #4facfe);
+      box-shadow: var(--shadow-lg, 0 4px 10px rgba(0,0,0,0.15));
+    }
+
+    /* Icon */
+    .widget-link-card .widget-icon {
+      font-size: 2rem;
+      margin-right: 1rem;
+      flex-shrink: 0;
+      text-align: center;
+      width: 2.5rem;
+    }
+
+    /* Text */
+    .widget-link-card h3 {
+      font-size: 1.2rem;
+      margin: 0;
+      color: var(--primary, #4facfe);
+    }
+
+    .widget-link-card p {
+      font-size: 0.85rem;
+      margin: 0;
+      color: #666;
+    }
+
+    /* Optional divider between items */
+    .widget-link-card + .widget-link-card {
+      border-top: 1px solid #eee;
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 768px) {
+      .widgets-container {
+        flex-direction: column;
+      }
+    }
+
+  </style>
 </head>
 <body>
 
@@ -18,127 +147,100 @@
 
   <main class="widgets-container">
 
-    <!-- Games Section -->
+    <!-- Games Section (Left Column) -->
     <section class="widget-section">
       <h2 class="section-title">🎮 Games</h2>
       <div class="widgets-grid">
-        
         <a href="tictactoe.html" class="widget-link-card">
           <div class="widget-icon">⭕</div>
-          <h3>Tic Tac Toe</h3>
-          <p>Classic two-player strategy game</p>
+          <div>
+            <h3>Tic Tac Toe</h3>
+            <p>Classic two-player strategy game</p>
+          </div>
         </a>
 
         <a href="blackjack.html" class="widget-link-card">
           <div class="widget-icon">🃏</div>
-          <h3>Blackjack</h3>
-          <p>Beat the dealer and get to 21</p>
-        </a>
-
-        <a href="bitcoinminer.html" class="widget-link-card">
-          <div class="widget-icon">₿</div>
-          <h3>Bitcoin Miner</h3>
-          <p>Mine Bitcoin directly from your browser</p>
+          <div>
+            <h3>Blackjack</h3>
+            <p>Beat the dealer and get to 21</p>
+          </div>
         </a>
 
         <a href="guess.html" class="widget-link-card">
           <div class="widget-icon">🎲</div>
-          <h3>Number Guessing</h3>
-          <p>Guess the secret number from 1-10</p>
+          <div>
+            <h3>Number Guessing</h3>
+            <p>Guess the secret number from 1-10</p>
+          </div>
         </a>
 
         <a href="snake.html" class="widget-link-card">
           <div class="widget-icon">🐍</div>
-          <h3>Snake</h3>
-          <p>Eat food and grow without hitting walls</p>
+          <div>
+            <h3>Snake</h3>
+            <p>Eat food and grow without hitting walls</p>
+          </div>
         </a>
 
         <a href="tetris.html" class="widget-link-card">
           <div class="widget-icon">🧱</div>
-          <h3>Tetris</h3>
-          <p>Clear lines by stacking falling blocks</p>
+          <div>
+            <h3>Tetris</h3>
+            <p>Clear lines by stacking falling blocks</p>
+          </div>
         </a>
 
         <a href="shooter.html" class="widget-link-card">
           <div class="widget-icon">🚀</div>
-          <h3>Space Shooter</h3>
-          <p>Defend against incoming alien invaders</p>
+          <div>
+            <h3>Space Shooter</h3>
+            <p>Defend against incoming alien invaders</p>
+          </div>
         </a>
-
       </div>
     </section>
 
-    <!-- Apps Section -->
+    <!-- Apps Section (Right Column) -->
     <section class="widget-section">
       <h2 class="section-title">⚙️ Apps</h2>
       <div class="widgets-grid">
-        
         <a href="calculator.html" class="widget-link-card">
           <div class="widget-icon">🔢</div>
-          <h3>Calculator</h3>
-          <p>Perform basic arithmetic calculations</p>
+          <div>
+            <h3>Calculator</h3>
+            <p>Perform basic arithmetic calculations</p>
+          </div>
         </a>
 
         <a href="timer.html" class="widget-link-card">
           <div class="widget-icon">⏱️</div>
-          <h3>Timer</h3>
-          <p>Set countdown timers with presets</p>
+          <div>
+            <h3>Timer</h3>
+            <p>Set countdown timers with presets</p>
+          </div>
         </a>
 
+        <a href="bitcoinminer.html" class="widget-link-card">
+          <div class="widget-icon">₿</div>
+          <div>
+            <h3>Bitcoin Miner</h3>
+            <p>Mine Bitcoin directly from your browser</p>
+          </div>
+        </a>
+
+        <a href="coinflip.html" class="widget-link-card">
+          <div class="widget-icon">🪙</div>
+          <div>
+            <h3>Coin Flip</h3>
+            <p>Flip one or more coins with animation</p>
+          </div>
+        </a>
+        
       </div>
     </section>
 
   </main>
-
-  <style>
-    .widget-section {
-      margin-bottom: 4rem;
-    }
-
-    .widget-link-card {
-      background: white;
-      border-radius: 20px;
-      padding: 2.5rem 2rem;
-      box-shadow: var(--shadow-lg);
-      transition: all 0.3s ease;
-      text-decoration: none;
-      color: var(--text-dark);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      cursor: pointer;
-      border: 3px solid transparent;
-    }
-
-    .widget-link-card:hover {
-      transform: translateY(-10px);
-      box-shadow: var(--shadow-xl);
-      border-color: var(--primary);
-    }
-
-    .widget-link-card .widget-icon {
-      font-size: 4rem;
-      margin-bottom: 1rem;
-      transition: transform 0.3s ease;
-    }
-
-    .widget-link-card:hover .widget-icon {
-      transform: scale(1.2) rotate(5deg);
-    }
-
-    .widget-link-card h3 {
-      font-size: 1.5rem;
-      margin-bottom: 0.5rem;
-      color: var(--primary);
-    }
-
-    .widget-link-card p {
-      color: var(--text-light);
-      font-size: 0.95rem;
-      margin: 0;
-    }
-  </style>
 
 </body>
 </html>
