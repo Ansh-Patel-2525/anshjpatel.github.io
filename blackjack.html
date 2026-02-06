@@ -20,6 +20,9 @@
       display: grid;
       grid-template-columns: 280px 1fr;
       gap: 1.5rem;
+
+      transform: scale(0.9);
+      transform-origin: top center;
     }
 
     .left-panel {
@@ -37,18 +40,24 @@
     .game-board {
       background: linear-gradient(135deg, #4ade80 0%, #86efac 100%);
       border-radius: 15px;
-      padding: 1.25rem;
-      min-height: 280px;
+      padding: 1.5rem;
       position: relative;
+    
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
     }
+    
 
     .dealer-area,
     .player-area {
-      margin: 0.5rem 0;
-      padding: 0.75rem;
+      margin: 0.75rem 0;
+      padding: 1.25rem;
       background: rgba(0, 0, 0, 0.15);
-      border-radius: 10px;
+      border-radius: 12px;
+      min-height: 223px;
     }
+    
 
     .area-title {
       color: #1f2937;
@@ -75,8 +84,8 @@
     }
 
     .card {
-      width: 60px;
-      height: 85px;
+      width: 111px;
+      height: 145px;
       background: white;
       border-radius: 8px;
       display: flex;
@@ -99,8 +108,8 @@
     }
 
     .card-back {
-      width: 60px;
-      height: 85px;
+      width: 111px;
+      height: 145px;
       background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
       border-radius: 8px;
       display: flex;
@@ -393,6 +402,11 @@
       <!-- Left Panel: Betting & Stats -->
       <div class="left-panel">
         <div class="betting-section">
+            <span class="bet-label">Starting Balance</span>
+            <input type="number" id="startMoneyInput" class="bet-input" value="1000" min="100" step="100">
+            <button class="bet-btn" onclick="setStartingMoney()">Start Game</button>
+        </div>
+        <div class="betting-section">
           <div class="money-display">
             <span>💰 Balance:</span>
             <span id="moneyAmount" class="money-amount">$1000</span>
@@ -405,7 +419,7 @@
             <button class="bet-btn" onclick="setBet(25)">$25</button>
             <button class="bet-btn" onclick="setBet(50)">$50</button>
             <button class="bet-btn" onclick="setBet(100)">$100</button>
-            <button class="bet-btn" onclick="setBet(money)">All In</button>
+            <button class="bet-btn" onclick="setAllIn()">All In</button>
           </div>
         </div>
 
@@ -426,6 +440,10 @@
             <div class="stat-label">Total Won</div>
             <div id="statsMoney" class="stat-value" style="color: #059669;">$0</div>
           </div>
+
+          <button class="bet-btn" onclick="resetStats()" style="grid-column: 1 / -1;">
+            Reset Stats
+          </button>
         </div>
       </div>
 
@@ -481,6 +499,47 @@
       totalWon: 0
     };
 
+    function resetStats() {
+      if (!confirm("Reset all stats and money?")) return;
+    
+      stats = {
+        wins: 0,
+        losses: 0,
+        pushes: 0,
+        totalWon: 0
+      };
+    
+      money = 1000;
+      currentBet = 10;
+    
+      localStorage.removeItem('blackjackStats');
+      localStorage.removeItem('blackjackMoney');
+    
+      document.getElementById('betInput').value = 10;
+    
+      updateStatsDisplay();
+      updateMoneyDisplay();
+      showMessage("Stats and money reset 🔄", "playing");
+    }
+    
+
+    function setStartingMoney() {
+      const input = document.getElementById('startMoneyInput');
+      let amount = parseInt(input.value);
+    
+      if (!Number.isFinite(amount) || amount < 100) {
+        amount = 100;
+      }
+    
+      money = amount;
+      currentBet = 10;
+      document.getElementById('betInput').value = 10;
+    
+      localStorage.setItem('blackjackMoney', money.toString());
+      updateMoneyDisplay();
+      showMessage(`Game started with $${money}`, "playing");
+    }
+    
     // Load stats and money from localStorage
     if (localStorage.getItem('blackjackStats')) {
       stats = JSON.parse(localStorage.getItem('blackjackStats'));
@@ -524,6 +583,11 @@
       return bet;
     }
 
+    function setAllIn() {
+    setBet(money);
+    }
+
+
     function updateMoneyDisplay() {
       document.getElementById('moneyAmount').textContent = '$' + money;
       
@@ -538,15 +602,9 @@
       
       // Check if player can afford to play
       if (money < 5) {
-        showMessage("Game Over! You're out of money. Resetting to $1000...", "lose");
-        setTimeout(() => {
-          money = 1000;
-          currentBet = 10;
-          betInput.value = 10;
-          updateMoneyDisplay();
-          saveStats();
-        }, 2000);
+        showMessage("You're broke 💸 Set a new starting balance to continue", "lose");
       }
+      
     }
 
     // Add event listener for bet input
