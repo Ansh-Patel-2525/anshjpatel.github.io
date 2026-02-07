@@ -21,12 +21,17 @@
     }
     
     .game-header-content {
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 0 auto;
       padding: 0 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
+    }
+    
+    .game-card {
+      max-width: 1200px;
+      margin: 0 auto;
     }
     
     .game-header h1 {
@@ -54,13 +59,21 @@
     
     .game-container {
       margin-top: 100px; /* Adjust based on your header height */
+      max-width: 1400px !important;
+      width: 95% !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
     }
 
-
+    .game-card {
+      max-width: 100% !important;
+      width: 100% !important;
+    }
 
     .frog-display {
       text-align: center;
       padding: 2rem;
+      max-width: 100% !important;
     }
 
     .current-time {
@@ -70,22 +83,67 @@
       margin-bottom: 2rem;
     }
 
+    /* NEW: Current frog number alert */
+    .frog-alert {
+      background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+      color: white;
+      padding: 2rem 2.5rem;
+      border-radius: 15px;
+      margin: 1rem auto 2rem;
+      max-width: 800px;
+      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+      animation: pulse 2s infinite;
+      display: none;
+    }
+
+    .frog-alert.show {
+      display: block;
+    }
+
+    .frog-alert h2 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.8rem;
+    }
+
+    .frog-alert p {
+      margin: 0;
+      font-size: 1rem;
+      opacity: 0.95;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+      }
+      50% {
+        transform: scale(1.02);
+        box-shadow: 0 6px 30px rgba(16, 185, 129, 0.6);
+      }
+    }
+
     .frog-info {
       display: flex;
       justify-content: space-around;
-      gap: 2rem;
+      gap: 3rem;
       margin: 2rem 0;
       flex-wrap: wrap;
+      max-width: 100% !important;
     }
 
     .frog-card {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
-      padding: 1.5rem;
+      padding: 2rem;
       border-radius: 15px;
       flex: 1;
-      min-width: 200px;
+      min-width: 250px;
+      max-width: 500px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .frog-card.hidden {
+      display: none;
     }
 
     .frog-card h3 {
@@ -97,7 +155,14 @@
     .frog-card .number {
       font-size: 3rem;
       font-weight: bold;
+      margin: 0 0 0.5rem 0;
+    }
+
+    .frog-card .description {
+      font-size: 0.9rem;
+      opacity: 0.85;
       margin: 0;
+      line-height: 1.4;
     }
 
     .view-all-btn {
@@ -159,6 +224,21 @@
       box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
+    }
+
+    .frog-number.current {
+      background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+      color: white;
+      animation: glow 2s infinite;
+    }
+
+    @keyframes glow {
+      0%, 100% {
+        box-shadow: 0 2px 5px rgba(16, 185, 129, 0.3);
+      }
+      50% {
+        box-shadow: 0 4px 20px rgba(16, 185, 129, 0.6);
+      }
     }
 
     /* Modal styles */
@@ -255,14 +335,22 @@
         <div class="emoji">🐸🐸🐸🐸🐸.</div>
         <div class="current-time" id="currentMinute">--</div>
         
+        <!-- NEW: Alert for when on a frog number -->
+        <div class="frog-alert" id="frogAlert">
+          <h2>You're on Frog Number <span id="frogAlertNumber">--</span>!</h2>
+          <p id="frogAlertDescription">Current minute is a special frog number!</p>
+        </div>
+        
         <div class="frog-info">
           <div class="frog-card">
             <h3>Just Missed:</h3>
             <p class="number" id="lastFrog">--</p>
+            <p class="description" id="lastFrogDescription">--</p>
           </div>
           <div class="frog-card">
             <h3>Next:</h3>
             <p class="number" id="nextFrog">--</p>
+            <p class="description" id="nextFrogDescription">--</p>
           </div>
         </div>
 
@@ -322,6 +410,23 @@
       
       document.getElementById('currentMinute').textContent = `Current Minute: ${currentMinute}`;
 
+      // Check if current minute is a frog number
+      const isFrogNumber = frogNumbers.includes(currentMinute);
+      const frogAlert = document.getElementById('frogAlert');
+      const lastFrogCard = document.querySelector('.frog-card:first-child');
+      
+      if (isFrogNumber) {
+        frogAlert.classList.add('show');
+        document.getElementById('frogAlertNumber').textContent = currentMinute;
+        document.getElementById('frogAlertDescription').textContent = frogDescriptions[currentMinute];
+        // Hide the "Just Missed" card when on a frog number
+        lastFrogCard.classList.add('hidden');
+      } else {
+        frogAlert.classList.remove('show');
+        // Show the "Just Missed" card when not on a frog number
+        lastFrogCard.classList.remove('hidden');
+      }
+
       // Find last frog (just missed)
       let lastFrog = null;
       for (let i = frogNumbers.length - 1; i >= 0; i--) {
@@ -349,7 +454,13 @@
       }
 
       document.getElementById('lastFrog').textContent = lastFrog;
+      document.getElementById('lastFrogDescription').textContent = frogDescriptions[lastFrog];
+      
       document.getElementById('nextFrog').textContent = nextFrog;
+      document.getElementById('nextFrogDescription').textContent = frogDescriptions[nextFrog];
+
+      // Update the frog grid to highlight current number
+      updateFrogGrid(currentMinute);
     }
 
     function toggleAllFrogs() {
@@ -384,7 +495,19 @@
         div.className = 'frog-number';
         div.textContent = num;
         div.onclick = () => openModal(num);
+        div.dataset.frogNumber = num;
         grid.appendChild(div);
+      });
+    }
+
+    function updateFrogGrid(currentMinute) {
+      const allNumbers = document.querySelectorAll('.frog-number');
+      allNumbers.forEach(el => {
+        if (parseInt(el.dataset.frogNumber) === currentMinute) {
+          el.classList.add('current');
+        } else {
+          el.classList.remove('current');
+        }
       });
     }
 
