@@ -200,16 +200,16 @@
   <main class="game-container">
     <div class="game-card">
       <div class="frog-display">
-        <div class="emoji">🐸🐸🐸🐸🐸.</div>
+        <div class="emoji">🐸</div>
         <div class="current-time" id="currentMinute">--</div>
         
         <div class="frog-info">
           <div class="frog-card">
-            <h3>Just Missed:</h3>
+            <h3>Just Missed</h3>
             <p class="number" id="lastFrog">--</p>
           </div>
           <div class="frog-card">
-            <h3>Next:</h3>
+            <h3>Next Frog</h3>
             <p class="number" id="nextFrog">--</p>
           </div>
         </div>
@@ -217,7 +217,7 @@
         <button class="view-all-btn" onclick="toggleAllFrogs()">View All Frog Numbers</button>
 
         <div class="all-frogs" id="allFrogs">
-          <h3>All Frog Numbers</h3>
+          <h3>All Frog Numbers (Minutes)</h3>
           <div class="frog-grid" id="frogGrid"></div>
         </div>
       </div>
@@ -242,26 +242,26 @@
     
     // Descriptions for each frog number - add your descriptions here
     const frogDescriptions = {
-      1: "5th Rhombus Number",
-      3: "T. Mullett's favourite number",
-      7: "3rd Rhombus Number",
-      9: "2nd Rhombus Number",
-      14: "1st Rhombus Number",
-      18: "1st Dream Number",
-      22: "When A.T got popular",
-      25: "P. Ansh's favourite number",
-      29: "2nd Dream Number",
-      31: "3rd Dream Number",
-      33: "When H took power",
-      37: "4th Dream Number",
-      40: "5th Dream Number",
-      44: "24 + 20 = 44 and 24 was when T reached a high and E.M likes the number 20",
-      46: "When D.T was born",
-      49: "4th Rhombus Number",
-      51: "6th Dream Number",
-      52: "7th Dream Number",
-      55: "Batman likes the number 11 and 11*5 = 55",
-      58: "8th Dream Number"
+      1: "Description for frog number 1",
+      3: "Description for frog number 3",
+      7: "Description for frog number 7",
+      9: "Description for frog number 9",
+      14: "Description for frog number 14",
+      18: "Description for frog number 18",
+      22: "Description for frog number 22",
+      25: "Description for frog number 25",
+      29: "Description for frog number 29",
+      31: "Description for frog number 31",
+      33: "Description for frog number 33",
+      37: "Description for frog number 37",
+      40: "Description for frog number 40",
+      44: "Description for frog number 44",
+      46: "Description for frog number 46",
+      49: "Description for frog number 49",
+      51: "Description for frog number 51",
+      52: "Description for frog number 52",
+      55: "Description for frog number 55",
+      58: "Description for frog number 58"
     };
 
     function updateFrogInfo() {
@@ -342,6 +342,24 @@
     
     // Update every second
     setInterval(updateFrogInfo, 1000);
+
+    // Header auto-hide on scroll
+    let lastScrollTop = 0;
+    const header = document.querySelector('.game-header');
+    
+    window.addEventListener('scroll', function() {
+      let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      
+      if (scrollTop > lastScrollTop && scrollTop > 100) {
+        // Scrolling down & past 100px
+        header.style.transform = 'translateY(-100%)';
+      } else {
+        // Scrolling up
+        header.style.transform = 'translateY(0)';
+      }
+      
+      lastScrollTop = scrollTop;
+    });
   </script>
 
 </body>
