@@ -7,6 +7,62 @@
   <link rel="stylesheet" href="style.css">
   <style>
 
+    /* ADDED: Header auto-hide styles */
+    .game-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #c026d3 100%);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease-in-out;
+      padding: 1rem 0;
+    }
+    
+    .game-header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .game-header h1 {
+      color: white;
+      margin: 0;
+      font-size: 1.8rem;
+    }
+    
+    .header-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+    
+    .game-header .back-link {
+      color: white;
+      text-decoration: none;
+      opacity: 0.9;
+      font-weight: 500;
+      transition: opacity 0.2s;
+    }
+    
+    .game-header .back-link:hover {
+      opacity: 1;
+    }
+    
+    .game-container {
+      margin-top: 100px; /* Adjust based on your header height */
+    }
+    
+    @media (max-width: 768px) {
+      .game-container {
+        margin-top: 90px;
+      }
+    }
+    /* END ADDED */
+
     
     .miner-container {
       max-width: 800px;
@@ -259,6 +315,31 @@
   </div>
 
   <script>
+    // ADDED: Hide/show header on scroll
+    let lastScrollTop = 0;
+    const header = document.querySelector('.game-header');
+    let scrollTimeout;
+    
+    window.addEventListener('scroll', function() {
+      clearTimeout(scrollTimeout);
+      
+      scrollTimeout = setTimeout(() => {
+        let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        if (scrollTop > lastScrollTop && scrollTop > 100) {
+          // Scrolling down & past threshold
+          header.style.transform = 'translateY(-100%)';
+        } else {
+          // Scrolling up
+          header.style.transform = 'translateY(0)';
+        }
+        
+        lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+      }, 50); // Small delay to smooth out rapid scroll events
+    }, false);
+    // END ADDED
+
+
     function startMining() {
       // Show mining animation
       const animation = document.getElementById('miningAnimation');
