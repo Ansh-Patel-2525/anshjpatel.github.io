@@ -47,17 +47,59 @@
       background: rgba(16, 185, 129, 0.4);
     }
     
-    .control-row {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-    }
+    
     
     .powerup-info {
       font-size: 12px;
       margin-top: 8px;
       color: #666;
     }
+
+    .dpad {
+      display: grid;
+      grid-template-columns: 60px 60px 60px;
+      grid-template-rows: 60px 60px 60px;
+      gap: 8px;
+    }
+    
+    .control-btn {
+      width: 60px;
+      height: 60px;
+      font-size: 24px;
+      border: 2px solid #10b981;
+      background: rgba(16, 185, 129, 0.2);
+      color: #10b981;
+      border-radius: 10px;
+      cursor: pointer;
+      user-select: none;
+      touch-action: manipulation;
+    }
+    
+    .control-btn:active {
+      background: rgba(16, 185, 129, 0.4);
+      transform: scale(0.95);
+    }
+    
+    .up {
+      grid-column: 2;
+      grid-row: 1;
+    }
+    
+    .left {
+      grid-column: 1;
+      grid-row: 2;
+    }
+    
+    .down {
+      grid-column: 2;
+      grid-row: 3;
+    }
+    
+    .right {
+      grid-column: 3;
+      grid-row: 2;
+    }
+    
   </style>
 </head>
 
@@ -99,15 +141,14 @@
       
       <!-- Mobile Controls -->
       <div class="game-controls">
-        <div class="control-row">
-          <button class="control-btn" id="btnUp">↑</button>
-        </div>
-        <div class="control-row">
-          <button class="control-btn" id="btnLeft">←</button>
-          <button class="control-btn" id="btnDown">↓</button>
-          <button class="control-btn" id="btnRight">→</button>
+        <div class="dpad">
+          <button class="control-btn up" id="btnUp">↑</button>
+          <button class="control-btn left" id="btnLeft">←</button>
+          <button class="control-btn down" id="btnDown">↓</button>
+          <button class="control-btn right" id="btnRight">→</button>
         </div>
       </div>
+      
       <p class="powerup-info">🍎 Apple +10 | ⚡ Speed Boost | 🐌 Slow Down | 💎 Bonus Points</p>
     </div>
   </main>
