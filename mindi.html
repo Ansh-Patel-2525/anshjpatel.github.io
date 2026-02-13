@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mindi - Ansh Patel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .game-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #c026d3 100%);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease-in-out;
+      padding: 1rem 0;
+    }
+    
+    .game-header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .game-header h1 {
+      color: white;
+      margin: 0;
+      font-size: 1.8rem;
+    }
+    
+    .header-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+    
+    .game-header .back-link {
+      color: white;
+      text-decoration: none;
+      opacity: 0.9;
+      font-weight: 500;
+      transition: opacity 0.2s;
+    }
+    
+    .game-header .back-link:hover {
+      opacity: 1;
+    }
+    
+    .game-container {
+      margin-top: 100px;
+    }
+    
+    @media (max-width: 768px) {
+      .game-container {
+        margin-top: 90px;
+      }
+    }
+    
+    .mindi-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 90px 1.5rem 1.5rem;
+    }
+
+    .mindi-card {
+      background: white;
+      border-radius: 20px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow-xl);
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 1.5rem;
+      transform: scale(0.9);
+      transform-origin: top center;
+    }
+
+    .left-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .right-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .game-info-section {
+      background: var(--bg-light);
+      padding: 1rem;
+      border-radius: 10px;
+      border: 2px solid var(--border);
+    }
+
+    .info-label {
+      font-weight: 600;
+      color: var(--text-dark);
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .trump-display {
+      font-size: 2.5rem;
+      text-align: center;
+      padding: 0.5rem;
+    }
+
+    .game-board {
+      background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+      border-radius: 15px;
+      padding: 1rem;
+      position: relative;
+      height: 500px;
+      display: grid;
+      grid-template-rows: 80px 1fr 110px;
+      gap: 0.5rem;
+      overflow: hidden;
+    }
+
+    .player-area {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .player-top {
+      justify-content: flex-start;
+    }
+
+    .player-left {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 5;
+    }
+
+    .player-right {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 5;
+    }
+
+    .player-bottom {
+      justify-content: flex-end;
+    }
+
+    .player-label {
+      color: white;
+      font-weight: 700;
+      font-size: 0.8rem;
+      margin-bottom: 0.35rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+      background: rgba(0,0,0,0.2);
+      padding: 0.25rem 0.7rem;
+      border-radius: 20px;
+    }
+
+    .player-label.active {
+      background: #fbbf24;
+      color: #1f2937;
+      animation: pulse 1s infinite;
+      box-shadow: 0 0 15px rgba(251, 191, 36, 0.6);
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .cards-hand {
+      display: flex;
+      gap: -15px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .player-bottom .cards-hand {
+      gap: 0.25rem;
+      flex-wrap: wrap;
+      max-width: 100%;
+    }
+
+    .card {
+      width: 55px;
+      height: 75px;
+      background: white;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 0.25rem 0.3rem;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+      font-weight: bold;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 2px solid #e5e7eb;
+      overflow: hidden;
+    }
+
+    .card > div:first-child,
+    .card > div:last-child {
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .card > div:nth-child(2) {
+      font-size: 1.3rem;
+      line-height: 1;
+    }
+
+    .player-bottom .card {
+      width: 60px;
+      height: 82px;
+      font-size: 0.8rem;
+      padding: 0.3rem 0.35rem;
+    }
+
+    .player-bottom .card > div:nth-child(2) {
+      font-size: 1.5rem;
+    }
+
+    .card.clickable:hover {
+      transform: translateY(-20px) scale(1.05);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+      z-index: 100;
+      border-color: #fbbf24;
+    }
+
+    .card.red {
+      color: #dc2626;
+    }
+
+    .card.black {
+      color: #1f2937;
+    }
+
+    .card-back {
+      width: 55px;
+      height: 75px;
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+      border: 2px solid #1e3a8a;
+      position: relative;
+    }
+
+    .card-back::before {
+      content: '🂠';
+      font-size: 2rem;
+      color: white;
+      opacity: 0.4;
+    }
+
+    .card-count {
+      position: absolute;
+      top: 3px;
+      right: 5px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 0.1rem 0.35rem;
+      border-radius: 8px;
+      font-size: 0.65rem;
+      font-weight: bold;
+    }
+
+    .trick-area {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 240px;
+    }
+
+    .trick-cards-container {
+      position: relative;
+      width: 280px;
+      height: 280px;
+    }
+
+    .trick-card-slot {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .trick-card-slot.top {
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .trick-card-slot.bottom {
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .trick-card-slot.left {
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .trick-card-slot.right {
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .trick-card-slot .card {
+      width: 55px;
+      height: 75px;
+      font-size: 0.75rem;
+    }
+
+    .game-message {
+      text-align: center;
+      padding: 0.75rem;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      min-height: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .message-playing {
+      background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+      color: #3730a3;
+    }
+
+    .message-win {
+      background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+      color: #065f46;
+    }
+
+    .message-lose {
+      background: linear-gradient(135deg, #fee2e2, #fecaca);
+      color: #991b1b;
+    }
+
+    .game-controls {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
+
+    .game-controls button {
+      padding: 0.75rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-new-game {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+    }
+
+    .btn-new-game:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .tricks-won {
+      background: var(--bg-light);
+      padding: 0.8rem;
+      border-radius: 10px;
+      border: 2px solid var(--border);
+    }
+
+    .tricks-label {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      margin-bottom: 0.3rem;
+      font-weight: 600;
+    }
+
+    .tricks-display {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--text-dark);
+    }
+
+    .tens-display {
+      font-size: 1.4rem;
+      color: #059669;
+      font-weight: bold;
+      margin-top: 0.3rem;
+    }
+
+    @media (max-width: 968px) {
+      .mindi-card {
+        grid-template-columns: 1fr;
+      }
+
+      .left-panel {
+        order: 2;
+      }
+
+      .right-panel {
+        order: 1;
+      }
+
+      .game-board {
+        height: 470px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .mindi-container {
+        padding: 100px 1rem 2rem;
+      }
+
+      .card {
+        width: 45px;
+        height: 62px;
+        font-size: 0.65rem;
+        padding: 0.2rem 0.25rem;
+      }
+
+      .card > div:nth-child(2) {
+        font-size: 1.1rem;
+      }
+
+      .player-bottom .card {
+        width: 48px;
+        height: 66px;
+        font-size: 0.7rem;
+      }
+
+      .player-bottom .card > div:nth-child(2) {
+        font-size: 1.2rem;
+      }
+
+      .card-back {
+        width: 48px;
+        height: 66px;
+      }
+
+      .trick-cards-container {
+        width: 220px;
+        height: 220px;
+      }
+
+      .trick-card-slot .card {
+        width: 48px;
+        height: 66px;
+      }
+
+      .game-board {
+        height: 420px;
+        padding: 0.75rem;
+        grid-template-rows: 70px 1fr 100px;
+      }
+
+      .player-label {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="game-header">
+    <div class="game-header-content">
+      <h1>🃏 Mindi</h1>
+      <div class="header-links">
+        <a href="widgets.html" class="back-link">← Widgets</a>
+        <a href="index.html" class="back-link">Home</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="mindi-container">
+    <div class="mindi-card">
+      
+      <!-- Left Panel: Info -->
+      <div class="left-panel">
+        <div class="game-info-section">
+          <div class="info-label">Trump Suit</div>
+          <div id="trumpDisplay" class="trump-display">None yet</div>
+        </div>
+
+        <div class="tricks-won">
+          <div class="tricks-label">Your Team (You & CPU2)</div>
+          <div class="tricks-display">
+            Tricks: <span id="yourTricks">0</span>
+          </div>
+          <div class="tens-display">
+            10s: <span id="yourTens">0</span>
+          </div>
+        </div>
+
+        <div class="tricks-won">
+          <div class="tricks-label">Opponent Team (CPU1 & CPU3)</div>
+          <div class="tricks-display">
+            Tricks: <span id="opponentTricks">0</span>
+          </div>
+          <div class="tens-display">
+            10s: <span id="opponentTens">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Panel: Game -->
+      <div class="right-panel">
+        <div id="gameMessage" class="game-message message-playing">
+          Click "New Game" to start playing!
+        </div>
+
+        <div class="game-board">
+          <!-- Top Player (CPU2 - Teammate) -->
+          <div class="player-area player-top">
+            <div id="labelCPU2" class="player-label">CPU2 (Teammate)</div>
+            <div id="handCPU2" class="cards-hand"></div>
+          </div>
+
+          <!-- Middle section with left/right players and trick area -->
+          <div style="position: relative;">
+            <!-- Left Player (CPU1 - Opponent) -->
+            <div class="player-area player-left">
+              <div id="labelCPU1" class="player-label">CPU1</div>
+              <div id="handCPU1" class="cards-hand"></div>
+            </div>
+
+            <!-- Center Trick Area -->
+            <div class="trick-area">
+              <div class="trick-cards-container">
+                <div class="trick-card-slot top" id="trickTop"></div>
+                <div class="trick-card-slot left" id="trickLeft"></div>
+                <div class="trick-card-slot right" id="trickRight"></div>
+                <div class="trick-card-slot bottom" id="trickBottom"></div>
+              </div>
+            </div>
+
+            <!-- Right Player (CPU3 - Opponent) -->
+            <div class="player-area player-right">
+              <div id="labelCPU3" class="player-label">CPU3</div>
+              <div id="handCPU3" class="cards-hand"></div>
+            </div>
+          </div>
+
+          <!-- Bottom Player (You) -->
+          <div class="player-area player-bottom">
+            <div id="labelPlayer" class="player-label">You</div>
+            <div id="handPlayer" class="cards-hand"></div>
+          </div>
+        </div>
+
+        <div class="game-controls">
+          <button id="btnNewGame" class="btn-new-game" onclick="startNewGame()">New Game</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Hide/show header on scroll
+    let lastScrollTop = 0;
+    const header = document.querySelector('.game-header');
+    let scrollTimeout;
+    
+    window.addEventListener('scroll', function() {
+      clearTimeout(scrollTimeout);
+      
+      scrollTimeout = setTimeout(() => {
+        let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        if (scrollTop > lastScrollTop && scrollTop > 100) {
+          header.style.transform = 'translateY(-100%)';
+        } else {
+          header.style.transform = 'translateY(0)';
+        }
+        
+        lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+      }, 50);
+    }, false);
+
+    // Game variables
+    const suits = ['♠', '♥', '♦', '♣'];
+    const values = ['A', 'K', 'Q', 'J', '10', '9', '8', '7', '6', '5', '4', '3', '2'];
+    const valueOrder = { 'A': 14, 'K': 13, 'Q': 12, 'J': 11, '10': 10, '9': 9, '8': 8, '7': 7, '6': 6, '5': 5, '4': 4, '3': 3, '2': 2 };
+
+    let deck = [];
+    let hands = {
+      player: [],
+      cpu1: [],
+      cpu2: [],
+      cpu3: []
+    };
+
+    let currentTrick = {
+      player: null,
+      cpu1: null,
+      cpu2: null,
+      cpu3: null
+    };
+
+    let currentPlayer = 'player';
+    let leadPlayer = 'player';
+    let leadSuit = null;
+    let trumpSuit = null;
+    let gameActive = false;
+
+    let tricksWon = {
+      yourTeam: 0,
+      opponentTeam: 0
+    };
+
+    let tensWon = {
+      yourTeam: 0,
+      opponentTeam: 0
+    };
+
+    function createDeck() {
+      deck = [];
+      for (let suit of suits) {
+        for (let value of values) {
+          deck.push({ suit, value });
+        }
+      }
+      for (let i = deck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [deck[i], deck[j]] = [deck[j], deck[i]];
+      }
+    }
+
+    function dealCards() {
+      hands = {
+        player: [],
+        cpu1: [],
+        cpu2: [],
+        cpu3: []
+      };
+
+      const players = ['player', 'cpu1', 'cpu2', 'cpu3'];
+      let playerIndex = 0;
+
+      for (let i = 0; i < 52; i++) {
+        hands[players[playerIndex]].push(deck[i]);
+        playerIndex = (playerIndex + 1) % 4;
+      }
+
+      for (let player of players) {
+        sortHand(hands[player]);
+      }
+    }
+
+    function sortHand(hand) {
+      hand.sort((a, b) => {
+        if (a.suit !== b.suit) {
+          return suits.indexOf(a.suit) - suits.indexOf(b.suit);
+        }
+        return valueOrder[b.value] - valueOrder[a.value];
+      });
+    }
+
+    function createCardElement(card, faceDown = false, clickable = false) {
+      if (faceDown) {
+        const cardBack = document.createElement('div');
+        cardBack.className = 'card-back';
+        return cardBack;
+      }
+
+      const cardDiv = document.createElement('div');
+      const color = ['♥', '♦'].includes(card.suit) ? 'red' : 'black';
+      cardDiv.className = `card ${color} ${clickable ? 'clickable' : ''}`;
+      cardDiv.innerHTML = `
+        <div>${card.value}${card.suit}</div>
+        <div style="text-align: center;">${card.suit}</div>
+        <div style="text-align: right;">${card.value}${card.suit}</div>
+      `;
+
+      if (clickable) {
+        cardDiv.addEventListener('click', () => playCard(card));
+      }
+
+      return cardDiv;
+    }
+
+    function updateDisplay() {
+      const playerHandDiv = document.getElementById('handPlayer');
+      playerHandDiv.innerHTML = '';
+      hands.player.forEach(card => {
+        const canPlay = canPlayCard(card);
+        playerHandDiv.appendChild(createCardElement(card, false, canPlay && currentPlayer === 'player' && gameActive));
+      });
+
+      // Show single card back with count for CPU players
+      ['cpu1', 'cpu2', 'cpu3'].forEach(cpu => {
+        const cpuHandDiv = document.getElementById(`hand${cpu.toUpperCase()}`);
+        cpuHandDiv.innerHTML = '';
+        const cardCount = hands[cpu].length;
+        if (cardCount > 0) {
+          const cardBack = document.createElement('div');
+          cardBack.className = 'card-back';
+          cardBack.innerHTML = `
+            <span class="card-count">${cardCount}</span>
+          `;
+          cardBack.style.setProperty('--before-content', '"🂠"');
+          cpuHandDiv.appendChild(cardBack);
+        }
+      });
+
+      document.getElementById('trickTop').innerHTML = '';
+      document.getElementById('trickLeft').innerHTML = '';
+      document.getElementById('trickRight').innerHTML = '';
+      document.getElementById('trickBottom').innerHTML = '';
+
+      if (currentTrick.cpu2) {
+        document.getElementById('trickTop').appendChild(createCardElement(currentTrick.cpu2));
+      }
+      if (currentTrick.cpu1) {
+        document.getElementById('trickLeft').appendChild(createCardElement(currentTrick.cpu1));
+      }
+      if (currentTrick.cpu3) {
+        document.getElementById('trickRight').appendChild(createCardElement(currentTrick.cpu3));
+      }
+      if (currentTrick.player) {
+        document.getElementById('trickBottom').appendChild(createCardElement(currentTrick.player));
+      }
+
+      ['player', 'cpu1', 'cpu2', 'cpu3'].forEach(p => {
+        const label = document.getElementById(p === 'player' ? 'labelPlayer' : `label${p.toUpperCase()}`);
+        if (p === currentPlayer) {
+          label.classList.add('active');
+        } else {
+          label.classList.remove('active');
+        }
+      });
+
+      document.getElementById('trumpDisplay').textContent = trumpSuit ? trumpSuit : 'None yet';
+      document.getElementById('yourTricks').textContent = tricksWon.yourTeam;
+      document.getElementById('opponentTricks').textContent = tricksWon.opponentTeam;
+      document.getElementById('yourTens').textContent = tensWon.yourTeam;
+      document.getElementById('opponentTens').textContent = tensWon.opponentTeam;
+    }
+
+    function canPlayCard(card) {
+      if (!leadSuit) return true;
+      if (hands.player.some(c => c.suit === leadSuit)) {
+        return card.suit === leadSuit;
+      }
+      return true;
+    }
+
+    function playCard(card) {
+      if (currentPlayer !== 'player' || !gameActive) return;
+      if (!canPlayCard(card)) return;
+
+      hands.player = hands.player.filter(c => c !== card);
+
+      if (!trumpSuit && leadSuit && card.suit !== leadSuit) {
+        trumpSuit = card.suit;
+        showMessage(`Trump suit established: ${trumpSuit}`, 'playing');
+      }
+
+      if (!leadSuit) {
+        leadSuit = card.suit;
+      }
+
+      currentTrick.player = card;
+      updateDisplay();
+      nextPlayer();
+    }
+
+    function nextPlayer() {
+      const order = ['player', 'cpu1', 'cpu2', 'cpu3'];
+      const currentIndex = order.indexOf(currentPlayer);
+      currentPlayer = order[(currentIndex + 1) % 4];
+
+      if (currentPlayer === leadPlayer) {
+        setTimeout(() => evaluateTrick(), 1000);
+      } else {
+        if (currentPlayer !== 'player') {
+          setTimeout(() => cpuPlay(), 800);
+        } else {
+          updateDisplay();
+        }
+      }
+    }
+
+    function cpuPlay() {
+      const cpuHand = hands[currentPlayer];
+      let cardToPlay;
+
+      const validCards = cpuHand.filter(card => {
+        if (!leadSuit) return true;
+        if (cpuHand.some(c => c.suit === leadSuit)) {
+          return card.suit === leadSuit;
+        }
+        return true;
+      });
+
+      if (validCards.length === 0) {
+        cardToPlay = cpuHand[0];
+      } else {
+        const leadSuitCards = validCards.filter(c => c.suit === leadSuit);
+        const trumpCards = validCards.filter(c => trumpSuit && c.suit === trumpSuit);
+
+        if (leadSuitCards.length > 0) {
+          leadSuitCards.sort((a, b) => valueOrder[b.value] - valueOrder[a.value]);
+          cardToPlay = leadSuitCards[0];
+        } else if (trumpCards.length > 0) {
+          trumpCards.sort((a, b) => valueOrder[a.value] - valueOrder[b.value]);
+          cardToPlay = trumpCards[0];
+        } else {
+          validCards.sort((a, b) => valueOrder[a.value] - valueOrder[b.value]);
+          cardToPlay = validCards[0];
+        }
+      }
+
+      if (!trumpSuit && leadSuit && cardToPlay.suit !== leadSuit) {
+        trumpSuit = cardToPlay.suit;
+        showMessage(`${currentPlayer.toUpperCase()} established trump: ${trumpSuit}`, 'playing');
+      }
+
+      if (!leadSuit) {
+        leadSuit = cardToPlay.suit;
+      }
+
+      hands[currentPlayer] = hands[currentPlayer].filter(c => c !== cardToPlay);
+      currentTrick[currentPlayer] = cardToPlay;
+
+      updateDisplay();
+      nextPlayer();
+    }
+
+    function evaluateTrick() {
+      const cardsPlayed = [
+        { player: 'player', card: currentTrick.player },
+        { player: 'cpu1', card: currentTrick.cpu1 },
+        { player: 'cpu2', card: currentTrick.cpu2 },
+        { player: 'cpu3', card: currentTrick.cpu3 }
+      ];
+
+      let winner = cardsPlayed[0];
+
+      for (let i = 1; i < cardsPlayed.length; i++) {
+        const current = cardsPlayed[i];
+
+        if (trumpSuit) {
+          if (current.card.suit === trumpSuit && winner.card.suit !== trumpSuit) {
+            winner = current;
+            continue;
+          }
+          if (winner.card.suit === trumpSuit && current.card.suit !== trumpSuit) {
+            continue;
+          }
+        }
+
+        if (current.card.suit === winner.card.suit) {
+          if (valueOrder[current.card.value] > valueOrder[winner.card.value]) {
+            winner = current;
+          }
+        } else if (current.card.suit !== leadSuit) {
+          continue;
+        }
+      }
+
+      let tensInTrick = 0;
+      cardsPlayed.forEach(cp => {
+        if (cp.card.value === '10') tensInTrick++;
+      });
+
+      if (winner.player === 'player' || winner.player === 'cpu2') {
+        tricksWon.yourTeam++;
+        tensWon.yourTeam += tensInTrick;
+      } else {
+        tricksWon.opponentTeam++;
+        tensWon.opponentTeam += tensInTrick;
+      }
+
+      showMessage(`${winner.player.toUpperCase()} wins the trick!`, 'playing');
+
+      currentTrick = { player: null, cpu1: null, cpu2: null, cpu3: null };
+      leadSuit = null;
+      leadPlayer = winner.player;
+      currentPlayer = winner.player;
+
+      updateDisplay();
+
+      if (hands.player.length === 0) {
+        setTimeout(() => endGame(), 1500);
+      } else {
+        if (currentPlayer !== 'player') {
+          setTimeout(() => cpuPlay(), 1000);
+        }
+      }
+    }
+
+    function endGame() {
+      gameActive = false;
+
+      if (tensWon.yourTeam > tensWon.opponentTeam) {
+        showMessage(`You win! Your team got ${tensWon.yourTeam} tens vs ${tensWon.opponentTeam}`, 'win');
+      } else if (tensWon.opponentTeam > tensWon.yourTeam) {
+        showMessage(`Opponents win! They got ${tensWon.opponentTeam} tens vs ${tensWon.yourTeam}`, 'lose');
+      } else {
+        if (tricksWon.yourTeam > tricksWon.opponentTeam) {
+          showMessage(`You win on tricks! (${tricksWon.yourTeam} vs ${tricksWon.opponentTeam})`, 'win');
+        } else {
+          showMessage(`Opponents win on tricks! (${tricksWon.opponentTeam} vs ${tricksWon.yourTeam})`, 'lose');
+        }
+      }
+    }
+
+    function showMessage(message, type) {
+      const msgDiv = document.getElementById('gameMessage');
+      msgDiv.textContent = message;
+      msgDiv.className = 'game-message message-' + type;
+    }
+
+    function startNewGame() {
+      createDeck();
+      dealCards();
+
+      currentTrick = { player: null, cpu1: null, cpu2: null, cpu3: null };
+      leadSuit = null;
+      trumpSuit = null;
+      tricksWon = { yourTeam: 0, opponentTeam: 0 };
+      tensWon = { yourTeam: 0, opponentTeam: 0 };
+
+      const players = ['player', 'cpu1', 'cpu2', 'cpu3'];
+      leadPlayer = players[Math.floor(Math.random() * 4)];
+      currentPlayer = leadPlayer;
+
+      gameActive = true;
+
+      updateDisplay();
+      showMessage(`${currentPlayer.toUpperCase()} starts the game!`, 'playing');
+
+      if (currentPlayer !== 'player') {
+        setTimeout(() => cpuPlay(), 1000);
+      }
+    }
+
+    updateDisplay();
+  </script>
+
+</body>
+</html>
