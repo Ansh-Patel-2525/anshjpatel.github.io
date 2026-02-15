@@ -994,6 +994,11 @@
       for (let i = 1; i < cardsPlayed.length; i++) {
         const current = cardsPlayed[i];
         
+        // Skip cards that are neither lead suit nor trump
+        if (current.card.suit !== leadSuit && current.card.suit !== trumpSuit) {
+          continue;
+        }
+        
         if (trumpSuit) {
           if (current.card.suit === trumpSuit && winner.card.suit !== trumpSuit) {
             winner = current;
@@ -1030,6 +1035,11 @@
       for (let i = 1; i < cardsPlayed.length; i++) {
         const current = cardsPlayed[i];
         
+        // Skip cards that are neither lead suit nor trump
+        if (current.suit !== leadSuit && current.suit !== trumpSuit) {
+          continue;
+        }
+        
         if (trumpSuit) {
           if (current.suit === trumpSuit && winner.suit !== trumpSuit) {
             winner = current;
@@ -1054,43 +1064,60 @@
     // End of Improved CPU AI
     // ============================================
 
+
     function evaluateTrick() {
+    
       const cardsPlayed = [
         { player: 'player', card: currentTrick.player },
         { player: 'cpu1', card: currentTrick.cpu1 },
         { player: 'cpu2', card: currentTrick.cpu2 },
         { player: 'cpu3', card: currentTrick.cpu3 }
       ];
-
-      let winner = cardsPlayed[0];
-
-      for (let i = 1; i < cardsPlayed.length; i++) {
-        const current = cardsPlayed[i];
-
+    
+      // Remove any null cards just in case
+      const played = cardsPlayed.filter(cp => cp.card !== null);
+    
+      // IMPORTANT: Start winner as the lead player's card
+      let winner = played.find(cp => cp.player === leadPlayer);
+    
+      for (let i = 0; i < played.length; i++) {
+    
+        const current = played[i];
+    
+        if (current.player === winner.player) continue;
+    
+        // Ignore cards that are neither lead suit nor trump
+        if (current.card.suit !== leadSuit && current.card.suit !== trumpSuit) {
+          continue;
+        }
+    
+        // Trump beats non-trump
         if (trumpSuit) {
           if (current.card.suit === trumpSuit && winner.card.suit !== trumpSuit) {
             winner = current;
             continue;
           }
+    
           if (winner.card.suit === trumpSuit && current.card.suit !== trumpSuit) {
             continue;
           }
         }
-
+    
+        // Same suit comparison
         if (current.card.suit === winner.card.suit) {
           if (valueOrder[current.card.value] > valueOrder[winner.card.value]) {
             winner = current;
           }
-        } else if (current.card.suit !== leadSuit) {
-          continue;
         }
       }
-
+    
+      // Count 10s
       let tensInTrick = 0;
-      cardsPlayed.forEach(cp => {
+      played.forEach(cp => {
         if (cp.card.value === '10') tensInTrick++;
       });
-
+    
+      // Assign trick
       if (winner.player === 'player' || winner.player === 'cpu2') {
         tricksWon.yourTeam++;
         tensWon.yourTeam += tensInTrick;
@@ -1098,16 +1125,16 @@
         tricksWon.opponentTeam++;
         tensWon.opponentTeam += tensInTrick;
       }
-
+    
       showMessage(`${winner.player.toUpperCase()} wins the trick!`, 'playing');
-
+    
       currentTrick = { player: null, cpu1: null, cpu2: null, cpu3: null };
       leadSuit = null;
       leadPlayer = winner.player;
       currentPlayer = winner.player;
-
+    
       updateDisplay();
-
+    
       if (hands.player.length === 0) {
         setTimeout(() => endGame(), 1500);
       } else {
@@ -1116,6 +1143,7 @@
         }
       }
     }
+    
 
     function endGame() {
       gameActive = false;
