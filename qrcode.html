@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QR Code Generator - Ansh Patel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <style>
+    .game-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #c026d3 100%);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease-in-out;
+      padding: 1rem 0;
+    }
+    
+    .game-header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .game-header h1 {
+      color: white;
+      margin: 0;
+      font-size: 1.8rem;
+    }
+    
+    .header-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+    
+    .game-header .back-link {
+      color: white;
+      text-decoration: none;
+      opacity: 0.9;
+      font-weight: 500;
+      transition: opacity 0.2s;
+    }
+    
+    .game-header .back-link:hover {
+      opacity: 1;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+    }
+
+    .container {
+      margin-top: 100px;
+      padding: 2rem;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .emoji {
+      font-size: 3rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .controls {
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #333;
+      font-size: 1rem;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.8rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+      font-family: inherit;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .form-group small {
+      display: block;
+      color: #666;
+      font-size: 0.85rem;
+      margin-top: 0.3rem;
+    }
+
+    .size-selector {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .size-option {
+      flex: 1;
+      padding: 0.8rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: white;
+    }
+
+    .size-option:hover {
+      border-color: #667eea;
+    }
+
+    .size-option.active {
+      border-color: #667eea;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-weight: 600;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 1rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    }
+
+    .qr-output {
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      text-align: center;
+      display: none;
+    }
+
+    .qr-output.show {
+      display: block;
+    }
+
+    #qrcode {
+      display: flex;
+      justify-content: center;
+      margin: 2rem 0;
+    }
+
+    #qrcode canvas,
+    #qrcode img {
+      border: 3px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 1rem;
+      background: white;
+    }
+
+    .download-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .game-header {
+        padding: 0.5rem 0;
+      }
+
+      .game-header-content {
+        padding: 0 1rem;
+      }
+
+      .game-header h1 {
+        font-size: 1.1rem;
+      }
+
+      .header-links {
+        gap: 0.8rem;
+        font-size: 0.85rem;
+      }
+
+      .container {
+        margin-top: 60px;
+        padding: 1rem;
+      }
+
+      .controls {
+        padding: 1.5rem;
+      }
+
+      .size-selector {
+        flex-direction: column;
+      }
+
+      .form-group input,
+      .form-group textarea {
+        font-size: 16px; /* Prevent iOS zoom */
+      }
+    }
+
+    @media (max-width: 480px) {
+      .game-header {
+        padding: 0.4rem 0;
+      }
+
+      .game-header-content {
+        padding: 0 0.5rem;
+      }
+
+      .game-header h1 {
+        font-size: 0.95rem;
+      }
+
+      .header-links {
+        gap: 0.4rem;
+        font-size: 0.75rem;
+      }
+
+      .container {
+        margin-top: 55px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="game-header">
+    <div class="game-header-content">
+      <h1>📱 QR Code Generator</h1>
+      <div class="header-links">
+        <a href="widgets.html" class="back-link">← Back to Widgets</a>
+        <a href="index.html" class="back-link">🏠 Home</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="emoji">📱✨🔲</div>
+
+    <div class="controls">
+      <div class="form-group">
+        <label>Enter Text or URL:</label>
+        <textarea id="qrText" placeholder="https://example.com
+or any text you want to encode"></textarea>
+        <small>Can be a website URL, text, phone number, email, etc.</small>
+      </div>
+
+      <div class="form-group">
+        <label>QR Code Size:</label>
+        <div class="size-selector">
+          <div class="size-option" onclick="selectSize(128)">Small<br>128px</div>
+          <div class="size-option active" onclick="selectSize(256)">Medium<br>256px</div>
+          <div class="size-option" onclick="selectSize(512)">Large<br>512px</div>
+        </div>
+      </div>
+
+      <button class="btn" onclick="generateQR()">📱 Generate QR Code</button>
+    </div>
+
+    <div class="qr-output" id="qrOutput">
+      <h2>Your QR Code</h2>
+      <div id="qrcode"></div>
+      <button class="btn download-btn" onclick="downloadQR()">⬇️ Download QR Code</button>
+    </div>
+  </div>
+
+  <script>
+    let currentSize = 256;
+    let qrCodeInstance = null;
+
+    function selectSize(size) {
+      currentSize = size;
+      const options = document.querySelectorAll('.size-option');
+      options.forEach(opt => opt.classList.remove('active'));
+      event.target.closest('.size-option').classList.add('active');
+    }
+
+    function generateQR() {
+      const text = document.getElementById('qrText').value.trim();
+      
+      if (!text) {
+        alert('Please enter some text or URL!');
+        return;
+      }
+
+      // Clear previous QR code
+      const qrContainer = document.getElementById('qrcode');
+      qrContainer.innerHTML = '';
+
+      // Generate new QR code
+      qrCodeInstance = new QRCode(qrContainer, {
+        text: text,
+        width: currentSize,
+        height: currentSize,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+
+      // Show output
+      document.getElementById('qrOutput').classList.add('show');
+    }
+
+    function downloadQR() {
+      const canvas = document.querySelector('#qrcode canvas');
+      if (!canvas) {
+        alert('Please generate a QR code first!');
+        return;
+      }
+
+      // Convert canvas to blob and download
+      canvas.toBlob(function(blob) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'qrcode.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+    }
+
+    // Header auto-hide
+    let lastScrollTop = 0;
+    const header = document.querySelector('.game-header');
+    
+    window.addEventListener('scroll', function() {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      
+      if (Math.abs(scrollTop - lastScrollTop) < 5) return;
+      
+      if (scrollTop > lastScrollTop && scrollTop > 100) {
+        header.style.transform = 'translateY(-100%)';
+      } else {
+        header.style.transform = 'translateY(0)';
+      }
+      
+      lastScrollTop = scrollTop;
+    });
+  </script>
+
+</body>
+</html>
