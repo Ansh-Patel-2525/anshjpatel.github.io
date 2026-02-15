@@ -175,13 +175,10 @@
 
     .output-section {
       margin-top: 2rem;
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
     }
 
     .output-box {
-      background: #f9fafb;
+      background: white;
       border: 2px solid #e5e7eb;
       border-radius: 10px;
       padding: 1.5rem;
@@ -220,7 +217,7 @@
       font-family: monospace;
       word-break: break-all;
       white-space: pre-wrap;
-      background: white;
+      background: #f9fafb;
       padding: 1rem;
       border-radius: 8px;
       border: 1px solid #e5e7eb;
@@ -228,32 +225,114 @@
       overflow-y: auto;
     }
 
-    .alert {
-      padding: 1rem;
-      border-radius: 10px;
-      margin-bottom: 1rem;
-      display: none;
-    }
-
-    .alert.show {
-      display: block;
-    }
-
-    .alert.error {
-      background: #fee2e2;
-      color: #dc2626;
-      border: 1px solid #fecaca;
-    }
-
-    .alert.success {
-      background: #d1fae5;
-      color: #059669;
-      border: 1px solid #a7f3d0;
-    }
-
     @media (max-width: 768px) {
+      .game-header-content {
+        padding: 0 1rem;
+      }
+
+      .game-header h1 {
+        font-size: 1.3rem;
+      }
+
+      .header-links {
+        gap: 1rem;
+        font-size: 0.9rem;
+      }
+
+      .game-container {
+        margin-top: 80px;
+        width: 100% !important;
+        padding: 0 0.5rem 1rem 0.5rem;
+      }
+
+      .encryptor-display {
+        padding: 1rem 0.5rem;
+      }
+
       .dual-panel-container {
         flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      .panel {
+        padding: 1.5rem 1rem;
+      }
+
+      .panel-header h2 {
+        font-size: 1.3rem;
+      }
+
+      .panel-header .emoji {
+        font-size: 2rem;
+      }
+
+      .input-group {
+        margin-bottom: 1rem;
+      }
+
+      .input-group label {
+        font-size: 0.95rem;
+      }
+
+      .input-group input,
+      .input-group textarea {
+        padding: 0.8rem;
+        font-size: 0.95rem;
+      }
+
+      .input-group textarea {
+        min-height: 120px;
+      }
+
+      .action-btn {
+        padding: 1rem;
+        font-size: 1rem;
+        /* Prevent iOS zoom on input focus */
+        touch-action: manipulation;
+      }
+
+      .output-section {
+        margin-top: 1rem;
+      }
+
+      .output-box {
+        padding: 1rem;
+      }
+
+      .output-header h3 {
+        font-size: 1rem;
+      }
+
+      .copy-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+      }
+
+      .output-text {
+        font-size: 0.85rem;
+        max-height: 200px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .game-header h1 {
+        font-size: 1.1rem;
+      }
+
+      .header-links {
+        flex-direction: column;
+        gap: 0.3rem;
+        font-size: 0.85rem;
+        align-items: flex-end;
+      }
+
+      .panel {
+        padding: 1rem 0.8rem;
+      }
+
+      .input-group input,
+      .input-group textarea {
+        font-size: 16px; /* Prevents iOS zoom */
       }
     }
   </style>
@@ -262,7 +341,7 @@
 
   <header class="game-header">
     <div class="game-header-content">
-      <h1>🔐 Encryptor/Decryptor</h1>
+      <h1>🔐 Encryptor</h1>
       <div class="header-links">
         <a href="widgets.html" class="back-link">← Back to Widgets</a>
         <a href="index.html" class="back-link">🏠 Home</a>
