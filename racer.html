@@ -372,19 +372,24 @@ function showOverlay(title,sub,sc,be,btn){
 // ── Obstacle pool ──
 const OB_COLORS = ['#f87171','#fb923c','#facc15','#4ade80','#38bdf8','#c084fc','#f472b6','#a3e635'];
 const OB_SHAPES = ['tri','diamond','hex','cross','ring'];
+const SAFE_TIME = 120; // frames (~2 seconds)
+
 function spawnObstacle(){
-  // Spawn multiple at once at higher speeds for density
   const count = zSpeed > diff.zBase*2 ? 2 : 1;
   for(let n=0;n<count;n++){
-    let wx;
-    // avoid spawning exactly on top of player
-    let tries=0;
-    do { wx = 0.04 + Math.random()*0.92; tries++; }
-    while(Math.abs(wx-playerX)<0.07 && tries<10);
+    let wx = 0.04 + Math.random()*0.92;
+
+    if(tick < SAFE_TIME){
+      let tries = 0;
+      while(Math.abs(wx-playerX)<0.07 && tries<10){
+        wx = 0.04 + Math.random()*0.92;
+        tries++;
+      }
+    }
 
     obstacles.push({
       wx,
-      z: 0,           // born right at the vanishing point → visible immediately
+      z: 0,
       color: OB_COLORS[Math.floor(Math.random()*OB_COLORS.length)],
       shape: OB_SHAPES[Math.floor(Math.random()*OB_SHAPES.length)],
       rot: Math.random()*Math.PI*2,
