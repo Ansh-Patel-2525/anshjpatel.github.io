@@ -1040,31 +1040,49 @@ canvas {
   }
 }
 
+/* Video Section */
 .video-section {
+  margin-top: 3rem;
+  padding: 2.5rem;
   background: white;
-  border-radius: 20px;
-  padding: 2rem;
-  margin-top: 2.5rem;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  border-radius: 24px;
+  border: 1px solid rgba(124, 58, 237, 0.15);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
 }
 
 .video-section h2 {
   text-align: center;
   margin-bottom: 2rem;
+  font-size: 2rem;
   color: var(--text-dark);
 }
 
+/* Responsive grid */
 .video-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 1.5rem;
 }
 
+/* Individual video card */
 .video-grid video {
   width: 100%;
-  border-radius: 12px;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
   background: #000;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  border-radius: 16px;
+  border: 4px solid #fff;
+  box-shadow:
+    0 8px 20px rgba(0,0,0,0.15),
+    0 0 0 2px rgba(124,58,237,0.15);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.video-grid video:hover {
+  transform: scale(1.03);
+  box-shadow:
+    0 15px 35px rgba(0,0,0,0.25),
+    0 0 0 3px #a855f7;
 }
 #rating {
   background: white;
