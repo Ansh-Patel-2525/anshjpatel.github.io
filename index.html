@@ -5,6 +5,28 @@
   <title>Ansh Patel</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
+  <style>
+    .rs-btn {
+      display: flex; align-items: center; gap: 12px;
+      padding: 13px 30px; border-radius: 10px;
+      border: 1.5px solid #ccc;
+      background: white; color: #222;
+      font-size: 15px; cursor: pointer; min-width: 190px;
+      transition: background 0.15s, transform 0.12s, border-color 0.15s;
+      font-family: inherit;
+    }
+    .rs-btn:hover { background: #f4f4f4; transform: scale(1.04); }
+    .rs-btn.laser-on { border-color: #ee5533; }
+    .rdot {
+      width: 11px; height: 11px; border-radius: 50%;
+      background: #bbb; flex-shrink: 0;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    .rs-btn.laser-on .rdot {
+      background: #ee5533;
+      box-shadow: 0 0 0 3px rgba(230,60,40,0.22), 0 0 10px 3px rgba(230,60,40,0.4);
+    }
+  </style>
 </head>
 <body>
 
@@ -93,7 +115,7 @@
         </div>
       </div>
     </section>
-    
+
     <section id="contact" class="section-card contact-section">
       <div class="section-icon">📬</div>
       <h2>Contact</h2>
@@ -124,6 +146,95 @@
       </div>
     </section>
 
+    <!-- Rating Section -->
+    <section id="rating" class="section-card" style="position:relative; overflow:hidden; padding:0; background:white;">
+
+      <div id="rs-red-flash" style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(200,10,5,0);pointer-events:none;z-index:10;border-radius:inherit;"></div>
+      <canvas id="rs-canvas" style="position:absolute;top:0;left:0;pointer-events:none;z-index:1;display:block;"></canvas>
+
+      <div style="position:relative;z-index:2;padding:2.5rem 1rem 2rem;text-align:center;font-family:inherit;user-select:none;">
+        <div class="section-icon">🎯</div>
+        <h2>Rate My Website</h2>
+        <p style="color:#888;margin-bottom:2rem;font-size:14px;">How did you find it?</p>
+
+        <div id="rs-layout" style="display:flex;align-items:center;justify-content:center;gap:3rem;flex-wrap:wrap;">
+
+          <!-- Buttons -->
+          <div style="display:flex;flex-direction:column;gap:14px;align-items:stretch;">
+            <button class="rs-btn btn-excellent" onmouseenter="rsAim('excellent')" onmouseleave="rsUnaim()">
+              <span class="rdot"></span> Excellent
+            </button>
+            <button class="rs-btn btn-good" onmouseenter="rsAim('good')" onmouseleave="rsUnaim()">
+              <span class="rdot"></span> Good enough
+            </button>
+            <button class="rs-btn btn-bad" onmouseenter="rsAim('bad')" onmouseleave="rsUnaim()">
+              <span class="rdot"></span> Bad
+            </button>
+          </div>
+
+          <!-- Ghost Sniper -->
+          <div id="rs-ghost-wrap" style="width:200px;height:250px;flex-shrink:0;">
+            <svg id="rs-svg" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+              <defs>
+                <radialGradient id="ghostGrad" cx="50%" cy="40%" r="55%">
+                  <stop offset="0%" stop-color="#f2f2ff"/>
+                  <stop offset="100%" stop-color="#c8c8de"/>
+                </radialGradient>
+              </defs>
+              <!-- shadow -->
+              <ellipse cx="100" cy="235" rx="58" ry="9" fill="rgba(0,0,0,0.09)"/>
+              <!-- cloak -->
+              <path d="M58 128 Q56 215 70 218 Q74 200 80 218 Q86 200 92 218 Q98 200 104 218 Q110 200 116 218 Q122 200 128 218 Q132 215 142 128 Z" fill="url(#ghostGrad)" stroke="#b0b0c8" stroke-width="1.2"/>
+              <!-- head -->
+              <ellipse cx="100" cy="100" rx="36" ry="38" fill="url(#ghostGrad)" stroke="#b0b0c8" stroke-width="1.2"/>
+              <!-- brows -->
+              <path id="rs-brow-l" d="M76 84 Q84 80 88 84" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round"/>
+              <path id="rs-brow-r" d="M112 84 Q116 80 124 84" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round"/>
+              <!-- eye whites -->
+              <ellipse cx="87" cy="102" rx="10" ry="11" fill="white" stroke="#aaa" stroke-width="0.8"/>
+              <ellipse cx="113" cy="102" rx="10" ry="11" fill="white" stroke="#aaa" stroke-width="0.8"/>
+              <!-- pupils -->
+              <circle id="rs-pupil-l" cx="87" cy="104" r="6" fill="#1a1a1a"/>
+              <circle id="rs-pupil-r" cx="113" cy="104" r="6" fill="#1a1a1a"/>
+              <!-- eye shines -->
+              <circle cx="89.5" cy="101.5" r="2" fill="white"/>
+              <circle cx="115.5" cy="101.5" r="2" fill="white"/>
+              <!-- left arm -->
+              <path d="M62 140 Q42 148 36 162 Q34 170 42 172 Q50 174 58 162 Q64 152 70 148" fill="#d0d0e4" stroke="#aaa" stroke-width="1"/>
+              <ellipse cx="39" cy="169" rx="8" ry="6" fill="#c8c8dc" stroke="#aaa" stroke-width="0.8"/>
+              <!-- right arm -->
+              <path d="M138 140 Q155 148 162 158 Q166 166 160 170 Q154 174 148 164 Q142 154 136 148" fill="#d0d0e4" stroke="#aaa" stroke-width="1"/>
+              <ellipse cx="161" cy="167" rx="8" ry="6" fill="#c8c8dc" stroke="#aaa" stroke-width="0.8"/>
+              <!-- rifle barrel -->
+              <rect x="34" y="154" width="140" height="9" rx="3" fill="#4a4a4a" stroke="#2a2a2a" stroke-width="0.8"/>
+              <!-- stock -->
+              <path d="M148 154 L168 154 L172 163 L148 163 Z" fill="#8B6340" stroke="#5a3c1a" stroke-width="0.8"/>
+              <!-- bolt -->
+              <path d="M140 154 Q143 148 146 154" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+              <!-- scope rail -->
+              <rect x="80" y="148" width="50" height="8" rx="2" fill="#2a2a2a"/>
+              <!-- scope body -->
+              <rect x="85" y="143" width="40" height="9" rx="3" fill="#3a3a3a" stroke="#222" stroke-width="0.5"/>
+              <!-- scope lenses -->
+              <circle cx="88" cy="147" r="3.5" fill="#111" stroke="#666" stroke-width="0.8"/>
+              <circle cx="122" cy="147" r="3.5" fill="#111" stroke="#666" stroke-width="0.8"/>
+              <!-- scope crosshair glint -->
+              <line x1="88" y1="145" x2="88" y2="149" stroke="#44aaff" stroke-width="0.7" opacity="0.7"/>
+              <line x1="86" y1="147" x2="90" y2="147" stroke="#44aaff" stroke-width="0.7" opacity="0.7"/>
+              <!-- suppressor -->
+              <rect x="34" y="152" width="14" height="13" rx="3" fill="#555" stroke="#333" stroke-width="0.5"/>
+              <!-- muzzle -->
+              <rect x="30" y="153.5" width="7" height="10" rx="1.5" fill="#444"/>
+              <!-- bipod -->
+              <line x1="60" y1="163" x2="52" y2="178" stroke="#555" stroke-width="2" stroke-linecap="round"/>
+              <line x1="68" y1="163" x2="76" y2="178" stroke="#555" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
     <footer>
       <p>© 2026 Ansh Patel</p>
       <p class="footer-meta">Website created on 21/01/2026 at 13:45</p>
@@ -132,5 +243,174 @@
   </main>
 
   <script src="script.js"></script>
+
+  <script>
+  (function(){
+    var outer    = document.getElementById('rating');
+    var canvas   = document.getElementById('rs-canvas');
+    var ctx      = canvas.getContext('2d');
+    var svgEl    = document.getElementById('rs-svg');
+    var pupilL   = document.getElementById('rs-pupil-l');
+    var pupilR   = document.getElementById('rs-pupil-r');
+    var browL    = document.getElementById('rs-brow-l');
+    var browR    = document.getElementById('rs-brow-r');
+    var flash    = document.getElementById('rs-red-flash');
+
+    var currentMode  = null;
+    var mouseX       = -999;
+    var mouseY       = -999;
+    var pulseT       = 0;
+    var flashOpacity = 0;
+
+    /* --- size the canvas to exactly match the section --- */
+    function resizeCanvas() {
+      canvas.width  = outer.offsetWidth;
+      canvas.height = outer.offsetHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    /* --- convert SVG viewBox coords to page-relative px --- */
+    function getMuzzlePos() {
+      var svgRect   = svgEl.getBoundingClientRect();
+      var outerRect = outer.getBoundingClientRect();
+      return {
+        x: svgRect.left - outerRect.left + (30  / 200) * svgRect.width,
+        y: svgRect.top  - outerRect.top  + (158 / 250) * svgRect.height
+      };
+    }
+
+    function getCenter() {
+      return { x: outer.offsetWidth / 2, y: outer.offsetHeight / 2 };
+    }
+
+    /* --- mouse tracking relative to the section --- */
+    outer.addEventListener('mousemove', function(e) {
+      var r  = outer.getBoundingClientRect();
+      mouseX = e.clientX - r.left;
+      mouseY = e.clientY - r.top;
+    });
+    outer.addEventListener('mouseleave', function() {
+      mouseX = -999; mouseY = -999;
+    });
+
+    /* --- eye / brow helpers --- */
+    function setRedEyes(on) {
+      var fill = on ? '#ee3311' : '#1a1a1a';
+      pupilL.setAttribute('fill', fill);
+      pupilR.setAttribute('fill', fill);
+      browL.setAttribute('d',      on ? 'M76 82 Q84 78 88 82' : 'M76 84 Q84 80 88 84');
+      browR.setAttribute('d',      on ? 'M112 82 Q116 78 124 82' : 'M112 84 Q116 80 124 84');
+      browL.setAttribute('stroke', on ? '#ee3311' : '#888');
+      browR.setAttribute('stroke', on ? '#ee3311' : '#888');
+    }
+
+    /* --- public API called by buttons --- */
+    window.rsUnaim = function() {
+      document.querySelectorAll('.rs-btn').forEach(function(b){ b.classList.remove('laser-on'); });
+      currentMode = null;
+      setRedEyes(false);
+      flash.style.background = 'rgba(200,10,5,0)';
+    };
+
+    window.rsAim = function(target) {
+      rsUnaim();
+      currentMode = target;
+      var btn = document.querySelector('.btn-' + target);
+      if (btn) btn.classList.add('laser-on');
+      if (target === 'bad') {
+        setRedEyes(true);
+        flashOpacity = 0.6;
+      }
+    };
+
+    /* --- canvas drawing helpers --- */
+    function drawLaser(x1, y1, x2, y2, thick) {
+      ctx.save();
+      /* muzzle glow */
+      var mg = ctx.createRadialGradient(x1, y1, 0, x1, y1, 18);
+      mg.addColorStop(0, 'rgba(255,80,40,0.9)');
+      mg.addColorStop(1, 'rgba(255,80,40,0)');
+      ctx.fillStyle = mg;
+      ctx.beginPath();
+      ctx.arc(x1, y1, 18, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.lineCap = 'round';
+      /* outer glow */
+      ctx.strokeStyle = 'rgba(255,40,0,0.12)';
+      ctx.lineWidth   = thick * 6;
+      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+      /* mid glow */
+      ctx.strokeStyle = 'rgba(255,60,20,0.45)';
+      ctx.lineWidth   = thick * 2.5;
+      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+      /* bright core */
+      ctx.fillStyle = '#ff0000';
+      ctx.lineWidth   = thick;
+      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawDot(x, y, r) {
+      ctx.save();
+      var g = ctx.createRadialGradient(x,y,0, x,y,r*4);
+      g.addColorStop(0,   'rgba(255,30,0,0.6)');
+      g.addColorStop(1,   'rgba(255,30,0,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(x,y,r*4,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle = 'rgba(255,60,20,0.75)';
+      ctx.beginPath(); ctx.arc(x,y,r*2,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#ff2200';
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
+
+    function drawCrosshair(x, y, r) {
+      ctx.save();
+      ctx.strokeStyle  = '#ff2200';
+      ctx.globalAlpha  = 0.9;
+      ctx.lineWidth    = 2.5;
+      ctx.setLineDash([7,4]);
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(x-r-12,y); ctx.lineTo(x+r+12,y); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x,y-r-12); ctx.lineTo(x,y+r+12); ctx.stroke();
+      ctx.fillStyle   = 'rgba(255,30,0,0.55)';
+      ctx.beginPath(); ctx.arc(x,y,5,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
+
+    /* --- main render loop --- */
+    function tick() {
+      pulseT += 0.07;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      var muzzle = getMuzzlePos();
+      var dotR   = 3 + 1.2 * Math.sin(pulseT);
+      var flicker = 0.7 + Math.random() * 0.6;
+
+      if (currentMode === 'bad') {
+        var c = getCenter();
+      
+        drawLaser(muzzle.x, muzzle.y, c.x, c.y, 5 * flicker);
+        drawCrosshair(c.x, c.y, 42 + 6 * Math.sin(pulseT * 0.8));
+        drawDot(c.x, c.y, dotR + 2);
+      
+        /* continuous red pulse */
+        var pulse = 0.25 + 0.25 * Math.sin(pulseT * 3);
+        flash.style.background = 'rgba(200,10,5,' + pulse.toFixed(3) + ')';
+      } else if (mouseX > 0) {
+        /* laser follows cursor anywhere inside the section */
+        drawLaser(muzzle.x, muzzle.y, mouseX, mouseY, 3 * flicker);
+        drawDot(mouseX, mouseY, dotR);
+      }
+
+      requestAnimationFrame(tick);
+    }
+    tick();
+  })();
+  </script>
+
 </body>
 </html>

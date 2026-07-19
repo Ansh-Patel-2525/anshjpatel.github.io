@@ -1039,3 +1039,14 @@ canvas {
     font-size: 1.1rem;
   }
 }
+
+#rating {
+  background: white;
+}
+
+#rating canvas {
+  background: transparent;
+  border: none;
+  margin: 0;
+  box-shadow: none;
+}
