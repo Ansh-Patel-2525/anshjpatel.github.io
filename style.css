@@ -957,6 +957,7 @@ canvas {
     align-items: center;
     gap: 1rem;
   }
+
   nav ul {
     gap: 1rem;
     flex-wrap: wrap;
