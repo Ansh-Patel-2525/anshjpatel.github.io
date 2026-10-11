@@ -2048,3 +2048,41 @@ nav a {
     transition: none;
   }
 }
+
+/* Force mobile navigation into one horizontal row */
+@media (max-width: 650px) {
+  nav .nav-content {
+    display: flex;
+    flex-direction: row !important;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 64px;
+    padding: 0.65rem 0.85rem;
+    gap: 0.5rem;
+  }
+
+  nav .logo {
+    flex-shrink: 0;
+  }
+
+  nav ul {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    margin-left: auto;
+  }
+
+  nav ul li,
+  nav ul a {
+    white-space: nowrap;
+  }
+
+  nav ul a {
+    font-size: 0.78rem;
+    padding: 0.4rem 0;
+  }
+}
