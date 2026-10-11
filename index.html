@@ -2,415 +2,255 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Ansh Patel</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Ansh Patel — Graduate Actuarial Analyst at AXA UK. A fun little corner of the internet.">
+  <title>Ansh Patel</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    .rs-btn {
-      display: flex; align-items: center; gap: 12px;
-      padding: 13px 30px; border-radius: 10px;
-      border: 1.5px solid #ccc;
-      background: white; color: #222;
-      font-size: 15px; cursor: pointer; min-width: 190px;
-      transition: background 0.15s, transform 0.12s, border-color 0.15s;
-      font-family: inherit;
+    :root { --ap-ink:#142238; --ap-muted:#637187; --ap-accent:#2d6cdf; --ap-accent-soft:#eaf1ff; --ap-line:#e2e8f0; --ap-bg:#f4f7fb; }
+    body { margin:0; background:var(--ap-bg); color:var(--ap-ink); font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; line-height:1.6; }
+    body p { color:var(--ap-muted); }
+
+    /* Nav */
+    nav { position:sticky; top:0; z-index:50; background:rgba(255,255,255,.92); backdrop-filter:blur(16px); border-bottom:1px solid var(--ap-line); box-shadow:0 4px 18px rgba(20,34,56,.035); }
+    nav .nav-content { width:min(1120px,calc(100% - 40px)); min-height:64px; margin:0 auto; padding:0; display:flex; align-items:center; justify-content:space-between; }
+    nav .logo { display:grid; place-items:center; width:42px; height:42px; border-radius:13px; background:var(--ap-ink); color:#fff; -webkit-text-fill-color:#fff; font-size:1rem; font-weight:800; letter-spacing:-.04em; text-decoration:none; transition:transform .2s; }
+    nav .logo:hover { transform:rotate(-8deg) scale(1.1); }
+    nav ul { display:flex; align-items:center; margin:0; padding:0; list-style:none; }
+    nav ul a { padding:9px 16px; border-radius:10px; background:var(--ap-accent-soft); color:var(--ap-accent); font-size:.9rem; font-weight:700; text-decoration:none; }
+    nav ul a::after { display:none; }
+
+    /* Hero */
+    .compact-hero { position:relative; overflow:hidden; isolation:isolate; min-height:auto; display:block; background:linear-gradient(120deg,#101d33 0%,#182d4d 60%,#244c7d 100%); color:#fff; padding:64px 24px 72px; }
+    .compact-hero:before,.compact-hero:after { content:""; position:absolute; z-index:-1; border:1px solid rgba(255,255,255,.1); border-radius:50%; }
+    .compact-hero:before { width:540px; height:540px; right:-90px; top:-270px; box-shadow:0 0 0 60px rgba(255,255,255,.025),0 0 0 120px rgba(255,255,255,.02); }
+    .compact-hero:after { width:280px; height:280px; left:8%; bottom:-200px; background:rgba(72,130,220,.15); }
+    .compact-hero .hero-background { display:none; }
+    .hero-inner { width:min(100%,720px); margin:0 auto; display:flex; flex-direction:column; align-items:center; text-align:center; }
+    .hero-inner .profile-pic { display:block; width:170px; height:170px; object-fit:cover; border-radius:50%; border:4px solid rgba(255,255,255,.25); box-shadow:0 20px 55px rgba(0,0,0,.3); animation:apFloat 4s ease-in-out infinite; }
+    @keyframes apFloat { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-8px); } }
+    .hero-inner .eyebrow { margin:22px 0 6px; color:#a9c9ff; font-size:.78rem; font-weight:800; letter-spacing:.18em; }
+    .hero-inner .hero-title { margin:0; color:#fff; font-size:clamp(2.5rem,7vw,4.2rem); line-height:1.05; letter-spacing:-.05em; }
+    .hero-inner .subtitle { margin:14px 0 6px; color:#e0eaff; font-size:clamp(1rem,2.5vw,1.25rem); font-weight:650; }
+    .hero-inner .hero-intro { max-width:520px; margin:8px 0 26px; color:#c3d0e2; }
+    .contact-links { display:flex; flex-wrap:wrap; justify-content:center; gap:12px; }
+    .contact-links a { display:inline-flex; align-items:center; gap:8px; min-height:46px; padding:0 20px; border-radius:12px; background:#fff; color:#142238; font-weight:750; text-decoration:none; transition:transform .18s, background .18s; }
+    .contact-links a:hover { transform:translateY(-3px) rotate(-1deg); background:#eaf1ff; }
+    .contact-links a.alt { background:rgba(255,255,255,.08); color:#fff; border:1px solid rgba(255,255,255,.3); }
+    .contact-links a.alt:hover { background:rgba(255,255,255,.18); }
+    .contact-links a { padding:8px 20px; text-align:left; }
+    .contact-links .cl-icon { font-size:1.25rem; flex-shrink:0; }
+    .contact-links .cl-text { display:flex; flex-direction:column; line-height:1.25; overflow-wrap:anywhere; }
+    .contact-links .cl-text small { font-size:.66rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; opacity:.6; }
+
+    /* Layout */
+    .compact-container { width:min(760px,calc(100% - 40px)); max-width:none; margin:34px auto 0; padding:0 0 28px; }
+    .compact-card { margin:0; border:1px solid var(--ap-line); border-radius:20px; background:#fff; box-shadow:0 8px 30px rgba(28,49,79,.045); }
+    .compact-card:hover { transform:none; }
+    .compact-section-heading { display:flex; align-items:center; gap:12px; margin:0 0 8px; }
+    .compact-section-heading .section-icon { display:grid; place-items:center; width:42px; height:42px; margin:0; border-radius:13px; background:var(--ap-accent-soft); font-size:1.15rem; animation:none; }
+    .compact-section-heading h2 { margin:0; color:var(--ap-ink); font-size:1.35rem; letter-spacing:-.035em; }
+
+    /* Rating widget */
+    .rs-btn { display:flex; align-items:center; gap:10px; padding:10px 18px; border-radius:11px; border:1.5px solid #dce3ed; background:#fff; color:#222; font:inherit; font-size:14px; cursor:pointer; min-width:190px; justify-content:flex-start; transition:background .15s,transform .12s,border-color .15s; }
+    .rs-btn:hover { background:#f4f4f4; transform:scale(1.02); }
+    .rs-btn.laser-on { border-color:#ee5533; }
+    .rdot { width:10px; height:10px; border-radius:50%; background:#bbb; flex-shrink:0; }
+    .rs-btn.laser-on .rdot { background:#ee5533; box-shadow:0 0 0 3px rgba(230,60,40,.18),0 0 9px 3px rgba(230,60,40,.3); }
+    .rating-inner { padding:28px !important; }
+    .rating-heading { justify-content:center; }
+    .rating-prompt { margin:0 0 18px; }
+    .rating-layout { display:flex; align-items:center; justify-content:center; gap:34px; flex-wrap:nowrap; }
+    .rating-buttons { display:flex; flex-direction:column; gap:10px; }
+    .ghost-wrap { width:150px; height:188px; flex:0 0 150px; }
+
+    /* Footer */
+    .compact-footer { display:flex; justify-content:space-between; gap:14px; padding:24px 4px 4px; margin:0; border:none; color:#8995a7; font-size:.78rem; }
+    .compact-footer p { margin:0; color:inherit; }
+
+    @media(max-width:640px) {
+      .compact-hero { padding:44px 20px 52px; }
+      .hero-inner .profile-pic { width:130px; height:130px; }
+      .contact-links { flex-direction:column; align-items:stretch; width:100%; }
+      .contact-links a { width:100%; box-sizing:border-box; }
+      .compact-container { width:calc(100% - 24px); margin-top:18px; }
+      .rating-inner { padding:22px 14px !important; }
+      .rating-layout { flex-direction:column-reverse; gap:12px; }
+      .rating-buttons { width:100%; }
+      .rs-btn { width:100%; min-width:0; }
+      .ghost-wrap { width:112px; height:140px; flex-basis:140px; }
+      .compact-footer { flex-direction:column; gap:5px; }
     }
-    .rs-btn:hover { background: #f4f4f4; transform: scale(1.04); }
-    .rs-btn.laser-on { border-color: #ee5533; }
-    .rdot {
-      width: 11px; height: 11px; border-radius: 50%;
-      background: #bbb; flex-shrink: 0;
-      transition: background 0.2s, box-shadow 0.2s;
-    }
-    .rs-btn.laser-on .rdot {
-      background: #ee5533;
-      box-shadow: 0 0 0 3px rgba(230,60,40,0.22), 0 0 10px 3px rgba(230,60,40,0.4);
-    }
+    @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms!important; transition-duration:.01ms!important; } }
   </style>
 </head>
 <body>
-
-  <!-- Navigation -->
-  <nav>
+  <nav aria-label="Main navigation">
     <div class="nav-content">
-      <a href="private.html" class="logo">AP</a>
+      <a href="private.html" class="logo" aria-label="AP Private Space">AP</a>
       <ul>
-        <li><a href="#about">About</a></li>
-        <li><a href="#projects">Projects</a></li>
-        <li><a href="#skills">Skills</a></li>
-        <li><a href="#contact">Contact</a></li>
-        <li><a href="widgets.html" class="nav-highlight">Widgets</a></li>
+        <li><a href="widgets.html">Widgets 🎮</a></li>
       </ul>
     </div>
   </nav>
 
-  <!-- Hero -->
-  <header class="hero">
+  <header class="hero compact-hero">
     <div class="hero-background"></div>
-    <div class="hero-content">
-      <div class="profile-wrapper">
-        <img src="GradPic.jpg" alt="Ansh Patel" class="profile-pic">
-      </div>
+    <div class="hero-inner">
+      <img src="GradPic.jpg" alt="Ansh Patel" class="profile-pic">
+      <p class="eyebrow">👋 HEY, I'M</p>
       <h1 class="hero-title">Ansh Patel</h1>
-      <p class="subtitle">MMath student at the University of Warwick</p>
-      <div class="hero-cta">
-        <a href="#contact" class="btn-primary">Get in Touch</a>
-        <a href="#projects" class="btn-secondary">View Work</a>
+      <p class="subtitle">Graduate Actuarial Analyst @ AXA UK</p>
+      <p class="hero-intro">Check out the widgets in the top-right corner, and see if you can uncover a secret link hidden somewhere on the homepage!</p>
+      <div class="contact-links">
+        <a href="tel:+4474401xxxxx">
+          <span class="cl-icon" aria-hidden="true">📱</span>
+          <span class="cl-text"><small>Phone</small>+44 7440 1xxxxx</span>
+        </a>
+        <a href="mailto:xxxxx@gmail.com">
+          <span class="cl-icon" aria-hidden="true">✉️</span>
+          <span class="cl-text"><small>Email</small>xxxxx@gmail.com</span>
+        </a>
+        <a class="alt" href="https://linkedin.com/in/ansh-patel-9b6665266" target="_blank" rel="noopener noreferrer">
+          <span class="cl-icon" aria-hidden="true">💼</span>
+          <span class="cl-text"><small>LinkedIn ↗</small>linkedin.com/in/ansh-patel-9b6665266</span>
+        </a>
       </div>
-    </div>
-    <div class="scroll-indicator">
-      <span></span>
     </div>
   </header>
 
-  <main class="container">
-
-    <section id="about" class="section-card">
-      <div class="section-icon">👨‍🎓</div>
-      <h2>About Me</h2>
-      <p>
-        My name is Ansh Patel and I am a final year MMath (Master of Mathematics)
-        student at the University of Warwick.
-      </p>
-    </section>
-
-    <section id="projects" class="section-card">
-      <div class="section-icon">🔬</div>
-      <h2>Projects</h2>
-      <div class="project-highlight">
-        <h3>Current Dissertation</h3>
-        <p>
-          <em>Asymptotic Analysis of Boundary Conditions
-          for Sound Propagation in Flow over Acoustic Linings</em>
-        </p>
-      </div>
-    </section>
-
-    <section id="skills" class="section-card">
-      <div class="section-icon">💻</div>
-      <h2>Skills</h2>
-      <div class="skills-grid">
-        <div class="skill-category">
-          <h3>Programming</h3>
-          <div class="skill-tags">
-            <span>Python</span>
-            <span>C</span>
-            <span>R</span>
+  <main class="container compact-container">
+    <!-- Website rating widget retained, including the IDs used by its animation. -->
+    <section id="rating" class="section-card compact-card compact-rating" style="position:relative;overflow:hidden;padding:0;background:white;">
+      <div id="rs-red-flash" style="position:absolute;inset:0;background:rgba(200,10,5,0);pointer-events:none;z-index:10;border-radius:inherit;"></div>
+      <canvas id="rs-canvas" aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;z-index:1;display:block;"></canvas>
+      <div class="rating-inner" style="position:relative;z-index:2;text-align:center;font-family:inherit;user-select:none;">
+        <div class="compact-section-heading rating-heading"><span class="section-icon" aria-hidden="true">🎯</span><h2>Rate My Website</h2></div>
+        <p class="rating-prompt">How did you find it?</p>
+        <div id="rs-layout" class="rating-layout">
+          <div class="rating-buttons">
+            <button type="button" class="rs-btn btn-excellent" onmouseenter="rsAim('excellent')" onmouseleave="rsUnaim()"><span class="rdot"></span>Excellent</button>
+            <button type="button" class="rs-btn btn-good" onmouseenter="rsAim('good')" onmouseleave="rsUnaim()"><span class="rdot"></span>Good enough</button>
+            <button type="button" class="rs-btn btn-bad" onmouseenter="rsAim('bad')" onmouseleave="rsUnaim()"><span class="rdot"></span>Bad</button>
           </div>
-        </div>
-        <div class="skill-category">
-          <h3>Tools</h3>
-          <div class="skill-tags">
-            <span>LaTeX</span>
-            <span>Excel</span>
-            <span>PowerPoint</span>
-          </div>
-        </div>
-        <div class="skill-category">
-          <h3>Specializations</h3>
-          <div class="skill-tags">
-            <span>OpenMP</span>
-            <span>MPI</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="contact" class="section-card contact-section">
-      <div class="section-icon">📬</div>
-      <h2>Contact</h2>
-      <div class="contact-grid">
-        <div class="contact-item">
-          <span class="contact-icon">📱</span>
-          <div>
-            <h4>Phone</h4>
-            <p>+44 74401 xxxxx</p>
-          </div>
-        </div>
-        <div class="contact-item">
-          <span class="contact-icon">✉️</span>
-          <div>
-            <h4>Email</h4>
-            <p>xxxxx@gmail.com</p>
-          </div>
-        </div>
-        <div class="contact-item">
-          <span class="contact-icon">💼</span>
-          <div>
-            <h4>LinkedIn</h4>
-            <a href="https://linkedin.com/in/ansh-patel-9b6665266" target="_blank">
-              View Profile
-            </a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Rating Section -->
-    <section id="rating" class="section-card" style="position:relative; overflow:hidden; padding:0; background:white;">
-
-      <div id="rs-red-flash" style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(200,10,5,0);pointer-events:none;z-index:10;border-radius:inherit;"></div>
-      <canvas id="rs-canvas" style="position:absolute;top:0;left:0;pointer-events:none;z-index:1;display:block;"></canvas>
-
-      <div style="position:relative;z-index:2;padding:2.5rem 1rem 2rem;text-align:center;font-family:inherit;user-select:none;">
-        <div class="section-icon">🎯</div>
-        <h2>Rate My Website</h2>
-        <p style="color:#888;margin-bottom:2rem;font-size:14px;">How did you find it?</p>
-
-        <div id="rs-layout" style="display:flex;align-items:center;justify-content:center;gap:3rem;flex-wrap:wrap;">
-
-          <!-- Buttons -->
-          <div style="display:flex;flex-direction:column;gap:14px;align-items:stretch;">
-            <button class="rs-btn btn-excellent" onmouseenter="rsAim('excellent')" onmouseleave="rsUnaim()">
-              <span class="rdot"></span> Excellent
-            </button>
-            <button class="rs-btn btn-good" onmouseenter="rsAim('good')" onmouseleave="rsUnaim()">
-              <span class="rdot"></span> Good enough
-            </button>
-            <button class="rs-btn btn-bad" onmouseenter="rsAim('bad')" onmouseleave="rsUnaim()">
-              <span class="rdot"></span> Bad
-            </button>
-          </div>
-
-          <!-- Ghost Sniper -->
-          <div id="rs-ghost-wrap" style="width:200px;height:250px;flex-shrink:0;">
-            <svg id="rs-svg" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-              <defs>
-                <radialGradient id="ghostGrad" cx="50%" cy="40%" r="55%">
-                  <stop offset="0%" stop-color="#f2f2ff"/>
-                  <stop offset="100%" stop-color="#c8c8de"/>
-                </radialGradient>
-              </defs>
-              <!-- shadow -->
-              <ellipse cx="100" cy="235" rx="58" ry="9" fill="rgba(0,0,0,0.09)"/>
-              <!-- cloak -->
+          <div id="rs-ghost-wrap" class="ghost-wrap">
+            <svg id="rs-svg" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" role="img" aria-label="A cartoon ghost holding a rifle">
+              <defs><radialGradient id="ghostGrad" cx="50%" cy="40%" r="55%"><stop offset="0%" stop-color="#f2f2ff"/><stop offset="100%" stop-color="#c8c8de"/></radialGradient></defs>
+              <ellipse cx="100" cy="235" rx="58" ry="9" fill="rgba(0,0,0,.09)"/>
               <path d="M58 128 Q56 215 70 218 Q74 200 80 218 Q86 200 92 218 Q98 200 104 218 Q110 200 116 218 Q122 200 128 218 Q132 215 142 128 Z" fill="url(#ghostGrad)" stroke="#b0b0c8" stroke-width="1.2"/>
-              <!-- head -->
               <ellipse cx="100" cy="100" rx="36" ry="38" fill="url(#ghostGrad)" stroke="#b0b0c8" stroke-width="1.2"/>
-              <!-- brows -->
               <path id="rs-brow-l" d="M76 84 Q84 80 88 84" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round"/>
               <path id="rs-brow-r" d="M112 84 Q116 80 124 84" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round"/>
-              <!-- eye whites -->
-              <ellipse cx="87" cy="102" rx="10" ry="11" fill="white" stroke="#aaa" stroke-width="0.8"/>
-              <ellipse cx="113" cy="102" rx="10" ry="11" fill="white" stroke="#aaa" stroke-width="0.8"/>
-              <!-- pupils -->
-              <circle id="rs-pupil-l" cx="87" cy="104" r="6" fill="#1a1a1a"/>
-              <circle id="rs-pupil-r" cx="113" cy="104" r="6" fill="#1a1a1a"/>
-              <!-- eye shines -->
-              <circle cx="89.5" cy="101.5" r="2" fill="white"/>
-              <circle cx="115.5" cy="101.5" r="2" fill="white"/>
-              <!-- left arm -->
-              <path d="M62 140 Q42 148 36 162 Q34 170 42 172 Q50 174 58 162 Q64 152 70 148" fill="#d0d0e4" stroke="#aaa" stroke-width="1"/>
-              <ellipse cx="39" cy="169" rx="8" ry="6" fill="#c8c8dc" stroke="#aaa" stroke-width="0.8"/>
-              <!-- right arm -->
-              <path d="M138 140 Q155 148 162 158 Q166 166 160 170 Q154 174 148 164 Q142 154 136 148" fill="#d0d0e4" stroke="#aaa" stroke-width="1"/>
-              <ellipse cx="161" cy="167" rx="8" ry="6" fill="#c8c8dc" stroke="#aaa" stroke-width="0.8"/>
-              <!-- rifle barrel -->
-              <rect x="34" y="154" width="140" height="9" rx="3" fill="#4a4a4a" stroke="#2a2a2a" stroke-width="0.8"/>
-              <!-- stock -->
-              <path d="M148 154 L168 154 L172 163 L148 163 Z" fill="#8B6340" stroke="#5a3c1a" stroke-width="0.8"/>
-              <!-- bolt -->
+              <ellipse cx="87" cy="102" rx="10" ry="11" fill="white" stroke="#aaa" stroke-width=".8"/><ellipse cx="113" cy="102" rx="10" ry="11" fill="white" stroke="#aaa" stroke-width=".8"/>
+              <circle id="rs-pupil-l" cx="87" cy="104" r="6" fill="#1a1a1a"/><circle id="rs-pupil-r" cx="113" cy="104" r="6" fill="#1a1a1a"/>
+              <circle cx="89.5" cy="101.5" r="2" fill="white"/><circle cx="115.5" cy="101.5" r="2" fill="white"/>
+              <path d="M62 140 Q42 148 36 162 Q34 170 42 172 Q50 174 58 162 Q64 152 70 148" fill="#d0d0e4" stroke="#aaa"/>
+              <path d="M138 140 Q155 148 162 158 Q166 166 160 170 Q154 174 148 164 Q142 154 136 148" fill="#d0d0e4" stroke="#aaa"/>
+              <ellipse cx="39" cy="169" rx="8" ry="6" fill="#c8c8dc" stroke="#aaa"/><ellipse cx="161" cy="167" rx="8" ry="6" fill="#c8c8dc" stroke="#aaa"/>
+              <rect x="34" y="154" width="140" height="9" rx="3" fill="#4a4a4a" stroke="#2a2a2a"/><path d="M148 154 L168 154 L172 163 L148 163 Z" fill="#8B6340" stroke="#5a3c1a"/>
               <path d="M140 154 Q143 148 146 154" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round"/>
-              <!-- scope rail -->
-              <rect x="80" y="148" width="50" height="8" rx="2" fill="#2a2a2a"/>
-              <!-- scope body -->
-              <rect x="85" y="143" width="40" height="9" rx="3" fill="#3a3a3a" stroke="#222" stroke-width="0.5"/>
-              <!-- scope lenses -->
-              <circle cx="88" cy="147" r="3.5" fill="#111" stroke="#666" stroke-width="0.8"/>
-              <circle cx="122" cy="147" r="3.5" fill="#111" stroke="#666" stroke-width="0.8"/>
-              <!-- scope crosshair glint -->
-              <line x1="88" y1="145" x2="88" y2="149" stroke="#44aaff" stroke-width="0.7" opacity="0.7"/>
-              <line x1="86" y1="147" x2="90" y2="147" stroke="#44aaff" stroke-width="0.7" opacity="0.7"/>
-              <!-- suppressor -->
-              <rect x="34" y="152" width="14" height="13" rx="3" fill="#555" stroke="#333" stroke-width="0.5"/>
-              <!-- muzzle -->
-              <rect x="30" y="153.5" width="7" height="10" rx="1.5" fill="#444"/>
-              <!-- bipod -->
-              <line x1="60" y1="163" x2="52" y2="178" stroke="#555" stroke-width="2" stroke-linecap="round"/>
-              <line x1="68" y1="163" x2="76" y2="178" stroke="#555" stroke-width="2" stroke-linecap="round"/>
+              <rect x="80" y="148" width="50" height="8" rx="2" fill="#2a2a2a"/><rect x="85" y="143" width="40" height="9" rx="3" fill="#3a3a3a" stroke="#222"/>
+              <circle cx="88" cy="147" r="3.5" fill="#111" stroke="#666"/><circle cx="122" cy="147" r="3.5" fill="#111" stroke="#666"/>
+              <line x1="88" y1="145" x2="88" y2="149" stroke="#44aaff" stroke-width=".7"/><line x1="86" y1="147" x2="90" y2="147" stroke="#44aaff" stroke-width=".7"/>
+              <rect x="34" y="152" width="14" height="13" rx="3" fill="#555" stroke="#333"/><rect x="30" y="153.5" width="7" height="10" rx="1.5" fill="#444"/>
+              <line x1="60" y1="163" x2="52" y2="178" stroke="#555" stroke-width="2" stroke-linecap="round"/><line x1="68" y1="163" x2="76" y2="178" stroke="#555" stroke-width="2" stroke-linecap="round"/>
             </svg>
           </div>
-
         </div>
       </div>
     </section>
 
-    <footer>
+    <footer class="compact-footer">
       <p>© 2026 Ansh Patel</p>
       <p class="footer-meta">Website created on 21/01/2026 at 13:45</p>
     </footer>
-
   </main>
 
   <script src="script.js"></script>
-
   <script>
-  (function(){
-    var outer    = document.getElementById('rating');
-    var canvas   = document.getElementById('rs-canvas');
-    var ctx      = canvas.getContext('2d');
-    var svgEl    = document.getElementById('rs-svg');
-    var pupilL   = document.getElementById('rs-pupil-l');
-    var pupilR   = document.getElementById('rs-pupil-r');
-    var browL    = document.getElementById('rs-brow-l');
-    var browR    = document.getElementById('rs-brow-r');
-    var flash    = document.getElementById('rs-red-flash');
+  (function () {
+    const outer = document.getElementById('rating');
+    const canvas = document.getElementById('rs-canvas');
+    if (!outer || !canvas) return;
+    const ctx = canvas.getContext('2d');
+    const svgEl = document.getElementById('rs-svg');
+    const pupilL = document.getElementById('rs-pupil-l');
+    const pupilR = document.getElementById('rs-pupil-r');
+    const browL = document.getElementById('rs-brow-l');
+    const browR = document.getElementById('rs-brow-r');
+    const flash = document.getElementById('rs-red-flash');
+    let currentMode = null, mouseX = -999, mouseY = -999, pulseT = 0;
 
-    var currentMode  = null;
-    var mouseX       = -999;
-    var mouseY       = -999;
-    var pulseT       = 0;
-    var flashOpacity = 0;
-
-    /* --- size the canvas to exactly match the section --- */
     function resizeCanvas() {
-      canvas.width  = outer.offsetWidth;
-      canvas.height = outer.offsetHeight;
+      const rect = outer.getBoundingClientRect();
+      canvas.width = Math.max(1, Math.round(rect.width));
+      canvas.height = Math.max(1, Math.round(rect.height));
     }
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
+    if ('ResizeObserver' in window) new ResizeObserver(resizeCanvas).observe(outer);
 
-    /* --- convert SVG viewBox coords to page-relative px --- */
     function getMuzzlePos() {
-      var svgRect   = svgEl.getBoundingClientRect();
-      var outerRect = outer.getBoundingClientRect();
-      return {
-        x: svgRect.left - outerRect.left + (30  / 200) * svgRect.width,
-        y: svgRect.top  - outerRect.top  + (158 / 250) * svgRect.height
-      };
+      const s = svgEl.getBoundingClientRect(), o = outer.getBoundingClientRect();
+      return {x:s.left-o.left+(30/200)*s.width,y:s.top-o.top+(158/250)*s.height};
     }
-
-    function getCenter() {
-      return { x: outer.offsetWidth / 2, y: outer.offsetHeight / 2 };
-    }
-
-    /* --- mouse tracking relative to the section --- */
-    outer.addEventListener('mousemove', function(e) {
-      var r  = outer.getBoundingClientRect();
-      mouseX = e.clientX - r.left;
-      mouseY = e.clientY - r.top;
-    });
-    outer.addEventListener('mouseleave', function() {
-      mouseX = -999; mouseY = -999;
-    });
-
-    /* --- eye / brow helpers --- */
     function setRedEyes(on) {
-      var fill = on ? '#ee3311' : '#1a1a1a';
-      pupilL.setAttribute('fill', fill);
-      pupilR.setAttribute('fill', fill);
-      browL.setAttribute('d',      on ? 'M76 82 Q84 78 88 82' : 'M76 84 Q84 80 88 84');
-      browR.setAttribute('d',      on ? 'M112 82 Q116 78 124 82' : 'M112 84 Q116 80 124 84');
-      browL.setAttribute('stroke', on ? '#ee3311' : '#888');
-      browR.setAttribute('stroke', on ? '#ee3311' : '#888');
+      const fill = on ? '#ee3311' : '#1a1a1a';
+      pupilL.setAttribute('fill', fill); pupilR.setAttribute('fill', fill);
+      browL.setAttribute('d', on ? 'M76 82 Q84 78 88 82' : 'M76 84 Q84 80 88 84');
+      browR.setAttribute('d', on ? 'M112 82 Q116 78 124 82' : 'M112 84 Q116 80 124 84');
+      browL.setAttribute('stroke', on ? '#ee3311' : '#888'); browR.setAttribute('stroke', on ? '#ee3311' : '#888');
     }
-
-    /* --- public API called by buttons --- */
+    window.rsAim = function(mode) {
+      currentMode = mode;
+      document.querySelectorAll('.rs-btn').forEach(b => b.classList.toggle('laser-on', b.classList.contains('btn-' + mode)));
+      setRedEyes(mode === 'bad');
+    };
     window.rsUnaim = function() {
-      document.querySelectorAll('.rs-btn').forEach(function(b){ b.classList.remove('laser-on'); });
       currentMode = null;
-      setRedEyes(false);
-      flash.style.background = 'rgba(200,10,5,0)';
+      document.querySelectorAll('.rs-btn').forEach(b => b.classList.remove('laser-on'));
+      setRedEyes(false); flash.style.background = 'rgba(200,10,5,0)';
     };
+    outer.addEventListener('mousemove', e => {
+      const r = outer.getBoundingClientRect(); mouseX = e.clientX-r.left; mouseY = e.clientY-r.top;
+    });
+    outer.addEventListener('mouseleave', () => { mouseX = -999; mouseY = -999; });
 
-    window.rsAim = function(target) {
-      rsUnaim();
-      currentMode = target;
-      var btn = document.querySelector('.btn-' + target);
-      if (btn) btn.classList.add('laser-on');
-      if (target === 'bad') {
-        setRedEyes(true);
-        flashOpacity = 0.6;
-      }
-    };
-
-    /* --- canvas drawing helpers --- */
-    function drawLaser(x1, y1, x2, y2, thick) {
+    function drawLaser(x1,y1,x2,y2,thick) {
       ctx.save();
-      /* muzzle glow */
-      var mg = ctx.createRadialGradient(x1, y1, 0, x1, y1, 18);
-      mg.addColorStop(0, 'rgba(255,80,40,0.9)');
-      mg.addColorStop(1, 'rgba(255,80,40,0)');
-      ctx.fillStyle = mg;
-      ctx.beginPath();
-      ctx.arc(x1, y1, 18, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.lineCap = 'round';
-      /* outer glow */
-      ctx.strokeStyle = 'rgba(255,40,0,0.12)';
-      ctx.lineWidth   = thick * 6;
-      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
-      /* mid glow */
-      ctx.strokeStyle = 'rgba(255,60,20,0.45)';
-      ctx.lineWidth   = thick * 2.5;
-      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
-      /* bright core */
-      ctx.fillStyle = '#ff0000';
-      ctx.lineWidth   = thick;
-      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
-      ctx.restore();
+      const g = ctx.createRadialGradient(x2,y2,0,x2,y2,18);
+      g.addColorStop(0,'rgba(255,80,40,.9)'); g.addColorStop(1,'rgba(255,80,40,0)');
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x2,y2,18,0,Math.PI*2); ctx.fill();
+      ctx.lineCap='round'; ctx.strokeStyle='rgba(255,40,0,.12)'; ctx.lineWidth=thick*6;
+      ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+      ctx.strokeStyle='rgba(255,60,20,.45)';ctx.lineWidth=thick*2.5;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+      ctx.strokeStyle='#ff0000';ctx.lineWidth=thick;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();
     }
-
-    function drawDot(x, y, r) {
-      ctx.save();
-      var g = ctx.createRadialGradient(x,y,0, x,y,r*4);
-      g.addColorStop(0,   'rgba(255,30,0,0.6)');
-      g.addColorStop(1,   'rgba(255,30,0,0)');
-      ctx.fillStyle = g;
-      ctx.beginPath(); ctx.arc(x,y,r*4,0,Math.PI*2); ctx.fill();
-      ctx.fillStyle = 'rgba(255,60,20,0.75)';
-      ctx.beginPath(); ctx.arc(x,y,r*2,0,Math.PI*2); ctx.fill();
-      ctx.fillStyle = '#ff2200';
-      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
-      ctx.restore();
+    function drawDot(x,y,r) {
+      ctx.save();const g=ctx.createRadialGradient(x,y,0,x,y,r*4);g.addColorStop(0,'rgba(255,30,0,.6)');g.addColorStop(1,'rgba(255,30,0,0)');
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r*4,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='rgba(255,60,20,.75)';ctx.beginPath();ctx.arc(x,y,r*2,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#ff2200';ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.restore();
     }
-
-    function drawCrosshair(x, y, r) {
-      ctx.save();
-      ctx.strokeStyle  = '#ff2200';
-      ctx.globalAlpha  = 0.9;
-      ctx.lineWidth    = 2.5;
-      ctx.setLineDash([7,4]);
-      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(x-r-12,y); ctx.lineTo(x+r+12,y); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(x,y-r-12); ctx.lineTo(x,y+r+12); ctx.stroke();
-      ctx.fillStyle   = 'rgba(255,30,0,0.55)';
-      ctx.beginPath(); ctx.arc(x,y,5,0,Math.PI*2); ctx.fill();
-      ctx.restore();
+    function drawCrosshair(x,y,r) {
+      ctx.save();ctx.strokeStyle='#ff2200';ctx.globalAlpha=.9;ctx.lineWidth=2.5;ctx.setLineDash([7,4]);
+      ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(x-r-12,y);ctx.lineTo(x+r+12,y);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(x,y-r-12);ctx.lineTo(x,y+r+12);ctx.stroke();
+      ctx.fillStyle='rgba(255,30,0,.55)';ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fill();ctx.restore();
     }
-
-    /* --- main render loop --- */
     function tick() {
-      pulseT += 0.07;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      var muzzle = getMuzzlePos();
-      var dotR   = 3 + 1.2 * Math.sin(pulseT);
-      var flicker = 0.7 + Math.random() * 0.6;
-
-      if (currentMode === 'bad') {
-        var c = getCenter();
-      
-        drawLaser(muzzle.x, muzzle.y, c.x, c.y, 5 * flicker);
-        drawCrosshair(c.x, c.y, 42 + 6 * Math.sin(pulseT * 0.8));
-        drawDot(c.x, c.y, dotR + 2);
-      
-        /* continuous red pulse */
-        var pulse = 0.25 + 0.25 * Math.sin(pulseT * 3);
-        flash.style.background = 'rgba(200,10,5,' + pulse.toFixed(3) + ')';
-      } else if (mouseX > 0) {
-        /* laser follows cursor anywhere inside the section */
-        drawLaser(muzzle.x, muzzle.y, mouseX, mouseY, 3 * flicker);
-        drawDot(mouseX, mouseY, dotR);
-      }
-
+      pulseT += .07; ctx.clearRect(0,0,canvas.width,canvas.height);
+      const m=getMuzzlePos(), dotR=3+1.2*Math.sin(pulseT), flicker=.7+Math.random()*.6;
+      if (currentMode==='bad') {
+        const x=outer.offsetWidth/2,y=outer.offsetHeight/2;
+        drawLaser(m.x,m.y,x,y,5*flicker);drawCrosshair(x,y,42+6*Math.sin(pulseT*.8));drawDot(x,y,dotR+2);
+        flash.style.background='rgba(200,10,5,'+(0.25+0.25*Math.sin(pulseT*3)).toFixed(3)+')';
+      } else if (mouseX>0) drawLaser(m.x,m.y,mouseX,mouseY,3*flicker),drawDot(mouseX,mouseY,dotR);
       requestAnimationFrame(tick);
     }
     tick();
   })();
   </script>
-
 </body>
 </html>

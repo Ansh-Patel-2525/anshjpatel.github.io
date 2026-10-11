@@ -1094,3 +1094,414 @@ canvas {
   margin: 0;
   box-shadow: none;
 }
+
+
+/* =========================================
+   COMPACT HOMEPAGE OVERRIDES
+   Add at the VERY END of style.css
+========================================= */
+
+/* Navigation */
+nav .nav-content {
+    padding: 0.65rem 1.5rem;
+}
+
+nav ul {
+    gap: 1.25rem;
+}
+
+nav a {
+    font-size: 0.92rem;
+}
+
+/* Compact hero */
+.compact-hero {
+    min-height: auto;
+    padding: 88px 24px 24px;
+}
+
+.compact-hero-content {
+    width: 100%;
+    max-width: 1050px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2.5rem;
+    text-align: left;
+    padding: 1.25rem 0;
+}
+
+.compact-profile {
+    width: 145px;
+    height: 180px;
+    flex: 0 0 145px;
+    margin: 0;
+}
+
+.compact-profile .profile-pic {
+    width: 145px;
+    height: 180px;
+    border-width: 4px;
+    border-radius: 16px;
+}
+
+.compact-hero-copy {
+    max-width: 680px;
+}
+
+.compact-hero .hero-title {
+    font-size: clamp(2.2rem, 4vw, 3.2rem);
+    margin-bottom: 0.25rem;
+}
+
+.compact-hero .subtitle {
+    font-size: 1.1rem;
+    margin-bottom: 0.65rem;
+}
+
+.hero-intro {
+    font-size: 0.95rem;
+    line-height: 1.55;
+    opacity: 0.92;
+    margin-bottom: 1rem;
+}
+
+.eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    font-weight: 700;
+    opacity: 0.85;
+    margin-bottom: 0.35rem;
+}
+
+.compact-hero .hero-cta {
+    justify-content: flex-start;
+    gap: 0.65rem;
+}
+
+.compact-hero .btn-primary,
+.compact-hero .btn-secondary {
+    padding: 0.65rem 1.2rem;
+    font-size: 0.9rem;
+}
+
+/* Main layout: two columns */
+.compact-container {
+    max-width: 1200px;
+    padding: 1rem 1.5rem 1.5rem;
+}
+
+.home-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    align-items: stretch;
+}
+
+.compact-card {
+    min-width: 0;
+    padding: 1.15rem 1.35rem;
+    margin-bottom: 0;
+    border-radius: 14px;
+}
+
+.compact-section-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-bottom: 0.7rem;
+}
+
+.compact-section-heading .section-icon {
+    font-size: 1.45rem;
+    margin: 0;
+    animation: none;
+}
+
+.compact-card h2 {
+    font-size: 1.25rem;
+    margin: 0;
+}
+
+.compact-card p {
+    font-size: 0.91rem;
+    line-height: 1.55;
+    margin-bottom: 0.5rem;
+}
+
+.compact-card p:last-child {
+    margin-bottom: 0;
+}
+
+/* Career and dissertation */
+.compact-highlight {
+    padding: 0.85rem 1rem;
+    margin-top: 0.5rem;
+    border-radius: 10px;
+}
+
+.compact-highlight h3 {
+    font-size: 1rem;
+    line-height: 1.35;
+    margin: 0.35rem 0 0.45rem;
+}
+
+.compact-highlight p {
+    font-size: 0.85rem;
+    line-height: 1.45;
+    margin-bottom: 0.4rem;
+}
+
+.career-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+}
+
+.compact-highlight .career-meta {
+    font-size: 0.78rem;
+    margin-top: 0.4rem;
+}
+
+/* Skills */
+.compact-skills {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.8rem;
+    margin-top: 0.4rem;
+}
+
+.compact-skills .skill-category h3 {
+    font-size: 0.86rem;
+    margin-bottom: 0.45rem;
+}
+
+.compact-skills .skill-tags {
+    gap: 0.35rem;
+}
+
+.compact-skills .skill-tags span {
+    padding: 0.28rem 0.5rem;
+    border-width: 1px;
+    border-radius: 6px;
+    font-size: 0.76rem;
+}
+
+/* Contact strip */
+.compact-contact {
+    margin-top: 1rem;
+}
+
+.compact-contact-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.65rem;
+}
+
+.compact-contact .contact-item {
+    padding: 0.65rem 0.8rem;
+    gap: 0.6rem;
+    border-radius: 9px;
+}
+
+.compact-contact .contact-icon {
+    font-size: 1.35rem;
+}
+
+.compact-contact .contact-item h4 {
+    font-size: 0.75rem;
+    margin-bottom: 0.1rem;
+}
+
+.compact-contact .contact-item p,
+.compact-contact .contact-item a {
+    font-size: 0.82rem;
+    overflow-wrap: anywhere;
+}
+
+/* Rating widget: smaller without removing its animation */
+.compact-rating {
+    margin-top: 1rem;
+}
+
+.rating-inner {
+    padding: 0.9rem 1rem !important;
+}
+
+.rating-heading {
+    justify-content: center;
+    margin-bottom: 0.2rem;
+}
+
+.rating-prompt {
+    color: #888;
+    font-size: 0.8rem !important;
+    margin-bottom: 0.65rem !important;
+}
+
+.rating-layout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.rating-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 0.55rem;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.rs-btn {
+    min-width: 0;
+    padding: 0.55rem 0.8rem;
+    font-size: 0.82rem !important;
+}
+
+.ghost-wrap {
+    width: 100px;
+    height: 125px;
+    flex-shrink: 0;
+}
+
+/* Footer */
+.compact-footer {
+    padding: 0.8rem 1rem;
+    margin-top: 1rem;
+}
+
+.compact-footer p {
+    font-size: 0.8rem;
+}
+
+.compact-footer .footer-meta {
+    font-size: 0.72rem;
+    margin-top: 0.2rem;
+}
+
+/* Medium screens */
+@media (max-width: 900px) {
+    .compact-hero-content {
+        gap: 1.5rem;
+    }
+
+    .home-grid {
+        gap: 0.8rem;
+    }
+
+    .compact-card {
+        padding: 1rem;
+    }
+
+    .compact-skills {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    nav ul {
+        gap: 0.8rem;
+    }
+}
+
+/* Phones and narrow windows */
+@media (max-width: 650px) {
+    nav .nav-content {
+        padding: 0.65rem 0.85rem;
+        gap: 0.75rem;
+    }
+
+    nav ul {
+        gap: 0.65rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    nav ul a {
+        font-size: 0.78rem;
+    }
+
+    .compact-hero {
+        padding: 100px 1rem 1.5rem;
+    }
+
+    .compact-hero-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .compact-profile {
+        width: 100px;
+        height: 125px;
+        flex-basis: auto;
+    }
+
+    .compact-profile .profile-pic {
+        width: 100px;
+        height: 125px;
+    }
+
+    .compact-hero-copy {
+        width: 100%;
+    }
+
+    .compact-hero .hero-title {
+        font-size: 2.2rem;
+    }
+
+    .compact-hero .subtitle {
+        font-size: 0.95rem;
+    }
+
+    .compact-hero .hero-cta {
+        justify-content: center;
+    }
+
+    .home-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .compact-container {
+        padding: 0.8rem;
+    }
+
+    .compact-skills {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .compact-contact-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .rating-layout {
+        gap: 0.5rem;
+    }
+
+    .rating-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .rating-buttons .rs-btn {
+        width: 100%;
+        max-width: 220px;
+    }
+
+    .ghost-wrap {
+        width: 80px;
+        height: 100px;
+    }
+}
+
+/* Respect users who prefer less animation */
+@media (prefers-reduced-motion: reduce) {
+    .compact-hero .hero-title,
+    .compact-profile .profile-pic,
+    .compact-hero .subtitle,
+    .compact-hero .hero-cta {
+        animation: none;
+    }
+}
