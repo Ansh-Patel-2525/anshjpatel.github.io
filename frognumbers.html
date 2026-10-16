@@ -1,99 +1,219 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Frog Numbers - Ansh Patel</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
-  <style>
+  <meta name="theme-color" content="#100d20">
 
-        /* ADDED: Header auto-hide styles */
+  <style>
+    :root {
+      --bg: #100d20;
+      --bg-soft: #17132b;
+      --surface: #211b39;
+      --surface-light: #2b2347;
+      --primary: #a78bfa;
+      --primary-bright: #c4b5fd;
+      --green: #65e6a5;
+      --green-dark: #26bd80;
+      --pink: #f0abfc;
+      --text: #f5f3ff;
+      --muted: #aaa4c5;
+      --border: rgba(196, 181, 253, 0.15);
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scrollbar-color: #66508f var(--bg);
+    }
+
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, sans-serif;
+      line-height: 1.6;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse at 15% 0%, rgba(124, 58, 237, 0.18), transparent 38%),
+        radial-gradient(ellipse at 90% 45%, rgba(16, 185, 129, 0.08), transparent 32%),
+        var(--bg);
+    }
+
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    button:focus-visible,
+    a:focus-visible,
+    .frog-number:focus-visible {
+      outline: 3px solid var(--green);
+      outline-offset: 4px;
+    }
+
     .game-header {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       z-index: 1000;
-      background:  linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #c026d3 100%);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      padding: 15px 0;
+      background: rgba(16, 13, 32, 0.84);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
       transition: transform 0.3s ease-in-out;
-      padding: 1rem 0;
     }
-    
+
     .game-header-content {
-      max-width: 1400px;
+      max-width: 1200px;
+      width: calc(100% - 48px);
       margin: 0 auto;
-      padding: 0 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 18px;
     }
-    
-    .game-card {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    
+
     .game-header h1 {
-      color: white;
-      margin: 0;
-      font-size: 1.8rem;
+      color: var(--text);
+      font-size: clamp(1.2rem, 2.5vw, 1.65rem);
+      font-weight: 800;
+      letter-spacing: -0.7px;
+      white-space: nowrap;
     }
-    
+
     .header-links {
       display: flex;
-      gap: 1.5rem;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
     }
-    
-    .game-header .back-link {
-      color: white;
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 40px;
+      padding: 9px 15px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: #e9e3ff;
+      background: rgba(167, 139, 250, 0.08);
       text-decoration: none;
-      opacity: 0.9;
-      font-weight: 500;
-      transition: opacity 0.2s;
+      font-size: 0.88rem;
+      font-weight: 650;
+      transition: background 0.2s ease, border-color 0.2s ease,
+        transform 0.2s ease;
     }
-    
-    .game-header .back-link:hover {
-      opacity: 1;
+
+    .back-link:hover {
+      background: rgba(167, 139, 250, 0.18);
+      border-color: rgba(196, 181, 253, 0.4);
+      transform: translateY(-2px);
     }
-    
+
     .game-container {
-      margin-top: 100px; /* Adjust based on your header height */
-      max-width: 1400px !important;
-      width: 95% !important;
-      margin-left: auto !important;
-      margin-right: auto !important;
+      width: min(1100px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 126px 0 65px;
+      min-height: 100vh;
     }
 
     .game-card {
-      max-width: 100% !important;
-      width: 100% !important;
+      width: 100%;
+      padding: clamp(20px, 4vw, 48px);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      background: linear-gradient(
+        145deg,
+        rgba(36, 29, 62, 0.96),
+        rgba(25, 20, 45, 0.96)
+      );
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .game-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 12%;
+      right: 12%;
+      height: 2px;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        var(--primary),
+        var(--green),
+        transparent
+      );
+      opacity: 0.9;
     }
 
     .frog-display {
+      max-width: 100%;
       text-align: center;
-      padding: 2rem;
-      max-width: 100% !important;
+      padding: 8px 0;
+    }
+
+    .emoji {
+      display: inline-block;
+      margin-bottom: 8px;
+      font-size: clamp(2.5rem, 7vw, 4rem);
+      letter-spacing: 5px;
+      filter: drop-shadow(0 8px 16px rgba(101, 230, 165, 0.12));
+      animation: frogFloat 4s ease-in-out infinite;
     }
 
     .current-time {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: var(--primary, #4facfe);
-      margin-bottom: 2rem;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      margin: 8px auto 25px;
+      padding: 12px 22px;
+      max-width: 100%;
+      border: 1px solid rgba(167, 139, 250, 0.23);
+      border-radius: 16px;
+      background: rgba(167, 139, 250, 0.09);
+      color: var(--primary-bright);
+      font-size: clamp(1.1rem, 3vw, 1.5rem);
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.3px;
     }
 
-    /* NEW: Current frog number alert */
     .frog-alert {
-      background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
-      color: white;
-      padding: 2rem 2.5rem;
-      border-radius: 15px;
-      margin: 1rem auto 2rem;
-      max-width: 800px;
-      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
-      animation: pulse 2s infinite;
       display: none;
+      position: relative;
+      max-width: 800px;
+      margin: 0 auto 28px;
+      padding: clamp(22px, 4vw, 34px);
+      border: 1px solid rgba(101, 230, 165, 0.38);
+      border-radius: 22px;
+      color: #edfff5;
+      background:
+        radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.13), transparent 40%),
+        linear-gradient(135deg, #126747, #168b63);
+      box-shadow: 0 15px 40px rgba(16, 185, 129, 0.12);
+      animation: alertIn 0.35s ease-out;
     }
 
     .frog-alert.show {
@@ -101,45 +221,48 @@
     }
 
     .frog-alert h2 {
-      margin: 0 0 0.5rem 0;
-      font-size: 1.8rem;
+      margin-bottom: 8px;
+      font-size: clamp(1.3rem, 3vw, 1.9rem);
+      line-height: 1.3;
     }
 
     .frog-alert p {
-      margin: 0;
-      font-size: 1rem;
-      opacity: 0.95;
-    }
-
-    @keyframes pulse {
-      0%, 100% {
-        transform: scale(1);
-        box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
-      }
-      50% {
-        transform: scale(1.02);
-        box-shadow: 0 6px 30px rgba(16, 185, 129, 0.6);
-      }
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 0.98rem;
+      overflow-wrap: anywhere;
     }
 
     .frog-info {
       display: flex;
-      justify-content: space-around;
-      gap: 3rem;
-      margin: 2rem 0;
+      justify-content: center;
+      align-items: stretch;
+      gap: 20px;
       flex-wrap: wrap;
-      max-width: 100% !important;
+      margin: 12px 0 26px;
     }
 
     .frog-card {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 2rem;
-      border-radius: 15px;
-      flex: 1;
-      min-width: 250px;
+      position: relative;
+      flex: 1 1 260px;
+      min-width: 0;
       max-width: 500px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      padding: 27px 24px;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      color: var(--text);
+      text-align: left;
+      background: linear-gradient(
+        145deg,
+        rgba(49, 39, 79, 0.95),
+        rgba(35, 28, 58, 0.95)
+      );
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+      transition: transform 0.25s ease, border-color 0.25s ease;
+    }
+
+    .frog-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(167, 139, 250, 0.4);
     }
 
     .frog-card.hidden {
@@ -147,47 +270,92 @@
     }
 
     .frog-card h3 {
-      margin: 0 0 0.5rem 0;
-      font-size: 1rem;
-      opacity: 0.9;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 13px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+    }
+
+    .frog-card h3::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--pink);
+      box-shadow: 0 0 12px rgba(240, 171, 252, 0.35);
+    }
+
+    .frog-card:nth-child(2) h3::before {
+      background: var(--green);
+      box-shadow: 0 0 12px rgba(101, 230, 165, 0.35);
     }
 
     .frog-card .number {
-      font-size: 3rem;
-      font-weight: bold;
-      margin: 0 0 0.5rem 0;
+      margin: 0 0 10px;
+      color: var(--primary-bright);
+      font-size: clamp(2.7rem, 6vw, 4rem);
+      font-weight: 850;
+      line-height: 1.1;
+      letter-spacing: -2px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .frog-card:nth-child(2) .number {
+      color: var(--green);
     }
 
     .frog-card .description {
-      font-size: 0.9rem;
-      opacity: 0.85;
       margin: 0;
-      line-height: 1.4;
+      color: #c3bddb;
+      font-size: 0.95rem;
+      line-height: 1.65;
+      overflow-wrap: anywhere;
     }
 
     .view-all-btn {
-      background: var(--primary, #4facfe);
-      color: white;
-      border: none;
-      padding: 1rem 2rem;
-      font-size: 1rem;
-      border-radius: 10px;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      min-height: 52px;
+      margin-top: 8px;
+      padding: 14px 24px;
+      border: 1px solid rgba(101, 230, 165, 0.35);
+      border-radius: 15px;
+      color: #082c1e;
+      background: linear-gradient(135deg, #8bf0bb, #4bd89a);
+      box-shadow: 0 8px 24px rgba(38, 189, 128, 0.15);
+      font-size: 0.98rem;
+      font-weight: 800;
       cursor: pointer;
-      margin-top: 2rem;
-      transition: all 0.2s ease;
+      transition: transform 0.2s ease, box-shadow 0.2s ease,
+        filter 0.2s ease;
     }
 
     .view-all-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(38, 189, 128, 0.25);
+      filter: brightness(1.04);
+    }
+
+    .view-all-btn:active {
+      transform: translateY(0);
     }
 
     .all-frogs {
       display: none;
-      margin-top: 2rem;
-      padding: 2rem;
-      background: #f5f5f5;
-      border-radius: 15px;
+      margin-top: 28px;
+      padding: clamp(18px, 3vw, 28px);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      text-align: left;
+      background: rgba(14, 11, 29, 0.5);
+      animation: alertIn 0.3s ease-out;
     }
 
     .all-frogs.show {
@@ -195,110 +363,142 @@
     }
 
     .all-frogs h3 {
-      margin-top: 0;
-      color: var(--primary, #4facfe);
+      margin: 0 0 5px;
+      color: var(--text);
+      font-size: 1.35rem;
+      letter-spacing: -0.4px;
+    }
+
+    .grid-subtitle {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 20px;
     }
 
     .frog-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-      gap: 1rem;
-      margin-top: 1rem;
+      grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
+      gap: 11px;
     }
 
     .frog-number {
-      background: white;
-      padding: 1rem;
-      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 62px;
+      padding: 10px 5px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      color: #dcd5f8;
+      background: var(--surface);
       text-align: center;
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: var(--primary, #4facfe);
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      font-size: 1.25rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
       cursor: pointer;
-      transition: all 0.2s ease;
+      user-select: none;
+      transition: transform 0.2s ease, background 0.2s ease,
+        border-color 0.2s ease, color 0.2s ease;
     }
 
     .frog-number:hover {
       transform: translateY(-3px);
-      box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-color: var(--primary);
       color: white;
+      background: var(--surface-light);
     }
 
     .frog-number.current {
-      background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
-      color: white;
+      border-color: var(--green);
+      color: #082c1e;
+      background: linear-gradient(135deg, #8bf0bb, #4bd89a);
+      box-shadow: 0 0 22px rgba(101, 230, 165, 0.2);
       animation: glow 2s infinite;
     }
 
-    @keyframes glow {
-      0%, 100% {
-        box-shadow: 0 2px 5px rgba(16, 185, 129, 0.3);
-      }
-      50% {
-        box-shadow: 0 4px 20px rgba(16, 185, 129, 0.6);
-      }
-    }
-
-    /* Modal styles */
     .modal {
       display: none;
       position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.5);
-      animation: fadeIn 0.3s;
+      z-index: 2000;
+      inset: 0;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(6, 4, 16, 0.76);
+      backdrop-filter: blur(9px);
+      -webkit-backdrop-filter: blur(9px);
+      animation: fadeIn 0.2s ease-out;
     }
 
     .modal.show {
       display: flex;
-      justify-content: center;
-      align-items: center;
     }
 
     .modal-content {
-      background: white;
-      padding: 2rem;
-      border-radius: 15px;
-      max-width: 500px;
-      width: 90%;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-      animation: slideIn 0.3s;
+      width: min(500px, 100%);
+      max-height: min(80vh, 650px);
+      overflow-y: auto;
+      padding: clamp(22px, 4vw, 32px);
+      border: 1px solid rgba(196, 181, 253, 0.24);
+      border-radius: 24px;
+      color: var(--text);
+      background: linear-gradient(145deg, #2a2145, #19142c);
+      box-shadow: 0 30px 100px rgba(0, 0, 0, 0.45);
+      animation: slideIn 0.25s ease-out;
     }
 
     .modal-header {
       display: flex;
+      align-items: flex-start;
       justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
+      gap: 15px;
+      margin-bottom: 20px;
     }
 
     .modal-header h2 {
-      margin: 0;
-      color: var(--primary, #4facfe);
-      font-size: 2rem;
+      color: var(--primary-bright);
+      font-size: clamp(1.4rem, 4vw, 1.9rem);
+      line-height: 1.35;
+      overflow-wrap: anywhere;
     }
 
     .close-btn {
-      background: none;
-      border: none;
-      font-size: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 40px;
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.04);
+      font-size: 1.8rem;
+      line-height: 1;
       cursor: pointer;
-      color: #999;
-      transition: color 0.2s;
+      transition: color 0.2s ease, background 0.2s ease;
     }
 
     .close-btn:hover {
-      color: #333;
+      color: white;
+      background: rgba(255, 255, 255, 0.12);
     }
 
     .modal-body {
-      color: #666;
-      line-height: 1.6;
+      color: #d0c9e7;
+      font-size: 1.02rem;
+      line-height: 1.8;
+      overflow-wrap: anywhere;
+    }
+
+    @keyframes frogFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    @keyframes alertIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     @keyframes fadeIn {
@@ -307,69 +507,211 @@
     }
 
     @keyframes slideIn {
-      from { transform: translateY(-50px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+      from { opacity: 0; transform: translateY(14px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    .emoji {
-      font-size: 2rem;
-      margin-bottom: 1rem;
+    @keyframes glow {
+      0%, 100% {
+        box-shadow: 0 0 12px rgba(101, 230, 165, 0.12);
+      }
+      50% {
+        box-shadow: 0 0 24px rgba(101, 230, 165, 0.3);
+      }
+    }
+
+    @media (max-width: 700px) {
+      .game-header {
+        padding: 12px 0;
+      }
+
+      .game-header-content {
+        width: calc(100% - 28px);
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 0;
+      }
+
+      .game-header h1 {
+        text-align: center;
+        font-size: 1.4rem;
+      }
+
+      .header-links {
+        width: 100%;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .back-link {
+        flex: 1 1 0;
+        min-width: 0;
+        padding: 9px 10px;
+        font-size: 0.82rem;
+        white-space: nowrap;
+      }
+
+      .game-container {
+        width: calc(100% - 24px);
+        padding: 145px 0 35px;
+      }
+
+      .game-card {
+        padding: 22px 15px;
+        border-radius: 22px;
+      }
+
+      .frog-display {
+        padding: 3px 0;
+      }
+
+      .frog-info {
+        gap: 12px;
+      }
+
+      .frog-card {
+        flex: 1 1 100%;
+        padding: 23px 20px;
+        border-radius: 18px;
+      }
+
+      .frog-card .number {
+        font-size: 3rem;
+      }
+
+      .frog-alert {
+        padding: 22px 16px;
+        border-radius: 18px;
+      }
+
+      .frog-grid {
+        grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+        gap: 8px;
+      }
+
+      .frog-number {
+        min-height: 52px;
+        font-size: 1.1rem;
+        border-radius: 12px;
+      }
+
+      .view-all-btn {
+        width: 100%;
+      }
+
+      .all-frogs {
+        padding: 18px 13px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .game-header h1 {
+        font-size: 1.2rem;
+      }
+
+      .back-link {
+        font-size: 0.75rem;
+        padding: 8px 5px;
+      }
+
+      .game-container {
+        padding-top: 140px;
+      }
+
+      .frog-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
     }
   </style>
 </head>
-<body>
 
-      <header class="game-header">
-        <div class="game-header-content">
-          <h1>🐸 Frog Numbers</h1>
-          <div class="header-links">
-            <a href="widgets.html" class="back-link">← Back to Widgets</a>
-            <a href="index.html" class="back-link">🏠 Home</a>
-          </div>
-        </div>
-      </header>
+<body>
+  <header class="game-header">
+    <div class="game-header-content">
+      <h1>🐸 Frog Numbers</h1>
+      <nav class="header-links" aria-label="Main navigation">
+        <a href="widgets.html" class="back-link">← Back to Widgets</a>
+        <a href="index.html" class="back-link">🏠 Home</a>
+      </nav>
+    </div>
+  </header>
 
   <main class="game-container">
     <div class="game-card">
       <div class="frog-display">
-        <div class="emoji">🐸🐸🐸🐸🐸.</div>
-        <div class="current-time" id="currentMinute">--</div>
-        
-        <!-- NEW: Alert for when on a frog number -->
-        <div class="frog-alert" id="frogAlert">
+        <div class="emoji" aria-hidden="true">🐸🐸🐸🐸🐸</div>
+        <div class="current-time" id="currentMinute" aria-live="polite">--</div>
+
+        <div class="frog-alert" id="frogAlert" role="status" aria-live="polite">
           <h2>You're on Frog Number <span id="frogAlertNumber">--</span>!</h2>
           <p id="frogAlertDescription">Current minute is a special frog number!</p>
         </div>
-        
+
         <div class="frog-info">
           <div class="frog-card">
-            <h3>Just Missed:</h3>
+            <h3>Just Missed</h3>
             <p class="number" id="lastFrog">--</p>
             <p class="description" id="lastFrogDescription">--</p>
           </div>
+
           <div class="frog-card">
-            <h3>Next:</h3>
+            <h3>Coming Up Next</h3>
             <p class="number" id="nextFrog">--</p>
             <p class="description" id="nextFrogDescription">--</p>
           </div>
         </div>
 
-        <button class="view-all-btn" onclick="toggleAllFrogs()">View All Frog Numbers</button>
+        <button
+          class="view-all-btn"
+          id="viewAllButton"
+          type="button"
+          onclick="toggleAllFrogs()"
+          aria-expanded="false"
+          aria-controls="allFrogs"
+        >
+          <span aria-hidden="true">🐸</span>
+          <span id="viewAllButtonText">View All Frog Numbers</span>
+          <span aria-hidden="true">↓</span>
+        </button>
 
         <div class="all-frogs" id="allFrogs">
-          <h3>All Frog Numbers</h3>
+          <h3>Every Frog Number</h3>
+          <p class="grid-subtitle">Select a number to discover what makes it special.</p>
           <div class="frog-grid" id="frogGrid"></div>
         </div>
       </div>
     </div>
   </main>
 
-  <!-- Modal for frog number description -->
-  <div id="frogModal" class="modal">
+  <div
+    id="frogModal"
+    class="modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modalTitle"
+    aria-describedby="modalDescription"
+  >
     <div class="modal-content">
       <div class="modal-header">
-        <h2>🐸 Frog Number <span id="modalFrogNumber"></span></h2>
-        <button class="close-btn" onclick="closeModal()">&times;</button>
+        <h2 id="modalTitle">🐸 Frog Number <span id="modalFrogNumber"></span></h2>
+        <button
+          class="close-btn"
+          type="button"
+          onclick="closeModal()"
+          aria-label="Close dialog"
+        >&times;</button>
       </div>
       <div class="modal-body">
         <p id="modalDescription">Description coming soon...</p>
@@ -379,8 +721,8 @@
 
   <script>
     const frogNumbers = [1, 3, 7, 9, 14, 18, 22, 25, 29, 31, 33, 37, 40, 44, 46, 49, 51, 52, 55, 58];
-    
-    // Descriptions for each frog number - add your descriptions here
+
+    // Descriptions for each frog number
     const frogDescriptions = {
       1: "1 is 1",
       3: "T. Mullett's favourite number",
@@ -407,22 +749,26 @@
     function updateFrogInfo() {
       const now = new Date();
       const currentMinute = now.getMinutes();
-      
-      document.getElementById('currentMinute').textContent = `Current Minute: ${currentMinute}`;
+
+      document.getElementById('currentMinute').textContent =
+        `Current Minute: ${currentMinute}`;
 
       // Check if current minute is a frog number
       const isFrogNumber = frogNumbers.includes(currentMinute);
       const frogAlert = document.getElementById('frogAlert');
       const lastFrogCard = document.querySelector('.frog-card:first-child');
-      
+
       if (isFrogNumber) {
         frogAlert.classList.add('show');
         document.getElementById('frogAlertNumber').textContent = currentMinute;
-        document.getElementById('frogAlertDescription').textContent = frogDescriptions[currentMinute];
+        document.getElementById('frogAlertDescription').textContent =
+          frogDescriptions[currentMinute];
+
         // Hide the "Just Missed" card when on a frog number
         lastFrogCard.classList.add('hidden');
       } else {
         frogAlert.classList.remove('show');
+
         // Show the "Just Missed" card when not on a frog number
         lastFrogCard.classList.remove('hidden');
       }
@@ -435,7 +781,8 @@
           break;
         }
       }
-      // If no frog before current minute, wrap around to last frog of previous hour
+
+      // Wrap around to last frog of previous hour
       if (lastFrog === null) {
         lastFrog = frogNumbers[frogNumbers.length - 1];
       }
@@ -448,16 +795,19 @@
           break;
         }
       }
-      // If no frog after current minute, wrap around to first frog of next hour
+
+      // Wrap around to first frog of next hour
       if (nextFrog === null) {
         nextFrog = frogNumbers[0];
       }
 
       document.getElementById('lastFrog').textContent = lastFrog;
-      document.getElementById('lastFrogDescription').textContent = frogDescriptions[lastFrog];
-      
+      document.getElementById('lastFrogDescription').textContent =
+        frogDescriptions[lastFrog];
+
       document.getElementById('nextFrog').textContent = nextFrog;
-      document.getElementById('nextFrogDescription').textContent = frogDescriptions[nextFrog];
+      document.getElementById('nextFrogDescription').textContent =
+        frogDescriptions[nextFrog];
 
       // Update the frog grid to highlight current number
       updateFrogGrid(currentMinute);
@@ -465,14 +815,26 @@
 
     function toggleAllFrogs() {
       const allFrogsDiv = document.getElementById('allFrogs');
+      const button = document.getElementById('viewAllButton');
+      const buttonText = document.getElementById('viewAllButtonText');
+
       allFrogsDiv.classList.toggle('show');
+
+      const isOpen = allFrogsDiv.classList.contains('show');
+      button.setAttribute('aria-expanded', isOpen);
+      buttonText.textContent = isOpen
+        ? 'Hide Frog Numbers'
+        : 'View All Frog Numbers';
     }
 
     function openModal(frogNumber) {
       const modal = document.getElementById('frogModal');
       document.getElementById('modalFrogNumber').textContent = frogNumber;
-      document.getElementById('modalDescription').textContent = frogDescriptions[frogNumber];
+      document.getElementById('modalDescription').textContent =
+        frogDescriptions[frogNumber];
+
       modal.classList.add('show');
+      document.querySelector('.close-btn').focus();
     }
 
     function closeModal() {
@@ -486,22 +848,42 @@
       if (event.target === modal) {
         closeModal();
       }
-    }
+    };
+
+    // Close modal with Escape
+    window.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeModal();
+      }
+    });
 
     function populateFrogGrid() {
       const grid = document.getElementById('frogGrid');
+
       frogNumbers.forEach(num => {
         const div = document.createElement('div');
         div.className = 'frog-number';
         div.textContent = num;
         div.onclick = () => openModal(num);
         div.dataset.frogNumber = num;
+        div.setAttribute('role', 'button');
+        div.setAttribute('tabindex', '0');
+        div.setAttribute('aria-label', `View details for frog number ${num}`);
+
+        div.addEventListener('keydown', event => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            openModal(num);
+          }
+        });
+
         grid.appendChild(div);
       });
     }
 
     function updateFrogGrid(currentMinute) {
       const allNumbers = document.querySelectorAll('.frog-number');
+
       allNumbers.forEach(el => {
         if (parseInt(el.dataset.frogNumber) === currentMinute) {
           el.classList.add('current');
@@ -514,36 +896,32 @@
     // Initialize
     updateFrogInfo();
     populateFrogGrid();
-    
+
     // Update every second
     setInterval(updateFrogInfo, 1000);
 
-    // Add this script before the closing </body> tag or in your existing <script> section
-    
+    // Hide the header while scrolling down, show it while scrolling up
     let lastScrollTop = 0;
     const header = document.querySelector('.game-header');
-    const scrollThreshold = 5; // Minimum scroll amount to trigger
-    
+    const scrollThreshold = 5;
+
     window.addEventListener('scroll', function() {
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      
+
       if (Math.abs(scrollTop - lastScrollTop) < scrollThreshold) {
-        return; // Ignore small scrolls
+        return;
       }
-      
+
       if (scrollTop > lastScrollTop && scrollTop > 100) {
-        // Scrolling down & past threshold
+        // Scrolling down and past threshold
         header.style.transform = 'translateY(-100%)';
       } else {
         // Scrolling up
         header.style.transform = 'translateY(0)';
       }
-      
+
       lastScrollTop = scrollTop;
-    });
+    }, { passive: true });
   </script>
-
-  
-
 </body>
 </html>

@@ -1,72 +1,688 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Calculator - Ansh Patel</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+  <meta name="theme-color" content="#090b16">
+  <title>Calculator - Ansh Patel</title>
 
-  <header class="game-header">
-    <div class="game-header-content">
-      <h1>🔢 Calculator</h1>
-      <div class="header-links">
-        <a href="widgets.html" class="back-link">← Back to Widgets</a>
-        <a href="index.html" class="back-link">🏠 Home</a>
-      </div>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #090b16;
+      --panel: rgba(20, 23, 42, 0.88);
+      --panel-light: #1a1e35;
+      --button: #22263e;
+      --button-hover: #303653;
+      --purple: #a78bfa;
+      --purple-bright: #8b5cf6;
+      --text: #f5f5ff;
+      --muted: #9299b8;
+      --border: rgba(255, 255, 255, 0.09);
+      --green: #34d399;
+      --red: #fb7185;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      min-height: 100%;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-x: hidden;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse at 15% 5%, rgba(124, 58, 237, 0.20), transparent 40%),
+        radial-gradient(ellipse at 90% 85%, rgba(79, 70, 229, 0.13), transparent 38%),
+        var(--bg);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button, a {
+      font: inherit;
+    }
+
+    button {
+      touch-action: manipulation;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .topbar {
+      width: 100%;
+      border-bottom: 1px solid var(--border);
+      background: rgba(9, 11, 22, 0.76);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .topbar-inner {
+      width: min(1100px, 100%);
+      min-height: 78px;
+      margin: auto;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-icon {
+      width: 43px;
+      height: 43px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      border-radius: 14px;
+      color: white;
+      font-size: 22px;
+      background: linear-gradient(145deg, #a78bfa, #6d28d9);
+      box-shadow: 0 5px 24px rgba(139, 92, 246, 0.3);
+    }
+
+    .brand-name {
+      font-size: 1.03rem;
+      font-weight: 750;
+      letter-spacing: -0.03em;
+    }
+
+    .brand-subtitle {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 0.76rem;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-link {
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: #c6cae0;
+      font-size: 0.84rem;
+      font-weight: 600;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+    }
+
+    .nav-link:hover {
+      background: var(--panel-light);
+      border-color: rgba(167, 139, 250, 0.4);
+      color: white;
+    }
+
+    main {
+      width: 100%;
+      min-height: calc(100vh - 79px);
+      min-height: calc(100dvh - 79px);
+      padding: 52px 20px 35px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .intro {
+      width: min(440px, 100%);
+      margin-bottom: 25px;
+      text-align: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 13px;
+      padding: 7px 12px;
+      border: 1px solid rgba(167, 139, 250, 0.22);
+      border-radius: 100px;
+      background: rgba(139, 92, 246, 0.09);
+      color: #c4b5fd;
+      font-size: 0.73rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 12px rgba(52, 211, 153, 0.7);
+    }
+
+    .intro h1 {
+      font-size: clamp(2rem, 5vw, 2.7rem);
+      line-height: 1.12;
+      letter-spacing: -0.065em;
+      font-weight: 800;
+    }
+
+    .intro h1 span {
+      color: var(--purple);
+    }
+
+    .intro p {
+      max-width: 340px;
+      margin: 12px auto 0;
+      color: var(--muted);
+      font-size: 0.94rem;
+      line-height: 1.6;
+    }
+
+    .calculator-shell {
+      width: min(420px, 100%);
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      border-radius: 28px;
+      background: var(--panel);
+      box-shadow:
+        0 30px 90px rgba(0, 0, 0, 0.38),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    .calculator-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      padding: 0 3px;
+    }
+
+    .calculator-label {
+      color: #dce0f5;
+      font-size: 0.83rem;
+      font-weight: 700;
+    }
+
+    .calculator-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 0.72rem;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .display-panel {
+      min-width: 0;
+      min-height: 132px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: stretch;
+      gap: 12px;
+      margin-bottom: 17px;
+      padding: 20px 17px;
+      border: 1px solid rgba(255, 255, 255, 0.055);
+      border-radius: 19px;
+      background: linear-gradient(145deg, #111427, #15182b);
+    }
+
+    .display-caption {
+      color: var(--muted);
+      font-size: 0.73rem;
+      text-align: right;
+    }
+
+    #calcDisplay {
+      display: block;
+      width: 100%;
+      min-width: 0;
+      padding: 0;
+      border: 0;
+      outline: none;
+      background: transparent;
+      color: #ffffff;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: clamp(1.65rem, 6vw, 2.35rem);
+      font-weight: 600;
+      line-height: 1.3;
+      text-align: right;
+      text-overflow: clip;
+      font-variant-numeric: tabular-nums;
+    }
+
+    #calcDisplay::placeholder {
+      color: #646b89;
+    }
+
+    .calculator {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .calc-btn {
+      min-width: 0;
+      min-height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 4px;
+      border: 1px solid rgba(255, 255, 255, 0.035);
+      border-radius: 16px;
+      background: var(--button);
+      color: #f0f1fc;
+      font-size: 1.25rem;
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+      transition:
+        background 0.16s ease,
+        transform 0.16s ease,
+        border-color 0.16s ease,
+        box-shadow 0.16s ease;
+    }
+
+    .calc-btn:hover {
+      background: var(--button-hover);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .calc-btn:active {
+      transform: scale(0.96);
+    }
+
+    .calc-btn:focus-visible,
+    .nav-link:focus-visible {
+      outline: 2px solid var(--purple);
+      outline-offset: 3px;
+    }
+
+    .calc-btn.operator {
+      background: rgba(139, 92, 246, 0.13);
+      border-color: rgba(167, 139, 250, 0.12);
+      color: #c4b5fd;
+    }
+
+    .calc-btn.operator:hover {
+      background: rgba(139, 92, 246, 0.26);
+    }
+
+    .calc-btn.utility {
+      background: #292d47;
+      color: #c0c5de;
+      font-size: 1rem;
+    }
+
+    .calc-btn.clear {
+      background: rgba(244, 63, 94, 0.12);
+      color: #fda4af;
+      border-color: rgba(244, 63, 94, 0.12);
+      font-size: 0.9rem;
+    }
+
+    .calc-btn.clear:hover {
+      background: rgba(244, 63, 94, 0.22);
+    }
+
+    .calc-btn.equals {
+      background: linear-gradient(135deg, #a78bfa, #7c3aed);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 6px 18px rgba(124, 58, 237, 0.24);
+    }
+
+    .calc-btn.equals:hover {
+      background: linear-gradient(135deg, #b7a1ff, #8b5cf6);
+      box-shadow: 0 8px 22px rgba(124, 58, 237, 0.32);
+    }
+
+    .calculator-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 18px;
+      padding: 0 3px;
+      color: var(--muted);
+      font-size: 0.7rem;
+    }
+
+    .keyboard-hint {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    kbd {
+      padding: 3px 6px;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      background: #191c30;
+      color: #d4d7e9;
+      font: inherit;
+    }
+
+    .page-footer {
+      margin-top: auto;
+      padding-top: 30px;
+      color: #6e7492;
+      font-size: 0.75rem;
+      text-align: center;
+    }
+
+    @media (min-width: 900px) {
+      main {
+        padding-top: 58px;
+      }
+
+      .calculator-shell {
+        padding: 23px;
+      }
+
+      .calc-btn {
+        min-height: 66px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .topbar-inner {
+        min-height: 0;
+        padding: 13px 14px;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .brand {
+        gap: 9px;
+      }
+
+      .brand-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        font-size: 19px;
+      }
+
+      .brand-name {
+        font-size: 0.9rem;
+      }
+
+      .brand-subtitle {
+        font-size: 0.69rem;
+      }
+
+      .nav-links {
+        gap: 6px;
+      }
+
+      .nav-link {
+        min-height: 38px;
+        padding: 8px 10px;
+        border-radius: 10px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+      }
+
+      main {
+        padding: 34px 13px 22px;
+      }
+
+      .intro {
+        margin-bottom: 21px;
+      }
+
+      .intro p {
+        font-size: 0.88rem;
+      }
+
+      .calculator-shell {
+        padding: 15px;
+        border-radius: 23px;
+      }
+
+      .display-panel {
+        min-height: 115px;
+        padding: 16px 13px;
+        border-radius: 16px;
+      }
+
+      .calculator {
+        gap: 8px;
+      }
+
+      .calc-btn {
+        min-height: 58px;
+        border-radius: 13px;
+        font-size: 1.15rem;
+      }
+
+      .calculator-footer {
+        font-size: 0.66rem;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .topbar-inner {
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .nav-links {
+        width: 100%;
+      }
+
+      .nav-link {
+        flex: 1;
+      }
+
+      main {
+        padding-top: 26px;
+      }
+
+      .calculator-shell {
+        padding: 12px;
+      }
+
+      .calculator {
+        gap: 7px;
+      }
+
+      .calc-btn {
+        min-height: 53px;
+        border-radius: 11px;
+      }
+
+      .keyboard-hint {
+        gap: 3px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="index.html" class="brand" aria-label="Home">
+        <span class="brand-icon" aria-hidden="true">⌗</span>
+        <span>
+          <span class="brand-name">Ansh Patel</span>
+          <span class="brand-subtitle" style="display:block">Interactive tools</span>
+        </span>
+      </a>
+
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="widgets.html" class="nav-link">← Widgets</a>
+        <a href="index.html" class="nav-link">⌂ Home</a>
+      </nav>
     </div>
   </header>
 
-  <main class="game-container">
-    <div class="game-card">
-      <div class="calc-container">
-        <input type="text" id="calcDisplay" readonly placeholder="0">
-        <div class="calculator">
-          <button onclick="press('7')" class="calc-btn">7</button>
-          <button onclick="press('8')" class="calc-btn">8</button>
-          <button onclick="press('9')" class="calc-btn">9</button>
-          <button onclick="press('/')" class="calc-btn operator">/</button>
-
-          <button onclick="press('4')" class="calc-btn">4</button>
-          <button onclick="press('5')" class="calc-btn">5</button>
-          <button onclick="press('6')" class="calc-btn">6</button>
-          <button onclick="press('*')" class="calc-btn operator">×</button>
-
-          <button onclick="press('1')" class="calc-btn">1</button>
-          <button onclick="press('2')" class="calc-btn">2</button>
-          <button onclick="press('3')" class="calc-btn">3</button>
-          <button onclick="press('-')" class="calc-btn operator">−</button>
-
-          <button onclick="press('0')" class="calc-btn">0</button>
-          <button onclick="press('.')" class="calc-btn">.</button>
-          <button onclick="calculate()" class="calc-btn equals">=</button>
-          <button onclick="press('+')" class="calc-btn operator">+</button>
-
-          <button class="calc-btn clear" onclick="clearCalc()">Clear</button>
-        </div>
+  <main>
+    <section class="intro">
+      <div class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        Ready to calculate
       </div>
-    </div>
+      <h1>Simple math.<br><span>Beautifully done.</span></h1>
+      <p>A clean, intuitive calculator for your everyday calculations.</p>
+    </section>
+
+    <section class="calculator-shell" aria-label="Calculator">
+      <div class="calculator-top">
+        <span class="calculator-label">Calculator</span>
+        <span class="calculator-status">
+          <span class="status-dot"></span>
+          Ready
+        </span>
+      </div>
+
+      <div class="display-panel">
+        <div class="display-caption" id="displayCaption" aria-live="polite">
+          Enter a calculation
+        </div>
+        <input
+          type="text"
+          id="calcDisplay"
+          readonly
+          placeholder="0"
+          aria-label="Calculator display"
+          autocomplete="off"
+          spellcheck="false"
+        >
+      </div>
+
+      <div class="calculator">
+        <button type="button" class="calc-btn clear" onclick="clearCalc()" aria-label="Clear all">AC</button>
+        <button type="button" class="calc-btn utility" onclick="backspace()" aria-label="Delete last character">⌫</button>
+        <button type="button" class="calc-btn utility" onclick="press('/')" aria-label="Divide">÷</button>
+        <button type="button" class="calc-btn operator" onclick="press('*')" aria-label="Multiply">×</button>
+
+        <button type="button" class="calc-btn" onclick="press('7')">7</button>
+        <button type="button" class="calc-btn" onclick="press('8')">8</button>
+        <button type="button" class="calc-btn" onclick="press('9')">9</button>
+        <button type="button" class="calc-btn operator" onclick="press('-')" aria-label="Subtract">−</button>
+
+        <button type="button" class="calc-btn" onclick="press('4')">4</button>
+        <button type="button" class="calc-btn" onclick="press('5')">5</button>
+        <button type="button" class="calc-btn" onclick="press('6')">6</button>
+        <button type="button" class="calc-btn operator" onclick="press('+')" aria-label="Add">+</button>
+
+        <button type="button" class="calc-btn" onclick="press('1')">1</button>
+        <button type="button" class="calc-btn" onclick="press('2')">2</button>
+        <button type="button" class="calc-btn" onclick="press('3')">3</button>
+        <button type="button" class="calc-btn equals" onclick="calculate()" aria-label="Calculate result">=</button>
+
+        <button type="button" class="calc-btn" onclick="press('0')">0</button>
+        <button type="button" class="calc-btn" onclick="press('.')">.</button>
+        <button type="button" class="calc-btn utility" onclick="press('(')" aria-label="Open bracket">(</button>
+        <button type="button" class="calc-btn utility" onclick="press(')')" aria-label="Close bracket">)</button>
+      </div>
+
+      <div class="calculator-footer">
+        <span>Basic arithmetic</span>
+        <span class="keyboard-hint">
+          <kbd>Enter</kbd> equals
+          <kbd>Esc</kbd> clear
+        </span>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      Designed for your everyday calculations.
+    </footer>
   </main>
 
   <script>
     let expression = "";
     const display = document.getElementById("calcDisplay");
+    const displayCaption = document.getElementById("displayCaption");
+
+    function updateDisplay() {
+      display.value = expression;
+      display.scrollLeft = display.scrollWidth;
+    }
 
     function press(value) {
+      if (display.value === "Error") {
+        expression = "";
+      }
+
       expression += value;
-      display.value = expression;
+      updateDisplay();
+      displayCaption.textContent = "Enter a calculation";
     }
 
     function calculate() {
+      if (!expression.trim()) return;
+
       try {
-        expression = eval(expression).toString();
-        display.value = expression;
+        // Only allow calculator characters before evaluating the expression.
+        if (!/^[0-9+\-*/().\s]+$/.test(expression)) {
+          throw new Error("Invalid expression");
+        }
+
+        const result = Function('"use strict"; return (' + expression + ')')();
+
+        if (typeof result !== "number" || !Number.isFinite(result)) {
+          throw new Error("Invalid result");
+        }
+
+        expression = Number.isInteger(result)
+          ? String(result)
+          : String(Number(result.toPrecision(12)));
+
+        updateDisplay();
+        displayCaption.textContent = "Result";
       } catch {
         expression = "";
         display.value = "Error";
+        displayCaption.textContent = "Invalid calculation";
+
         setTimeout(() => {
-          display.value = "";
+          if (display.value === "Error") {
+            display.value = "";
+            displayCaption.textContent = "Enter a calculation";
+          }
         }, 1500);
       }
     }
@@ -74,24 +690,40 @@
     function clearCalc() {
       expression = "";
       display.value = "";
+      displayCaption.textContent = "Enter a calculation";
     }
 
-    // Keyboard support
-    document.addEventListener('keydown', (e) => {
-      if (e.key >= '0' && e.key <= '9' || e.key === '.') {
-        press(e.key);
-      } else if (e.key === '+' || e.key === '-' || e.key === '*' || e.key === '/') {
-        press(e.key);
-      } else if (e.key === 'Enter') {
-        calculate();
-      } else if (e.key === 'Escape' || e.key === 'Delete') {
+    function backspace() {
+      if (display.value === "Error") {
         clearCalc();
-      } else if (e.key === 'Backspace') {
-        expression = expression.slice(0, -1);
-        display.value = expression;
+        return;
+      }
+
+      expression = expression.slice(0, -1);
+      updateDisplay();
+      displayCaption.textContent = "Enter a calculation";
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+      if (/^[0-9.]$/.test(e.key)) {
+        e.preventDefault();
+        press(e.key);
+      } else if (["+", "-", "*", "/", "(", ")"].includes(e.key)) {
+        e.preventDefault();
+        press(e.key);
+      } else if (e.key === "Enter" || e.key === "=") {
+        e.preventDefault();
+        calculate();
+      } else if (e.key === "Escape" || e.key === "Delete") {
+        e.preventDefault();
+        clearCalc();
+      } else if (e.key === "Backspace") {
+        e.preventDefault();
+        backspace();
       }
     });
   </script>
-
 </body>
 </html>

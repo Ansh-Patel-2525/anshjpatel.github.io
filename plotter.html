@@ -4,342 +4,817 @@
   <meta charset="UTF-8">
   <title>Plotter - Ansh Patel</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
   <style>
-    /* Header styles - keeping same */
+    :root {
+      --primary: #7c3aed;
+      --primary-dark: #6d28d9;
+      --primary-light: #f3e8ff;
+      --accent: #a855f7;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #e5e7eb;
+      --surface: #ffffff;
+      --background: #ffffff;
+      --success: #059669;
+      --danger: #dc2626;
+      --shadow-sm: 0 2px 8px rgba(15, 23, 42, .04);
+      --shadow-md: 0 8px 24px rgba(15, 23, 42, .07);
+      --shadow-lg: 0 16px 40px rgba(15, 23, 42, .08);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--background);
+      color: var(--text);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Arial, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    button, input, textarea {
+      font: inherit;
+    }
+
+    button, a, input[type="color"], input[type="checkbox"] {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid rgba(124, 58, 237, .3);
+      outline-offset: 3px;
+    }
+
+    /* HEADER */
+
     .game-header {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       z-index: 1000;
-      background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #c026d3 100%);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      transition: transform 0.3s ease-in-out;
-      padding: 1rem 0;
-    }
-    
-    .game-header-content {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .game-header h1 {
+      padding: 15px 0;
+      background: linear-gradient(110deg, #6d28d9, #7c3aed 55%, #9333ea);
       color: white;
-      margin: 0;
-      font-size: 1.8rem;
+      border-bottom: 1px solid rgba(255,255,255,.2);
+      box-shadow: 0 4px 20px rgba(76, 29, 149, .16);
+      transition: transform .3s ease;
     }
-    
+
+    .game-header-content {
+      width: min(1440px, 100%);
+      margin: 0 auto;
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .game-header h1 {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      color: white;
+      font-size: clamp(1.35rem, 2.5vw, 1.8rem);
+      font-weight: 800;
+      letter-spacing: -.7px;
+    }
+
+    .header-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 13px;
+      font-size: 1.3rem;
+    }
+
     .header-links {
       display: flex;
-      gap: 1.5rem;
+      align-items: center;
+      gap: 10px;
     }
-    
+
     .game-header .back-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 40px;
+      padding: 9px 15px;
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 11px;
+      background: rgba(255,255,255,.1);
       color: white;
       text-decoration: none;
-      opacity: 0.9;
-      font-weight: 500;
-      transition: opacity 0.2s;
-    }
-    
-    .game-header .back-link:hover {
-      opacity: 1;
+      font-size: .88rem;
+      font-weight: 650;
+      white-space: nowrap;
+      transition: background .2s ease, transform .2s ease;
     }
 
-    /* New layout */
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
+    .game-header .back-link:hover {
+      background: rgba(255,255,255,.2);
+      transform: translateY(-1px);
     }
+
+    /* PAGE */
 
     .container {
-      margin-top: 100px;
-      padding: 2rem;
-      max-width: 1200px;
-      margin-left: auto;
-      margin-right: auto;
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      padding: 116px 26px 45px;
     }
+
+    .page-intro {
+      margin-bottom: 27px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 8px;
+      color: var(--primary);
+      font-size: .75rem;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .page-intro h2 {
+      margin-bottom: 7px;
+      color: #111827;
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      font-weight: 850;
+      letter-spacing: -1.2px;
+      line-height: 1.2;
+    }
+
+    .page-intro p {
+      max-width: 650px;
+      color: var(--muted);
+      font-size: .98rem;
+    }
+
+    /* MODE SELECTOR */
 
     .mode-tabs {
       display: flex;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-      justify-content: center;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-bottom: 20px;
+      padding: 6px;
+      width: fit-content;
+      max-width: 100%;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 14px;
     }
 
     .tab-btn {
-      padding: 0.8rem 2rem;
-      border: none;
-      background: #e5e7eb;
-      color: #666;
+      min-height: 43px;
+      padding: 10px 17px;
+      border: 1px solid transparent;
       border-radius: 10px;
+      background: transparent;
+      color: #64748b;
       cursor: pointer;
-      font-size: 1rem;
-      transition: all 0.2s;
+      font-size: .9rem;
+      font-weight: 700;
+      transition: background .2s ease, color .2s ease, box-shadow .2s ease;
+    }
+
+    .tab-btn:hover:not(.active) {
+      background: #f1f5f9;
+      color: var(--text);
     }
 
     .tab-btn.active {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
-      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      background: var(--primary);
+      box-shadow: 0 3px 9px rgba(124,58,237,.22);
     }
 
+    /* CONTROL PANEL */
+
     .controls {
+      padding: 25px;
+      margin-bottom: 23px;
       background: white;
-      padding: 1.5rem;
-      border-radius: 15px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      margin-bottom: 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .section-heading-icon {
+      width: 43px;
+      height: 43px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      color: var(--primary);
+      background: var(--primary-light);
+      border-radius: 12px;
+      font-size: 1.2rem;
+    }
+
+    .section-heading h3 {
+      color: #1e293b;
+      font-size: 1.08rem;
+      font-weight: 800;
+    }
+
+    .section-heading p {
+      color: var(--muted);
+      font-size: .83rem;
     }
 
     .form-group {
-      margin-bottom: 1rem;
+      margin-bottom: 21px;
     }
 
     .form-group label {
       display: block;
-      margin-bottom: 0.3rem;
-      font-weight: 600;
-      color: #333;
-      font-size: 0.9rem;
+      margin-bottom: 7px;
+      color: #334155;
+      font-size: .9rem;
+      font-weight: 750;
     }
 
     .form-group input[type="text"],
+    .form-group input[type="number"],
     .form-group textarea {
+      display: block;
       width: 100%;
-      padding: 0.6rem;
-      border: 2px solid #e5e7eb;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      box-sizing: border-box;
-      font-family: monospace;
+      padding: 12px 14px;
+      color: #1e293b;
+      background: #fff;
+      border: 1px solid #dbe1ea;
+      border-radius: 10px;
+      font-size: .94rem;
+      transition: border-color .2s ease, box-shadow .2s ease;
     }
 
     .form-group textarea {
+      min-height: 110px;
       resize: vertical;
-      min-height: 80px;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      line-height: 1.7;
+    }
+
+    .form-group input:hover,
+    .form-group textarea:hover,
+    .range-item input:hover {
+      border-color: #c4b5fd;
     }
 
     .form-group input:focus,
-    .form-group textarea:focus {
+    .form-group textarea:focus,
+    .range-item input:focus {
       outline: none;
-      border-color: #667eea;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(124,58,237,.1);
     }
 
     .form-group small {
       display: block;
-      color: #666;
-      font-size: 0.8rem;
-      margin-top: 0.2rem;
+      margin-top: 7px;
+      color: #7b8798;
+      font-size: .8rem;
+    }
+
+    /* AXIS RANGE */
+
+    .range-heading {
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: .82rem;
+      font-weight: 800;
+      letter-spacing: .3px;
     }
 
     .range-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 0.8rem;
-      margin-bottom: 1rem;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 21px;
     }
 
     .range-item {
       display: flex;
+      min-width: 0;
       flex-direction: column;
     }
 
     .range-item label {
-      font-size: 0.85rem;
-      margin-bottom: 0.3rem;
-      color: #555;
-      font-weight: 600;
+      margin-bottom: 6px;
+      color: #475569;
+      font-size: .82rem;
+      font-weight: 750;
     }
 
     .range-item input {
-      padding: 0.5rem;
-      border: 2px solid #e5e7eb;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      box-sizing: border-box;
+      width: 100%;
+      min-width: 0;
+      padding: 10px 11px;
+      color: #1e293b;
+      background: #fff;
+      border: 1px solid #dbe1ea;
+      border-radius: 9px;
+      font-size: .9rem;
+      transition: border-color .2s ease, box-shadow .2s ease;
     }
 
-    .range-item input:focus {
-      outline: none;
-      border-color: #667eea;
-    }
+    /* COLOR PICKERS */
 
     .color-picker-group {
       display: flex;
       align-items: center;
-      gap: 1rem;
-      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 21px;
     }
 
-    .color-picker-group label {
-      font-weight: 600;
-      color: #333;
-      font-size: 0.9rem;
+    .color-picker-group > label {
+      color: #334155;
+      font-size: .88rem;
+      font-weight: 750;
     }
 
     .color-picker-group input[type="color"] {
-      width: 60px;
-      height: 40px;
-      border: 2px solid #e5e7eb;
-      border-radius: 8px;
+      width: 48px;
+      height: 39px;
+      padding: 3px;
+      background: white;
+      border: 1px solid #dbe1ea;
+      border-radius: 9px;
       cursor: pointer;
     }
+
+    .function-colors {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .function-color {
+      min-width: 62px;
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      gap: 5px;
+      padding: 10px;
+      background: #fafafa;
+      border: 1px solid #edf0f5;
+      border-radius: 11px;
+    }
+
+    .function-color small {
+      color: #64748b;
+      font-size: .75rem;
+      font-weight: 800;
+    }
+
+    .function-color input[type="color"] {
+      width: 39px;
+      height: 35px;
+      padding: 2px;
+      border: 1px solid #dbe1ea;
+      border-radius: 7px;
+      background: white;
+      cursor: pointer;
+    }
+
+    .checkbox-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      color: #334155;
+      font-size: .9rem;
+      font-weight: 650;
+      cursor: pointer;
+    }
+
+    .checkbox-control input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    /* BUTTONS */
 
     .btn-group {
       display: flex;
-      gap: 0.8rem;
+      gap: 11px;
+      padding-top: 19px;
+      border-top: 1px solid #eef0f4;
     }
 
     .btn {
+      min-height: 48px;
       flex: 1;
-      padding: 0.9rem;
-      border: none;
-      border-radius: 10px;
-      font-size: 1rem;
-      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border: 1px solid transparent;
+      border-radius: 11px;
+      font-size: .94rem;
+      font-weight: 800;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: transform .18s ease, box-shadow .18s ease,
+        background .18s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
       color: white;
-      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+      background: linear-gradient(135deg, #7c3aed, #9333ea);
+      box-shadow: 0 4px 12px rgba(124,58,237,.2);
     }
 
     .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+      background: linear-gradient(135deg, #6d28d9, #7e22ce);
+      box-shadow: 0 7px 17px rgba(124,58,237,.25);
     }
 
     .btn-danger {
-      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-      color: white;
-      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+      color: #b91c1c;
+      background: white;
+      border-color: #fecaca;
     }
 
     .btn-danger:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+      background: #fff5f5;
+      box-shadow: 0 4px 12px rgba(220,38,38,.08);
     }
 
+    /* GRAPH PANEL */
+
     .chart-box {
+      padding: 22px;
       background: white;
-      padding: 0.5rem !important;
-      border-radius: 15px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .chart-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 17px;
+    }
+
+    .chart-heading h3 {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: #1e293b;
+      font-size: 1.05rem;
+      font-weight: 800;
+    }
+
+    .chart-heading-icon {
+      color: var(--primary);
+      font-size: 1.2rem;
+    }
+
+    .chart-badge {
+      padding: 5px 10px;
+      color: #6d28d9;
+      background: #f5f0ff;
+      border: 1px solid #e9ddff;
+      border-radius: 20px;
+      font-size: .74rem;
+      font-weight: 750;
     }
 
     .chart-canvas-wrapper {
       position: relative;
-      height: 650px !important;
-      width: 100% !important;
+      width: 100%;
+      height: 570px;
     }
 
     #myChart {
-      background: white !important;
+      display: block;
       width: 100% !important;
       height: 100% !important;
+      background: white;
     }
 
     .hidden {
-      display: none;
+      display: none !important;
     }
+
+    .page-footer {
+      padding: 22px 10px 0;
+      color: #94a3b8;
+      font-size: .8rem;
+      text-align: center;
+    }
+
+    /* TABLET */
 
     @media (max-width: 768px) {
       .game-header {
-        padding: 0.5rem 0;
+        padding: 10px 0;
       }
 
       .game-header-content {
-        padding: 0 1rem;
+        padding: 0 17px;
       }
 
       .game-header h1 {
+        font-size: 1.35rem;
+      }
+
+      .header-icon {
+        width: 36px;
+        height: 36px;
         font-size: 1.1rem;
       }
 
+      .game-header .back-link {
+        min-height: 36px;
+        padding: 8px 10px;
+        font-size: .78rem;
+      }
+
       .header-links {
-        gap: 0.8rem;
-        font-size: 0.85rem;
+        gap: 7px;
       }
 
       .container {
-        margin-top: 60px;
-        padding: 1rem;
+        padding: 94px 17px 30px;
+      }
+
+      .controls {
+        padding: 19px;
+      }
+
+      .chart-box {
+        padding: 15px;
+      }
+
+      .chart-canvas-wrapper {
+        height: 480px;
       }
 
       .range-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.6rem;
+        gap: 9px;
+      }
+    }
+
+    /* MOBILE */
+
+    @media (max-width: 520px) {
+      .game-header-content {
+        gap: 9px;
+        padding: 0 11px;
+      }
+
+      .game-header h1 {
+        gap: 7px;
+        font-size: 1.12rem;
+      }
+
+      .header-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+        font-size: 1rem;
+      }
+
+      .header-links {
+        gap: 5px;
+      }
+
+      .game-header .back-link {
+        min-height: 33px;
+        padding: 6px 8px;
+        gap: 4px;
+        border-radius: 9px;
+        font-size: .69rem;
+      }
+
+      .container {
+        padding: 85px 12px 25px;
+      }
+
+      .page-intro {
+        margin-bottom: 20px;
+      }
+
+      .page-intro h2 {
+        font-size: 1.85rem;
+      }
+
+      .page-intro p {
+        font-size: .9rem;
+      }
+
+      .mode-tabs {
+        width: 100%;
+        gap: 5px;
+        margin-bottom: 15px;
+      }
+
+      .tab-btn {
+        flex: 1;
+        padding: 10px 7px;
+        font-size: .79rem;
+      }
+
+      .controls {
+        padding: 15px;
+        margin-bottom: 16px;
+        border-radius: 15px;
+      }
+
+      .section-heading {
+        gap: 9px;
+        margin-bottom: 18px;
+      }
+
+      .section-heading-icon {
+        width: 37px;
+        height: 37px;
+        font-size: 1.05rem;
+      }
+
+      .section-heading h3 {
+        font-size: .97rem;
+      }
+
+      .section-heading p {
+        font-size: .76rem;
+      }
+
+      .form-group {
+        margin-bottom: 17px;
+      }
+
+      .form-group label {
+        font-size: .85rem;
+      }
+
+      .form-group textarea {
+        min-height: 100px;
+      }
+
+      .range-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 11px;
+        margin-bottom: 18px;
+      }
+
+      .range-item input {
+        padding: 10px;
+        font-size: 16px;
+      }
+
+      .form-group input[type="number"],
+      .form-group textarea {
+        font-size: 16px;
+      }
+
+      .function-colors {
+        gap: 7px;
+      }
+
+      .function-color {
+        min-width: 51px;
+        flex: 1;
+        padding: 7px 4px;
+      }
+
+      .function-color input[type="color"] {
+        width: 34px;
+        height: 32px;
       }
 
       .btn-group {
         flex-direction: column;
+        padding-top: 15px;
       }
 
-      .chart-canvas-wrapper {
-        height: 500px !important;
+      .btn {
+        min-height: 46px;
+        flex: auto;
+        font-size: .9rem;
       }
 
       .chart-box {
-        padding: 0.5rem !important;
+        padding: 12px;
+        border-radius: 15px;
       }
 
-      .form-group input,
-      .form-group textarea,
-      .range-item input {
-        font-size: 16px; /* Prevent iOS zoom */
-      }
-    }
-
-    @media (max-width: 480px) {
-      .game-header {
-        padding: 0.4rem 0;
+      .chart-heading {
+        margin-bottom: 12px;
       }
 
-      .game-header-content {
-        padding: 0 0.5rem;
+      .chart-heading h3 {
+        font-size: .95rem;
       }
 
-      .game-header h1 {
-        font-size: 0.95rem;
-      }
-
-      .header-links {
-        gap: 0.4rem;
-        font-size: 0.75rem;
-      }
-
-      .container {
-        margin-top: 55px;
-      }
-
-      .tab-btn {
-        padding: 0.6rem 1.2rem;
-        font-size: 0.9rem;
+      .chart-badge {
+        font-size: .68rem;
       }
 
       .chart-canvas-wrapper {
-        height: 400px !important;
+        height: 400px;
+      }
+
+      .page-footer {
+        padding-top: 17px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .game-header-content {
+        padding: 0 7px;
+      }
+
+      .game-header h1 {
+        font-size: 1rem;
+      }
+
+      .game-header .back-link {
+        padding: 6px;
+        font-size: .65rem;
+      }
+
+      .container {
+        padding-right: 8px;
+        padding-left: 8px;
+      }
+
+      .controls {
+        padding: 12px;
+      }
+
+      .chart-canvas-wrapper {
+        height: 340px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
       }
     }
   </style>
 </head>
-<body>
 
+<body>
   <header class="game-header">
     <div class="game-header-content">
-      <h1>📊 Plotter</h1>
+      <h1><span class="header-icon">📊</span> Plotter</h1>
       <div class="header-links">
         <a href="widgets.html" class="back-link">← Back to Widgets</a>
         <a href="index.html" class="back-link">🏠 Home</a>
@@ -347,127 +822,152 @@
     </div>
   </header>
 
-  <div class="container">
+  <main class="container">
+    <section class="page-intro">
+      <div class="eyebrow">✦ Mathematics workspace</div>
+      <h2>Graph Plotter</h2>
+      <p>Plot coordinate points or explore mathematical functions with a graph you can customise.</p>
+    </section>
+
     <div class="mode-tabs">
       <button class="tab-btn active" onclick="switchMode('points')">📍 Plot Points</button>
       <button class="tab-btn" onclick="switchMode('function')">ƒ(x) Plot Function</button>
     </div>
 
-    <div class="controls">
+    <section class="controls">
+      <div class="section-heading">
+        <div class="section-heading-icon">⚙️</div>
+        <div>
+          <h3>Graph settings</h3>
+          <p>Enter your data and customise your graph.</p>
+        </div>
+      </div>
+
       <!-- Points Mode -->
       <div id="pointsMode">
         <div class="form-group">
-          <label>Enter Points (x,y):</label>
+          <label for="pointsInput">Enter coordinates (x, y)</label>
           <textarea id="pointsInput" placeholder="1,2
 3,4
 5,7"></textarea>
-          <small>One point per line as x,y</small>
+          <small>Enter one point per line, using the format x,y.</small>
         </div>
 
+        <div class="range-heading">Axis range · Optional</div>
         <div class="range-grid">
           <div class="range-item">
-            <label>X Min</label>
+            <label for="xMinPoints">X Minimum</label>
             <input type="number" id="xMinPoints" placeholder="Auto">
           </div>
           <div class="range-item">
-            <label>X Max</label>
+            <label for="xMaxPoints">X Maximum</label>
             <input type="number" id="xMaxPoints" placeholder="Auto">
           </div>
           <div class="range-item">
-            <label>Y Min</label>
+            <label for="yMinPoints">Y Minimum</label>
             <input type="number" id="yMinPoints" placeholder="Auto">
           </div>
           <div class="range-item">
-            <label>Y Max</label>
+            <label for="yMaxPoints">Y Maximum</label>
             <input type="number" id="yMaxPoints" placeholder="Auto">
           </div>
         </div>
 
         <div class="color-picker-group">
-          <label>Color:</label>
+          <label for="colorPoints">Point colour</label>
           <input type="color" id="colorPoints" value="#667eea">
+          <small>Choose the colour for your plotted points.</small>
         </div>
       </div>
 
       <!-- Function Mode -->
       <div id="functionMode" class="hidden">
         <div class="form-group">
-          <label>Functions y = .... (one per line, up to 5):</label>
+          <label for="functionInput">Enter functions y = f(x)</label>
           <textarea id="functionInput" placeholder="x^2
 2*x + 3
 sin(x)"></textarea>
-          <small>Use: +, -, *, /, ^, sin(), cos(), tan(), sqrt(), abs()</small>
+          <small>One function per line, up to five. Supported: +, -, *, /, ^, sin(), cos(), tan(), sqrt(), abs(), log(), exp().</small>
         </div>
 
+        <div class="range-heading">Axis range</div>
         <div class="range-grid">
           <div class="range-item">
-            <label>X Min</label>
+            <label for="xMin">X Minimum</label>
             <input type="number" id="xMin" value="-10">
           </div>
           <div class="range-item">
-            <label>X Max</label>
+            <label for="xMax">X Maximum</label>
             <input type="number" id="xMax" value="10">
           </div>
           <div class="range-item">
-            <label>Y Min</label>
+            <label for="yMin">Y Minimum</label>
             <input type="number" id="yMin" placeholder="Auto">
           </div>
           <div class="range-item">
-            <label>Y Max</label>
+            <label for="yMax">Y Maximum</label>
             <input type="number" id="yMax" placeholder="Auto">
           </div>
         </div>
 
         <div class="form-group">
-          <label>Resolution (Points):</label>
+          <label for="resolution">Resolution (number of samples)</label>
           <input type="number" id="resolution" value="200" min="50" max="2000" step="50">
-          <small>Range:(50-2000). Default:(200)</small>
+          <small>Choose between 50 and 2,000 samples. Higher values create more detailed curves.</small>
         </div>
 
         <div class="form-group">
-          <label>Colors for each function:</label>
-          <div style="display: flex; gap: 0.8rem; flex-wrap: wrap;">
-            <div style="display: flex; flex-direction: column; align-items: center;">
-              <small style="margin-bottom: 0.3rem;">F1</small>
-              <input type="color" id="color1" value="#667eea" style="width: 50px; height: 40px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer;">
+          <label>Colours for each function</label>
+          <div class="function-colors">
+            <div class="function-color">
+              <small>Function 1</small>
+              <input type="color" id="color1" value="#667eea" aria-label="Function 1 colour">
             </div>
-            <div style="display: flex; flex-direction: column; align-items: center;">
-              <small style="margin-bottom: 0.3rem;">F2</small>
-              <input type="color" id="color2" value="#ef4444" style="width: 50px; height: 40px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer;">
+            <div class="function-color">
+              <small>Function 2</small>
+              <input type="color" id="color2" value="#ef4444" aria-label="Function 2 colour">
             </div>
-            <div style="display: flex; flex-direction: column; align-items: center;">
-              <small style="margin-bottom: 0.3rem;">F3</small>
-              <input type="color" id="color3" value="#10b981" style="width: 50px; height: 40px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer;">
+            <div class="function-color">
+              <small>Function 3</small>
+              <input type="color" id="color3" value="#10b981" aria-label="Function 3 colour">
             </div>
-            <div style="display: flex; flex-direction: column; align-items: center;">
-              <small style="margin-bottom: 0.3rem;">F4</small>
-              <input type="color" id="color4" value="#f59e0b" style="width: 50px; height: 40px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer;">
+            <div class="function-color">
+              <small>Function 4</small>
+              <input type="color" id="color4" value="#f59e0b" aria-label="Function 4 colour">
             </div>
-            <div style="display: flex; flex-direction: column; align-items: center;">
-              <small style="margin-bottom: 0.3rem;">F5</small>
-              <input type="color" id="color5" value="#3b82f6" style="width: 50px; height: 40px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer;">
+            <div class="function-color">
+              <small>Function 5</small>
+              <input type="color" id="color5" value="#3b82f6" aria-label="Function 5 colour">
             </div>
           </div>
         </div>
 
-        <div class="color-picker-group">
-          <label>Show individual points:</label>
-          <input type="checkbox" id="showPoints" style="width: 20px; height: 20px; cursor: pointer;">
-        </div>
+        <label class="checkbox-control" for="showPoints">
+          <input type="checkbox" id="showPoints">
+          Show individual points along each curve
+        </label>
       </div>
 
       <div class="btn-group">
-        <button class="btn btn-primary" onclick="plotGraph()">📊 Plot</button>
-        <button class="btn btn-danger" onclick="clearGraph()">🗑️ Clear</button>
+        <button class="btn btn-primary" onclick="plotGraph()">📈 Plot graph</button>
+        <button class="btn btn-danger" onclick="clearGraph()">✕ Clear inputs and graph</button>
       </div>
-    </div>
+    </section>
 
-    <div class="chart-box">
+    <section class="chart-box">
+      <div class="chart-heading">
+        <h3><span class="chart-heading-icon">⌁</span> Your graph</h3>
+        <span class="chart-badge">Interactive chart</span>
+      </div>
       <div class="chart-canvas-wrapper">
         <canvas id="myChart"></canvas>
       </div>
-    </div>
-  </div>
+    </section>
+
+    <footer class="page-footer">
+      Built for exploring coordinates, functions and graphs.
+    </footer>
+  </main>
 
   <script>
     let currentMode = 'points';
@@ -478,9 +978,9 @@ sin(x)"></textarea>
       const pointsMode = document.getElementById('pointsMode');
       const functionMode = document.getElementById('functionMode');
       const tabs = document.querySelectorAll('.tab-btn');
-      
+
       tabs.forEach(tab => tab.classList.remove('active'));
-      
+
       if (mode === 'points') {
         tabs[0].classList.add('active');
         pointsMode.classList.remove('hidden');
@@ -495,11 +995,11 @@ sin(x)"></textarea>
     function parsePoints(input) {
       const lines = input.trim().split('\n');
       const points = [];
-      
+
       for (let line of lines) {
         line = line.trim().replace(/[()]/g, '').replace(/\s+/g, '');
         if (!line) continue;
-        
+
         const parts = line.split(',');
         if (parts.length >= 2) {
           const x = parseFloat(parts[0]);
@@ -532,35 +1032,35 @@ sin(x)"></textarea>
     function plotGraph() {
       const datasets = [];
       let xMin = null, xMax = null, yMin = null, yMax = null;
-      
+
       if (currentMode === 'points') {
         const input = document.getElementById('pointsInput').value;
         if (!input.trim()) {
           alert('Please enter some points!');
           return;
         }
-        
+
         const data = parsePoints(input);
         if (data.length === 0) {
           alert('No valid points found!');
           return;
         }
-        
+
         const xMinInput = document.getElementById('xMinPoints').value;
         const xMaxInput = document.getElementById('xMaxPoints').value;
         const yMinInput = document.getElementById('yMinPoints').value;
         const yMaxInput = document.getElementById('yMaxPoints').value;
-        
+
         if (xMinInput) xMin = parseFloat(xMinInput);
         if (xMaxInput) xMax = parseFloat(xMaxInput);
         if (yMinInput) yMin = parseFloat(yMinInput);
         if (yMaxInput) yMax = parseFloat(yMaxInput);
-        
+
         const plotColor = document.getElementById('colorPoints').value;
         const r = parseInt(plotColor.slice(1, 3), 16);
         const g = parseInt(plotColor.slice(3, 5), 16);
         const b = parseInt(plotColor.slice(5, 7), 16);
-        
+
         datasets.push({
           label: 'Points',
           data: data,
@@ -570,42 +1070,37 @@ sin(x)"></textarea>
           pointRadius: 6,
           borderWidth: 2.5
         });
-        
+
       } else {
         const funcInput = document.getElementById('functionInput').value;
         if (!funcInput.trim()) {
           alert('Please enter at least one function!');
           return;
         }
-        
+
         const xMinVal = parseFloat(document.getElementById('xMin').value);
         const xMaxVal = parseFloat(document.getElementById('xMax').value);
-        
+
         if (xMinVal >= xMaxVal) {
           alert('X Min must be less than X Max!');
           return;
         }
-        
+
         const yMinInput = document.getElementById('yMin').value;
         const yMaxInput = document.getElementById('yMax').value;
-        
+
         if (yMinInput) yMin = parseFloat(yMinInput);
         if (yMaxInput) yMax = parseFloat(yMaxInput);
-        
-        // Get resolution and show points toggle
+
         let numPoints = parseInt(document.getElementById('resolution').value);
         if (isNaN(numPoints) || numPoints < 50) numPoints = 50;
         if (numPoints > 2000) numPoints = 2000;
-        
+
         const showPoints = document.getElementById('showPoints').checked;
-        
-        // Parse multiple functions (one per line)
+
         const functions = funcInput.split('\n').filter(f => f.trim());
-        
-        // Limit to 5 functions
         const functionsToPlot = functions.slice(0, 5);
-        
-        // Get colors from color pickers
+
         const colors = [
           document.getElementById('color1').value,
           document.getElementById('color2').value,
@@ -613,11 +1108,11 @@ sin(x)"></textarea>
           document.getElementById('color4').value,
           document.getElementById('color5').value
         ];
-        
+
         functionsToPlot.forEach((func, index) => {
           const data = [];
           const step = (xMaxVal - xMinVal) / numPoints;
-          
+
           for (let i = 0; i <= numPoints; i++) {
             const x = xMinVal + i * step;
             const y = evaluateFunction(func.trim(), x);
@@ -625,13 +1120,13 @@ sin(x)"></textarea>
               data.push({ x, y });
             }
           }
-          
+
           if (data.length > 0) {
             const color = colors[index];
             const r = parseInt(color.slice(1, 3), 16);
             const g = parseInt(color.slice(3, 5), 16);
             const b = parseInt(color.slice(5, 7), 16);
-            
+
             datasets.push({
               label: `y = ${func.trim()}`,
               data: data,
@@ -643,19 +1138,19 @@ sin(x)"></textarea>
             });
           }
         });
-        
+
         if (datasets.length === 0) {
           alert('Could not evaluate any functions!');
           return;
         }
       }
-      
+
       const ctx = document.getElementById('myChart').getContext('2d');
-      
+
       if (chart) {
         chart.destroy();
       }
-      
+
       const scalesConfig = {
         x: {
           type: 'linear',
@@ -690,12 +1185,12 @@ sin(x)"></textarea>
           }
         }
       };
-      
+
       if (xMin !== null) scalesConfig.x.min = xMin;
       if (xMax !== null) scalesConfig.x.max = xMax;
       if (yMin !== null) scalesConfig.y.min = yMin;
       if (yMax !== null) scalesConfig.y.max = yMax;
-      
+
       chart = new Chart(ctx, {
         type: 'scatter',
         data: {
@@ -738,21 +1233,20 @@ sin(x)"></textarea>
     // Header auto-hide
     let lastScrollTop = 0;
     const header = document.querySelector('.game-header');
-    
+
     window.addEventListener('scroll', function() {
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      
+
       if (Math.abs(scrollTop - lastScrollTop) < 5) return;
-      
+
       if (scrollTop > lastScrollTop && scrollTop > 100) {
         header.style.transform = 'translateY(-100%)';
       } else {
         header.style.transform = 'translateY(0)';
       }
-      
+
       lastScrollTop = scrollTop;
     });
   </script>
-
 </body>
 </html>

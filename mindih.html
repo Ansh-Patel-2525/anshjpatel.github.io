@@ -1,129 +1,341 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Mindi - Ansh Patel</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+
   <style>
+    /* ========================================
+       MINDI — INDIAN CARD TABLE DESIGN
+       UI ONLY — ORIGINAL GAME LOGIC PRESERVED
+    ======================================== */
+
+    :root {
+      --felt: #12664b;
+      --felt-dark: #084b38;
+      --felt-light: #19815b;
+      --gold: #e9c779;
+      --gold-dark: #b88b3c;
+      --cream: #fffaf0;
+      --ink: #24332e;
+      --muted: #78867f;
+      --border: #e6e8df;
+      --shadow-sm: 0 3px 10px rgba(28,45,35,.08);
+      --shadow-md: 0 12px 32px rgba(28,45,35,.12);
+      --shadow-lg: 0 20px 55px rgba(13,50,36,.16);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse at 10% 5%, rgba(233,199,121,.16), transparent 35%),
+        radial-gradient(ellipse at 90% 90%, rgba(18,102,75,.09), transparent 35%),
+        #f7f5ed;
+      font-family: "Segoe UI", Inter, -apple-system, BlinkMacSystemFont,
+        Roboto, sans-serif;
+      line-height: 1.5;
+    }
+
+    button, a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* HEADER */
+
     .game-header {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
+      inset: 0 0 auto;
       z-index: 1000;
-      background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #c026d3 100%);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      transition: transform 0.3s ease-in-out;
-      padding: 1rem 0;
+      padding: 14px 0;
+      color: white;
+      background: linear-gradient(110deg, #104c3a, #12664b 58%, #247657);
+      border-bottom: 1px solid rgba(233,199,121,.45);
+      box-shadow: 0 5px 24px rgba(8,42,30,.22);
+      transition: transform .3s ease;
     }
-    
+
     .game-header-content {
-      max-width: 1200px;
+      width: min(1440px, 100%);
       margin: 0 auto;
-      padding: 0 2rem;
+      padding: 0 28px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 18px;
     }
-    
+
     .game-header h1 {
-      color: white;
-      margin: 0;
-      font-size: 1.8rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #fff8e8;
+      font-size: clamp(1.4rem, 2.4vw, 2rem);
+      font-weight: 850;
+      letter-spacing: -.8px;
     }
-    
+
+    .game-header h1::before {
+      content: "♠";
+      width: 43px;
+      height: 43px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(233,199,121,.75);
+      border-radius: 13px;
+      color: var(--gold);
+      background: rgba(255,255,255,.07);
+      font-size: 1.55rem;
+    }
+
     .header-links {
       display: flex;
-      gap: 1.5rem;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 10px;
     }
-    
+
     .game-header .back-link {
-      color: white;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 40px;
+      padding: 9px 16px;
+      color: #fff9e9;
+      background: rgba(255,255,255,.09);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 12px;
       text-decoration: none;
-      opacity: 0.9;
-      font-weight: 500;
-      transition: opacity 0.2s;
+      font-size: .88rem;
+      font-weight: 700;
+      transition: background .2s ease, transform .2s ease;
     }
-    
+
     .game-header .back-link:hover {
-      opacity: 1;
+      background: rgba(255,255,255,.19);
+      transform: translateY(-2px);
     }
-    
+
+    .game-header .back-link:focus-visible,
+    button:focus-visible {
+      outline: 3px solid var(--gold);
+      outline-offset: 3px;
+    }
+
+    /* PAGE LAYOUT */
+
     .game-container {
-      margin-top: 100px;
-    }
-    
-    @media (max-width: 768px) {
-      .game-container {
-        margin-top: 90px;
-      }
-    }
-    
-    .mindi-container {
-      max-width: 1200px;
+      max-width: 600px;
       margin: 0 auto;
-      padding: 90px 1.5rem 1.5rem;
+      padding: 120px 24px 48px;
+      min-height: 100vh;
+    }
+
+    .mindi-container {
+      width: min(1440px, 100%);
+      margin: 0 auto;
+      padding: 112px 28px 36px;
     }
 
     .mindi-card {
-      background: white;
-      border-radius: 20px;
-      padding: 1.5rem;
-      box-shadow: var(--shadow-xl);
       display: grid;
-      grid-template-columns: 220px 1fr;
-      gap: 1.5rem;
-      transform: scale(0.9);
-      transform-origin: top center;
+      grid-template-columns: 245px minmax(0,1fr);
+      align-items: start;
+      gap: 24px;
+      padding: 24px;
+      background: rgba(255,255,255,.94);
+      border: 1px solid rgba(221,222,208,.9);
+      border-radius: 25px;
+      box-shadow: var(--shadow-lg);
+      transform: none;
     }
 
-    .left-panel {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
+    .left-panel,
     .right-panel {
+      min-width: 0;
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 16px;
+    }
+
+    /* TRUMP AND SCORE PANELS */
+
+    .game-info-section,
+    .tricks-won {
+      padding: 19px;
+      background: linear-gradient(145deg, #fffefa, #f8f7ef);
+      border: 1px solid var(--border);
+      border-radius: 17px;
+      box-shadow: var(--shadow-sm);
     }
 
     .game-info-section {
-      background: var(--bg-light);
-      padding: 1rem;
-      border-radius: 10px;
-      border: 2px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      border-top: 3px solid var(--gold-dark);
     }
 
     .info-label {
-      font-weight: 600;
-      color: var(--text-dark);
-      font-size: 0.9rem;
-      margin-bottom: 0.5rem;
+      margin-bottom: 9px;
+      color: var(--muted);
+      font-size: .76rem;
+      font-weight: 800;
+      letter-spacing: 1.3px;
+      text-transform: uppercase;
     }
 
     .trump-display {
-      font-size: 2.5rem;
-      text-align: center;
-      padding: 0.5rem;
+      min-height: 64px;
+      display: grid;
+      place-items: center;
+      color: var(--felt-dark);
+      font-size: 2.8rem;
+      font-weight: 800;
     }
 
-    .game-board {
-      background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    .tricks-won {
+      border-left: 4px solid var(--felt-light);
+    }
+
+    .tricks-won:nth-child(3) {
+      border-left-color: #d97757;
+    }
+
+    .tricks-label {
+      margin-bottom: 11px;
+      color: var(--muted);
+      font-size: .76rem;
+      font-weight: 800;
+      letter-spacing: .4px;
+      line-height: 1.5;
+    }
+
+    .tricks-display {
+      color: var(--ink);
+      font-size: 1.02rem;
+      font-weight: 700;
+    }
+
+    .tricks-display span {
+      display: inline-block;
+      min-width: 27px;
+      color: var(--felt);
+      font-size: 1.35rem;
+      font-weight: 900;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .tens-display {
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+      margin-top: 7px;
+      color: var(--gold-dark);
+      font-size: .86rem;
+      font-weight: 800;
+    }
+
+    .tens-display span {
+      color: #b1842f;
+      font-size: 1.65rem;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* GAME STATUS */
+
+    .game-message {
+      min-height: 56px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid transparent;
       border-radius: 15px;
-      padding: 1rem;
+      font-size: .94rem;
+      font-weight: 750;
+      line-height: 1.5;
+      text-align: center;
+      transition: background .25s ease, color .25s ease;
+    }
+
+    .message-playing {
+      color: #215a47;
+      background: #e7f4eb;
+      border-color: #c8e5d0;
+    }
+
+    .message-win {
+      color: #176341;
+      background: #d9f5e3;
+      border-color: #9edbb6;
+    }
+
+    .message-lose {
+      color: #9d3737;
+      background: #fff0e9;
+      border-color: #f3c7b9;
+    }
+
+    /* CARD TABLE */
+
+    .game-board {
       position: relative;
-      height: 500px;
+      isolation: isolate;
+      height: 570px;
+      padding: 14px;
       display: grid;
-      grid-template-rows: 80px 1fr 110px;
-      gap: 0.5rem;
+      grid-template-rows: 90px minmax(0,1fr) 112px;
+      gap: 4px;
       overflow: hidden;
+      border: 7px solid #a8793f;
+      border-radius: 24px;
+      background:
+        radial-gradient(ellipse at center, rgba(255,255,255,.055), transparent 65%),
+        repeating-linear-gradient(
+          135deg,
+          rgba(255,255,255,.012) 0,
+          rgba(255,255,255,.012) 2px,
+          transparent 2px,
+          transparent 5px
+        ),
+        linear-gradient(145deg, #197653, #10573f 60%, #0c4936);
+      box-shadow:
+        inset 0 0 0 2px rgba(255,238,188,.35),
+        inset 0 0 32px rgba(0,0,0,.15),
+        0 9px 18px rgba(36,52,39,.13);
+    }
+
+    .game-board::before {
+      content: "";
+      position: absolute;
+      inset: 12px;
+      z-index: -1;
+      border: 1px solid rgba(239,212,150,.22);
+      border-radius: 13px;
+      pointer-events: none;
     }
 
     .player-area {
       position: relative;
+      z-index: 2;
+      min-width: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -133,78 +345,99 @@
       justify-content: flex-start;
     }
 
-    .player-left {
-      position: absolute;
-      left: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: 5;
-    }
-
-    .player-right {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: 5;
-    }
-
     .player-bottom {
       justify-content: flex-end;
     }
 
+    .player-left,
+    .player-right {
+      position: absolute;
+      top: 50%;
+      z-index: 5;
+      transform: translateY(-50%);
+    }
+
+    .player-left {
+      left: 5px;
+    }
+
+    .player-right {
+      right: 5px;
+    }
+
     .player-label {
-      color: white;
-      font-weight: 700;
-      font-size: 0.8rem;
-      margin-bottom: 0.35rem;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.4);
-      background: rgba(0,0,0,0.2);
-      padding: 0.25rem 0.7rem;
+      max-width: 100%;
+      margin-bottom: 7px;
+      padding: 5px 11px;
+      overflow: hidden;
+      color: #fff8e7;
+      background: rgba(4,43,30,.56);
+      border: 1px solid rgba(255,255,255,.15);
       border-radius: 20px;
+      font-size: .73rem;
+      font-weight: 800;
+      line-height: 1.35;
+      text-align: center;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-shadow: 0 1px 2px rgba(0,0,0,.3);
     }
 
     .player-label.active {
-      background: #fbbf24;
-      color: #1f2937;
-      animation: pulse 1s infinite;
-      box-shadow: 0 0 15px rgba(251, 191, 36, 0.6);
+      color: #42300d;
+      background: linear-gradient(135deg, #ffedb0, #e8c56e);
+      border-color: #fff0b9;
+      box-shadow: 0 0 0 3px rgba(235,197,103,.17),
+        0 3px 12px rgba(0,0,0,.16);
+      animation: activeTurn 1.8s ease-in-out infinite;
     }
 
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
+    @keyframes activeTurn {
+      0%, 100% {
+        box-shadow: 0 0 0 2px rgba(235,197,103,.15);
+      }
+      50% {
+        box-shadow: 0 0 0 5px rgba(235,197,103,.28);
+      }
     }
 
     .cards-hand {
       display: flex;
-      gap: -15px;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
+      gap: 3px;
+      min-width: 0;
     }
 
     .player-bottom .cards-hand {
-      gap: 0.25rem;
-      flex-wrap: wrap;
+      width: 100%;
       max-width: 100%;
+      flex-wrap: wrap;
+      gap: 5px;
     }
 
+    /* CARD FACES */
+
     .card {
-      width: 55px;
-      height: 75px;
-      background: white;
-      border-radius: 6px;
+      position: relative;
+      flex: 0 0 auto;
+      width: 51px;
+      height: 71px;
+      padding: 5px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 0.25rem 0.3rem;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-      font-weight: bold;
-      font-size: 0.75rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border: 2px solid #e5e7eb;
       overflow: hidden;
+      color: #202a28;
+      background: linear-gradient(145deg, #fffefa, #f7f4e9);
+      border: 1px solid #e5dfcf;
+      border-radius: 8px;
+      box-shadow: 0 4px 7px rgba(0,0,0,.23);
+      font-size: .72rem;
+      font-weight: 900;
+      line-height: 1;
+      transition: transform .18s ease, box-shadow .18s ease,
+        border-color .18s ease;
     }
 
     .card > div:first-child,
@@ -214,206 +447,221 @@
     }
 
     .card > div:nth-child(2) {
-      font-size: 1.3rem;
+      font-size: 1.35rem;
       line-height: 1;
     }
 
+    .card.red {
+      color: #d12f43;
+    }
+
+    .card.black {
+      color: #25342f;
+    }
+
+    .card.clickable {
+      cursor: pointer;
+      border-color: #e7d6a8;
+      box-shadow: 0 4px 8px rgba(0,0,0,.28);
+    }
+
+    .card.clickable:hover {
+      z-index: 100;
+      transform: translateY(-13px) rotate(-2deg);
+      border-color: var(--gold);
+      box-shadow: 0 10px 18px rgba(0,0,0,.32);
+    }
+
     .player-bottom .card {
-      width: 60px;
-      height: 82px;
-      font-size: 0.8rem;
-      padding: 0.3rem 0.35rem;
+      width: 56px;
+      height: 78px;
+      padding: 6px;
+      font-size: .77rem;
     }
 
     .player-bottom .card > div:nth-child(2) {
       font-size: 1.5rem;
     }
 
-    .card.clickable:hover {
-      transform: translateY(-20px) scale(1.05);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
-      z-index: 100;
-      border-color: #fbbf24;
-    }
-
-    .card.red {
-      color: #dc2626;
-    }
-
-    .card.black {
-      color: #1f2937;
-    }
+    /* FACE-DOWN CARDS */
 
     .card-back {
-      width: 55px;
-      height: 75px;
-      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-      border-radius: 6px;
+      position: relative;
+      flex: 0 0 auto;
+      width: 51px;
+      height: 71px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-      border: 2px solid #1e3a8a;
-      position: relative;
+      overflow: hidden;
+      color: #f9e7b0;
+      background:
+        repeating-linear-gradient(
+          45deg,
+          transparent 0,
+          transparent 5px,
+          rgba(255,255,255,.075) 5px,
+          rgba(255,255,255,.075) 7px
+        ),
+        linear-gradient(135deg, #214e82, #16375f);
+      border: 3px double #d6b76c;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,.25);
     }
 
     .card-back::before {
-      content: '🂠';
-      font-size: 2rem;
-      color: white;
-      opacity: 0.4;
+      content: "✦";
+      display: grid;
+      place-items: center;
+      width: 31px;
+      height: 45px;
+      color: #f9e7b0;
+      border: 1px solid rgba(249,231,176,.65);
+      border-radius: 5px;
+      font-size: 1.35rem;
     }
 
     .card-count {
       position: absolute;
-      top: 3px;
-      right: 5px;
-      background: rgba(0,0,0,0.7);
+      top: 2px;
+      right: 2px;
+      z-index: 2;
+      min-width: 20px;
+      padding: 2px 4px;
       color: white;
-      padding: 0.1rem 0.35rem;
-      border-radius: 8px;
-      font-size: 0.65rem;
-      font-weight: bold;
+      background: #c18b38;
+      border: 1px solid rgba(255,255,255,.7);
+      border-radius: 7px;
+      font-size: .62rem;
+      font-weight: 900;
+      text-align: center;
     }
+
+    /* TRICK AREA */
 
     .trick-area {
       position: relative;
+      min-width: 0;
+      min-height: 220px;
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 240px;
     }
 
     .trick-cards-container {
       position: relative;
-      width: 280px;
-      height: 280px;
+      width: 250px;
+      height: 250px;
+      max-width: 100%;
+    }
+
+    .trick-cards-container::before {
+      content: "MINDI";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+      color: rgba(255,239,193,.18);
+      font-family: Georgia, serif;
+      font-size: 1.35rem;
+      font-weight: 900;
+      letter-spacing: 5px;
+      pointer-events: none;
     }
 
     .trick-card-slot {
       position: absolute;
+      z-index: 3;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
     .trick-card-slot.top {
-      top: 10px;
+      top: 3px;
       left: 50%;
       transform: translateX(-50%);
     }
 
     .trick-card-slot.bottom {
-      bottom: 10px;
+      bottom: 3px;
       left: 50%;
       transform: translateX(-50%);
     }
 
     .trick-card-slot.left {
-      left: 10px;
+      left: 3px;
       top: 50%;
       transform: translateY(-50%);
     }
 
     .trick-card-slot.right {
-      right: 10px;
+      right: 3px;
       top: 50%;
       transform: translateY(-50%);
     }
 
     .trick-card-slot .card {
-      width: 55px;
-      height: 75px;
-      font-size: 0.75rem;
+      width: 53px;
+      height: 74px;
+      font-size: .73rem;
+      box-shadow: 0 6px 14px rgba(0,0,0,.3);
     }
 
-    .game-message {
-      text-align: center;
-      padding: 0.75rem;
-      border-radius: 10px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      min-height: 45px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .message-playing {
-      background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
-      color: #3730a3;
-    }
-
-    .message-win {
-      background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-      color: #065f46;
-    }
-
-    .message-lose {
-      background: linear-gradient(135deg, #fee2e2, #fecaca);
-      color: #991b1b;
-    }
+    /* NEW GAME BUTTON */
 
     .game-controls {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 0.5rem;
+      gap: 10px;
     }
 
     .game-controls button {
-      padding: 0.75rem;
-      border: none;
-      border-radius: 10px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .btn-new-game {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      min-height: 51px;
+      padding: 13px 20px;
       color: white;
+      background: linear-gradient(120deg, #17694c, #25835d);
+      border: 1px solid #267653;
+      border-radius: 14px;
+      box-shadow: 0 5px 0 #0c4c36,
+        0 8px 15px rgba(16,86,61,.16);
+      font: inherit;
+      font-size: .95rem;
+      font-weight: 850;
+      cursor: pointer;
+      transition: transform .2s ease, box-shadow .2s ease,
+        filter .2s ease;
     }
 
-    .btn-new-game:hover {
+    .game-controls button:hover {
+      filter: brightness(1.08);
       transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
+      box-shadow: 0 7px 0 #0c4c36,
+        0 12px 20px rgba(16,86,61,.2);
     }
 
-    .tricks-won {
-      background: var(--bg-light);
-      padding: 0.8rem;
-      border-radius: 10px;
-      border: 2px solid var(--border);
+    .game-controls button:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #0c4c36;
     }
 
-    .tricks-label {
-      font-size: 0.75rem;
-      color: var(--text-light);
-      margin-bottom: 0.3rem;
-      font-weight: 600;
-    }
+    /* TABLET */
 
-    .tricks-display {
-      font-size: 1.1rem;
-      font-weight: bold;
-      color: var(--text-dark);
-    }
+    @media (max-width: 1050px) {
+      .mindi-container {
+        padding: 106px 18px 28px;
+      }
 
-    .tens-display {
-      font-size: 1.4rem;
-      color: #059669;
-      font-weight: bold;
-      margin-top: 0.3rem;
-    }
-
-    @media (max-width: 968px) {
       .mindi-card {
         grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 20px;
       }
 
       .left-panel {
+        display: grid;
+        grid-template-columns: repeat(3,minmax(0,1fr));
+        gap: 12px;
         order: 2;
       }
 
@@ -421,66 +669,357 @@
         order: 1;
       }
 
-      .game-board  {
-    min-height: 550px;
-    height: 75vh;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .mindi-container {
-        padding: 100px 1rem 2rem;
-      }
-
-      .card {
-        width: 45px;
-        height: 62px;
-        font-size: 0.65rem;
-        padding: 0.2rem 0.25rem;
-      }
-
-      .card > div:nth-child(2) {
-        font-size: 1.1rem;
-      }
-
-      .player-bottom .card {
-        width: 48px;
-        height: 66px;
-        font-size: 0.7rem;
-      }
-
-      .player-bottom .card > div:nth-child(2) {
-        font-size: 1.2rem;
-      }
-
-      .card-back {
-        width: 48px;
-        height: 66px;
-      }
-
-      .trick-cards-container {
-        width: 220px;
-        height: 220px;
-      }
-
-      .trick-card-slot .card {
-        width: 48px;
-        height: 66px;
+      .game-info-section,
+      .tricks-won {
+        min-width: 0;
+        padding: 15px;
       }
 
       .game-board {
-        height: 420px;
-        padding: 0.75rem;
-        grid-template-rows: 70px 1fr 100px;
+        height: 550px;
+      }
+
+      .tricks-label {
+        font-size: .7rem;
+      }
+    }
+
+    /* MOBILE */
+
+    @media (max-width: 600px) {
+      .game-header {
+        padding: 10px 0;
+      }
+
+      .game-header-content {
+        padding: 0 13px;
+        gap: 10px;
+      }
+
+      .game-header h1 {
+        gap: 7px;
+        font-size: 1.25rem;
+      }
+
+      .game-header h1::before {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        font-size: 1.2rem;
+      }
+
+      .header-links {
+        gap: 6px;
+      }
+
+      .game-header .back-link {
+        min-height: 35px;
+        padding: 7px 10px;
+        border-radius: 10px;
+        font-size: .76rem;
+      }
+
+      .mindi-container {
+        padding: 88px 9px 22px;
+      }
+
+      .mindi-card {
+        gap: 14px;
+        padding: 11px;
+        border-radius: 18px;
+      }
+
+      .right-panel,
+      .left-panel {
+        gap: 12px;
+      }
+
+      .game-message {
+        min-height: 48px;
+        padding: 11px;
+        border-radius: 12px;
+        font-size: .84rem;
+      }
+
+      .game-board {
+        height: 430px;
+        min-height: 0;
+        padding: 8px 4px;
+        grid-template-rows: 66px minmax(0,1fr) 100px;
+        gap: 0;
+        border-width: 4px;
+        border-radius: 17px;
       }
 
       .player-label {
-        font-size: 0.7rem;
-        padding: 0.2rem 0.5rem;
+        margin-bottom: 5px;
+        padding: 4px 7px;
+        font-size: .62rem;
+      }
+
+      .player-left {
+        left: 0;
+      }
+
+      .player-right {
+        right: 0;
+      }
+
+      .card {
+        width: 36px;
+        height: 51px;
+        padding: 3px;
+        border-radius: 5px;
+        font-size: .56rem;
+      }
+
+      .card > div:nth-child(2) {
+        font-size: .94rem;
+      }
+
+      .player-bottom .cards-hand {
+        gap: 3px;
+      }
+
+      .player-bottom .card {
+        width: 39px;
+        height: 55px;
+        padding: 3px;
+        font-size: .58rem;
+      }
+
+      .player-bottom .card > div:nth-child(2) {
+        font-size: 1rem;
+      }
+
+      .card-back {
+        width: 36px;
+        height: 51px;
+        border-width: 2px;
+        border-radius: 5px;
+      }
+
+      .card-back::before {
+        width: 22px;
+        height: 32px;
+        font-size: .95rem;
+      }
+
+      .card-count {
+        top: 1px;
+        right: 1px;
+        min-width: 16px;
+        padding: 1px 3px;
+        font-size: .53rem;
+      }
+
+      .trick-area {
+        min-height: 180px;
+      }
+
+      .trick-cards-container {
+        width: 174px;
+        height: 205px;
+      }
+
+      .trick-cards-container::before {
+        font-size: .85rem;
+        letter-spacing: 3px;
+      }
+
+      .trick-card-slot.top {
+        top: 0;
+      }
+
+      .trick-card-slot.bottom {
+        bottom: 0;
+      }
+
+      .trick-card-slot.left {
+        left: 0;
+      }
+
+      .trick-card-slot.right {
+        right: 0;
+      }
+
+      .trick-card-slot .card {
+        width: 39px;
+        height: 55px;
+        padding: 3px;
+        font-size: .58rem;
+      }
+
+      .trick-card-slot .card > div:nth-child(2) {
+        font-size: 1rem;
+      }
+
+      .left-panel {
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+      }
+
+      .game-info-section {
+        grid-column: 1 / -1;
+      }
+
+      .game-info-section,
+      .tricks-won {
+        padding: 12px;
+        border-radius: 13px;
+      }
+
+      .info-label {
+        font-size: .69rem;
+      }
+
+      .trump-display {
+        min-height: 44px;
+        font-size: 2rem;
+      }
+
+      .tricks-label {
+        margin-bottom: 7px;
+        font-size: .65rem;
+      }
+
+      .tricks-display {
+        font-size: .82rem;
+      }
+
+      .tricks-display span {
+        min-width: 20px;
+        font-size: 1.1rem;
+      }
+
+      .tens-display {
+        font-size: .75rem;
+      }
+
+      .tens-display span {
+        font-size: 1.3rem;
+      }
+
+      .game-controls button {
+        min-height: 47px;
+        border-radius: 12px;
+        font-size: .9rem;
       }
     }
+
+    /* VERY NARROW PHONES */
+
+    @media (max-width: 370px) {
+      .game-header-content {
+        padding: 0 8px;
+      }
+
+      .game-header h1 {
+        font-size: 1.08rem;
+      }
+
+      .game-header .back-link {
+        padding: 6px 7px;
+        font-size: .69rem;
+      }
+
+      .mindi-container {
+        padding-right: 5px;
+        padding-left: 5px;
+      }
+
+      .mindi-card {
+        padding: 7px;
+      }
+
+      .game-board {
+        height: 400px;
+      }
+
+      .card {
+        width: 32px;
+        height: 47px;
+        font-size: .5rem;
+      }
+
+      .player-bottom .card {
+        width: 34px;
+        height: 49px;
+        font-size: .52rem;
+      }
+
+      .card-back {
+        width: 32px;
+        height: 47px;
+      }
+
+      .trick-cards-container {
+        width: 158px;
+        height: 190px;
+      }
+
+      .trick-card-slot .card {
+        width: 35px;
+        height: 50px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+    }
+
+    /* Keep CPU2's teammate label visible above its cards */
+.player-top {
+  justify-content: flex-start;
+  align-self: start;
+  min-width: 0;
+  width: 100%;
+  overflow: visible;
+}
+
+.player-top .player-label {
+  position: relative;
+  z-index: 20;
+  flex-shrink: 0;
+  width: max-content;
+  max-width: calc(100% - 12px);
+  overflow: visible;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+  margin-top: 3px;
+  margin-bottom: 7px;
+  line-height: 1.25;
+}
+
+/* Keep the CPU2 card back below the label */
+.player-top .cards-hand {
+  position: relative;
+  z-index: 2;
+}
+
+/* Mobile: prevent CPU2's name from being covered */
+@media (max-width: 600px) {
+  .game-board {
+    grid-template-rows: 82px minmax(0, 1fr) 100px;
+  }
+
+  .player-top .player-label {
+    max-width: calc(100% - 8px);
+    padding: 4px 8px;
+    font-size: 0.65rem;
+  }
+}
   </style>
 </head>
+
 <body>
 
   <header class="game-header">
@@ -488,16 +1027,18 @@
       <h1>𝟙𝟘 Mindi</h1>
       <div class="header-links">
         <a href="widgets.html" class="back-link">← Widgets</a>
-        <a href="index.html" class="back-link">Home</a>
+        <a href="index.html" class="back-link">🏠 Home</a>
       </div>
     </div>
   </header>
 
   <div class="mindi-container">
     <div class="mindi-card">
-      
-      <!-- Left Panel: Info -->
+
+      <!-- LEFT PANEL: GAME INFORMATION -->
+
       <div class="left-panel">
+
         <div class="game-info-section">
           <div class="info-label">Trump Suit</div>
           <div id="trumpDisplay" class="trump-display">None yet</div>
@@ -522,30 +1063,39 @@
             10s: <span id="opponentTens">0</span>
           </div>
         </div>
+
       </div>
 
-      <!-- Right Panel: Game -->
+      <!-- RIGHT PANEL: GAME TABLE -->
+
       <div class="right-panel">
+
         <div id="gameMessage" class="game-message message-playing">
           Click "New Game" to start playing!
         </div>
 
         <div class="game-board">
-          <!-- Top Player (CPU2 - Teammate) -->
+
+          <!-- TOP PLAYER: CPU2 -->
+
           <div class="player-area player-top">
             <div id="labelCPU2" class="player-label">CPU2 (Teammate)</div>
             <div id="handCPU2" class="cards-hand"></div>
           </div>
 
-          <!-- Middle section with left/right players and trick area -->
+          <!-- MIDDLE TABLE AREA -->
+
           <div style="position: relative;">
-            <!-- Left Player (CPU1 - Opponent) -->
+
+            <!-- LEFT PLAYER: CPU1 -->
+
             <div class="player-area player-left">
               <div id="labelCPU1" class="player-label">CPU1</div>
               <div id="handCPU1" class="cards-hand"></div>
             </div>
 
-            <!-- Center Trick Area -->
+            <!-- TRICK AREA -->
+
             <div class="trick-area">
               <div class="trick-cards-container">
                 <div class="trick-card-slot top" id="trickTop"></div>
@@ -555,23 +1105,30 @@
               </div>
             </div>
 
-            <!-- Right Player (CPU3 - Opponent) -->
+            <!-- RIGHT PLAYER: CPU3 -->
+
             <div class="player-area player-right">
               <div id="labelCPU3" class="player-label">CPU3</div>
               <div id="handCPU3" class="cards-hand"></div>
             </div>
+
           </div>
 
-          <!-- Bottom Player (You) -->
+          <!-- BOTTOM PLAYER: YOU -->
+
           <div class="player-area player-bottom">
             <div id="labelPlayer" class="player-label">You</div>
             <div id="handPlayer" class="cards-hand"></div>
           </div>
+
         </div>
 
         <div class="game-controls">
-          <button id="btnNewGame" class="btn-new-game" onclick="startNewGame()">New Game</button>
+          <button id="btnNewGame" class="btn-new-game" onclick="startNewGame()">
+            New Game
+          </button>
         </div>
+
       </div>
 
     </div>
@@ -582,19 +1139,19 @@
     let lastScrollTop = 0;
     const header = document.querySelector('.game-header');
     let scrollTimeout;
-    
+
     window.addEventListener('scroll', function() {
       clearTimeout(scrollTimeout);
-      
+
       scrollTimeout = setTimeout(() => {
         let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        
+
         if (scrollTop > lastScrollTop && scrollTop > 100) {
           header.style.transform = 'translateY(-100%)';
         } else {
           header.style.transform = 'translateY(0)';
         }
-        
+
         lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
       }, 50);
     }, false);
@@ -602,9 +1159,14 @@
     // Game variables
     const suits = ['♠', '♥', '♦', '♣'];
     const values = ['A', 'K', 'Q', 'J', '10', '9', '8', '7', '6', '5', '4', '3', '2'];
-    const valueOrder = { 'A': 14, 'K': 13, 'Q': 12, 'J': 11, '10': 10, '9': 9, '8': 8, '7': 7, '6': 6, '5': 5, '4': 4, '3': 3, '2': 2 };
+    const valueOrder = {
+      'A': 14, 'K': 13, 'Q': 12, 'J': 11, '10': 10,
+      '9': 9, '8': 8, '7': 7, '6': 6, '5': 5,
+      '4': 4, '3': 3, '2': 2
+    };
 
     let deck = [];
+
     let hands = {
       player: [],
       cpu1: [],
@@ -637,11 +1199,13 @@
 
     function createDeck() {
       deck = [];
+
       for (let suit of suits) {
         for (let value of values) {
           deck.push({ suit, value });
         }
       }
+
       for (let i = deck.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [deck[i], deck[j]] = [deck[j], deck[i]];
@@ -674,6 +1238,7 @@
         if (a.suit !== b.suit) {
           return suits.indexOf(a.suit) - suits.indexOf(b.suit);
         }
+
         return valueOrder[b.value] - valueOrder[a.value];
       });
     }
@@ -687,7 +1252,9 @@
 
       const cardDiv = document.createElement('div');
       const color = ['♥', '♦'].includes(card.suit) ? 'red' : 'black';
+
       cardDiv.className = `card ${color} ${clickable ? 'clickable' : ''}`;
+
       cardDiv.innerHTML = `
         <div>${card.value}${card.suit}</div>
         <div style="text-align: center;">${card.suit}</div>
@@ -704,22 +1271,34 @@
     function updateDisplay() {
       const playerHandDiv = document.getElementById('handPlayer');
       playerHandDiv.innerHTML = '';
+
       hands.player.forEach(card => {
         const canPlay = canPlayCard(card);
-        playerHandDiv.appendChild(createCardElement(card, false, canPlay && currentPlayer === 'player' && gameActive));
+
+        playerHandDiv.appendChild(
+          createCardElement(
+            card,
+            false,
+            canPlay && currentPlayer === 'player' && gameActive
+          )
+        );
       });
 
       // Show single card back with count for CPU players
       ['cpu1', 'cpu2', 'cpu3'].forEach(cpu => {
         const cpuHandDiv = document.getElementById(`hand${cpu.toUpperCase()}`);
         cpuHandDiv.innerHTML = '';
+
         const cardCount = hands[cpu].length;
+
         if (cardCount > 0) {
           const cardBack = document.createElement('div');
           cardBack.className = 'card-back';
+
           cardBack.innerHTML = `
             <span class="card-count">${cardCount}</span>
           `;
+
           cardBack.style.setProperty('--before-content', '"🂠"');
           cpuHandDiv.appendChild(cardBack);
         }
@@ -731,20 +1310,34 @@
       document.getElementById('trickBottom').innerHTML = '';
 
       if (currentTrick.cpu2) {
-        document.getElementById('trickTop').appendChild(createCardElement(currentTrick.cpu2));
+        document.getElementById('trickTop').appendChild(
+          createCardElement(currentTrick.cpu2)
+        );
       }
+
       if (currentTrick.cpu1) {
-        document.getElementById('trickLeft').appendChild(createCardElement(currentTrick.cpu1));
+        document.getElementById('trickLeft').appendChild(
+          createCardElement(currentTrick.cpu1)
+        );
       }
+
       if (currentTrick.cpu3) {
-        document.getElementById('trickRight').appendChild(createCardElement(currentTrick.cpu3));
+        document.getElementById('trickRight').appendChild(
+          createCardElement(currentTrick.cpu3)
+        );
       }
+
       if (currentTrick.player) {
-        document.getElementById('trickBottom').appendChild(createCardElement(currentTrick.player));
+        document.getElementById('trickBottom').appendChild(
+          createCardElement(currentTrick.player)
+        );
       }
 
       ['player', 'cpu1', 'cpu2', 'cpu3'].forEach(p => {
-        const label = document.getElementById(p === 'player' ? 'labelPlayer' : `label${p.toUpperCase()}`);
+        const label = document.getElementById(
+          p === 'player' ? 'labelPlayer' : `label${p.toUpperCase()}`
+        );
+
         if (p === currentPlayer) {
           label.classList.add('active');
         } else {
@@ -752,7 +1345,9 @@
         }
       });
 
-      document.getElementById('trumpDisplay').textContent = trumpSuit ? trumpSuit : 'None yet';
+      document.getElementById('trumpDisplay').textContent =
+        trumpSuit ? trumpSuit : 'None yet';
+
       document.getElementById('yourTricks').textContent = tricksWon.yourTeam;
       document.getElementById('opponentTricks').textContent = tricksWon.opponentTeam;
       document.getElementById('yourTens').textContent = tensWon.yourTeam;
@@ -761,9 +1356,11 @@
 
     function canPlayCard(card) {
       if (!leadSuit) return true;
+
       if (hands.player.some(c => c.suit === leadSuit)) {
         return card.suit === leadSuit;
       }
+
       return true;
     }
 
@@ -790,6 +1387,7 @@
     function nextPlayer() {
       const order = ['player', 'cpu1', 'cpu2', 'cpu3'];
       const currentIndex = order.indexOf(currentPlayer);
+
       currentPlayer = order[(currentIndex + 1) % 4];
 
       if (currentPlayer === leadPlayer) {
@@ -804,9 +1402,9 @@
     }
 
     // ============================================
-    // IMPROVED CPU AI - Much Smarter Strategy
+    // ORIGINAL CPU AI — UNCHANGED
     // ============================================
-    
+
     function cpuPlay() {
       const cpuHand = hands[currentPlayer];
       let cardToPlay;
@@ -814,9 +1412,11 @@
       // Get valid cards that follow suit rules
       const validCards = cpuHand.filter(card => {
         if (!leadSuit) return true;
+
         if (cpuHand.some(c => c.suit === leadSuit)) {
           return card.suit === leadSuit;
         }
+
         return true;
       });
 
@@ -833,7 +1433,10 @@
       // Establish trump if playing off-suit
       if (!trumpSuit && leadSuit && cardToPlay.suit !== leadSuit) {
         trumpSuit = cardToPlay.suit;
-        showMessage(`${currentPlayer.toUpperCase()} established trump: ${trumpSuit}`, 'playing');
+        showMessage(
+          `${currentPlayer.toUpperCase()} established trump: ${trumpSuit}`,
+          'playing'
+        );
       }
 
       if (!leadSuit) {
@@ -852,26 +1455,28 @@
       // Count cards by suit
       const suitCounts = {};
       suits.forEach(s => suitCounts[s] = hand.filter(c => c.suit === s).length);
-      
+
       // Find suit with most cards
       let bestSuit = null;
       let maxCount = 0;
+
       for (let suit in suitCounts) {
         if (suitCounts[suit] > maxCount) {
           maxCount = suitCounts[suit];
           bestSuit = suit;
         }
       }
-      
-      // From that suit, lead with a high card (but not the absolute highest unless it's Ace)
+
+      // From that suit, lead with a high card
+      // but not the absolute highest unless it's Ace
       const suitCards = hand.filter(c => c.suit === bestSuit);
       suitCards.sort((a, b) => valueOrder[b.value] - valueOrder[a.value]);
-      
+
       // If we have Ace, lead it. Otherwise lead second-highest
       if (suitCards[0].value === 'A') {
         return suitCards[0];
       } else if (suitCards.length > 1) {
-        return suitCards[1]; // Lead second-best to save the best
+        return suitCards[1];
       } else {
         return suitCards[0];
       }
@@ -879,65 +1484,75 @@
 
     function chooseFollowCard(validCards, hand) {
       // Check if there are any 10s in the current trick
-      const tensInTrick = Object.values(currentTrick).filter(c => c && c.value === '10').length;
-      
+      const tensInTrick = Object.values(currentTrick)
+        .filter(c => c && c.value === '10').length;
+
       // Check if teammate is winning
       const teammateWinning = isTeammateWinning();
-      
+
       // Evaluate current winning card
       const currentWinner = getCurrentWinner();
-      
+
       const leadSuitCards = validCards.filter(c => c.suit === leadSuit);
       const trumpCards = validCards.filter(c => trumpSuit && c.suit === trumpSuit);
-      
+
       // CASE 1: Following suit
       if (leadSuitCards.length > 0) {
         leadSuitCards.sort((a, b) => valueOrder[b.value] - valueOrder[a.value]);
-        
+
         // If teammate is already winning
         if (teammateWinning) {
           // Play lowest card to save high ones
           return leadSuitCards[leadSuitCards.length - 1];
         }
-        
+
         // If trick has 10s, try harder to win
         const shouldTryToWin = tensInTrick > 0;
-        
+
         // Try to beat the current winner
-        const canWin = leadSuitCards.some(c => valueOrder[c.value] > valueOrder[currentWinner.value]);
-        
+        const canWin = leadSuitCards.some(
+          c => valueOrder[c.value] > valueOrder[currentWinner.value]
+        );
+
         if (canWin && (shouldTryToWin || !teammateWinning)) {
           // Find the lowest card that can still win
-          const winningCards = leadSuitCards.filter(c => valueOrder[c.value] > valueOrder[currentWinner.value]);
-          return winningCards[winningCards.length - 1]; // Lowest winning card
+          const winningCards = leadSuitCards.filter(
+            c => valueOrder[c.value] > valueOrder[currentWinner.value]
+          );
+
+          return winningCards[winningCards.length - 1];
         } else {
           // Can't win or don't need to, play lowest
           return leadSuitCards[leadSuitCards.length - 1];
         }
       }
-      
+
       // CASE 2: Can't follow suit, use trump
       else if (trumpCards.length > 0) {
         trumpCards.sort((a, b) => valueOrder[b.value] - valueOrder[a.value]);
-        
+
         // If teammate is winning, don't trump
         if (teammateWinning) {
           // Discard lowest non-trump card instead
           const nonTrumpCards = validCards.filter(c => c.suit !== trumpSuit);
+
           if (nonTrumpCards.length > 0) {
             nonTrumpCards.sort((a, b) => valueOrder[a.value] - valueOrder[b.value]);
             return nonTrumpCards[0];
           }
         }
-        
+
         // If trick has 10s or opponent winning, use trump
         if (tensInTrick > 0 || !teammateWinning) {
           // Check if current winner is trump
           if (currentWinner.suit === trumpSuit) {
             // Try to beat their trump with lowest trump that wins
-            const canBeat = trumpCards.filter(c => valueOrder[c.value] > valueOrder[currentWinner.value]);
+            const canBeat = trumpCards.filter(
+              c => valueOrder[c.value] > valueOrder[currentWinner.value]
+            );
+
             if (canBeat.length > 0) {
-              return canBeat[canBeat.length - 1]; // Lowest beating trump
+              return canBeat[canBeat.length - 1];
             } else {
               // Can't beat, play lowest trump
               return trumpCards[trumpCards.length - 1];
@@ -947,16 +1562,18 @@
             return trumpCards[trumpCards.length - 1];
           }
         }
-        
+
         // No good reason to trump, discard low card
         const nonTrumpCards = validCards.filter(c => c.suit !== trumpSuit);
+
         if (nonTrumpCards.length > 0) {
           nonTrumpCards.sort((a, b) => valueOrder[a.value] - valueOrder[b.value]);
           return nonTrumpCards[0];
         }
+
         return trumpCards[trumpCards.length - 1];
       }
-      
+
       // CASE 3: Can't follow, can't trump - discard lowest
       else {
         validCards.sort((a, b) => valueOrder[a.value] - valueOrder[b.value]);
@@ -967,142 +1584,155 @@
     function isTeammateWinning() {
       // Check if this CPU's teammate is currently winning the trick
       const currentWinner = getCurrentWinnerPlayer();
-      
+
       if (currentPlayer === 'cpu1') {
-        return currentWinner === 'cpu3'; // cpu1's teammate is cpu3
+        return currentWinner === 'cpu3';
       } else if (currentPlayer === 'cpu2') {
-        return currentWinner === 'player'; // cpu2's teammate is player
+        return currentWinner === 'player';
       } else if (currentPlayer === 'cpu3') {
-        return currentWinner === 'cpu1'; // cpu3's teammate is cpu1
+        return currentWinner === 'cpu1';
       }
+
       return false;
     }
 
     function getCurrentWinnerPlayer() {
       // Determine who is currently winning the trick
       const cardsPlayed = [];
-      
-      if (currentTrick.player) cardsPlayed.push({ player: 'player', card: currentTrick.player });
-      if (currentTrick.cpu1) cardsPlayed.push({ player: 'cpu1', card: currentTrick.cpu1 });
-      if (currentTrick.cpu2) cardsPlayed.push({ player: 'cpu2', card: currentTrick.cpu2 });
-      if (currentTrick.cpu3) cardsPlayed.push({ player: 'cpu3', card: currentTrick.cpu3 });
-      
+
+      if (currentTrick.player) {
+        cardsPlayed.push({ player: 'player', card: currentTrick.player });
+      }
+
+      if (currentTrick.cpu1) {
+        cardsPlayed.push({ player: 'cpu1', card: currentTrick.cpu1 });
+      }
+
+      if (currentTrick.cpu2) {
+        cardsPlayed.push({ player: 'cpu2', card: currentTrick.cpu2 });
+      }
+
+      if (currentTrick.cpu3) {
+        cardsPlayed.push({ player: 'cpu3', card: currentTrick.cpu3 });
+      }
+
       if (cardsPlayed.length === 0) return null;
-      
+
       let winner = cardsPlayed[0];
-      
+
       for (let i = 1; i < cardsPlayed.length; i++) {
         const current = cardsPlayed[i];
-        
+
         // Skip cards that are neither lead suit nor trump
         if (current.card.suit !== leadSuit && current.card.suit !== trumpSuit) {
           continue;
         }
-        
+
         if (trumpSuit) {
           if (current.card.suit === trumpSuit && winner.card.suit !== trumpSuit) {
             winner = current;
             continue;
           }
+
           if (winner.card.suit === trumpSuit && current.card.suit !== trumpSuit) {
             continue;
           }
         }
-        
+
         if (current.card.suit === winner.card.suit) {
           if (valueOrder[current.card.value] > valueOrder[winner.card.value]) {
             winner = current;
           }
         }
       }
-      
+
       return winner.player;
     }
 
     function getCurrentWinner() {
       // Get the current winning card
       const cardsPlayed = [];
-      
+
       if (currentTrick.player) cardsPlayed.push(currentTrick.player);
       if (currentTrick.cpu1) cardsPlayed.push(currentTrick.cpu1);
       if (currentTrick.cpu2) cardsPlayed.push(currentTrick.cpu2);
       if (currentTrick.cpu3) cardsPlayed.push(currentTrick.cpu3);
-      
+
       if (cardsPlayed.length === 0) return null;
-      
+
       let winner = cardsPlayed[0];
-      
+
       for (let i = 1; i < cardsPlayed.length; i++) {
         const current = cardsPlayed[i];
-        
+
         // Skip cards that are neither lead suit nor trump
         if (current.suit !== leadSuit && current.suit !== trumpSuit) {
           continue;
         }
-        
+
         if (trumpSuit) {
           if (current.suit === trumpSuit && winner.suit !== trumpSuit) {
             winner = current;
             continue;
           }
+
           if (winner.suit === trumpSuit && current.suit !== trumpSuit) {
             continue;
           }
         }
-        
+
         if (current.suit === winner.suit) {
           if (valueOrder[current.value] > valueOrder[winner.value]) {
             winner = current;
           }
         }
       }
-      
+
       return winner;
     }
 
     // ============================================
-    // End of Improved CPU AI
+    // END OF ORIGINAL CPU AI
     // ============================================
 
-
     function evaluateTrick() {
-    
+
       const cardsPlayed = [
         { player: 'player', card: currentTrick.player },
         { player: 'cpu1', card: currentTrick.cpu1 },
         { player: 'cpu2', card: currentTrick.cpu2 },
         { player: 'cpu3', card: currentTrick.cpu3 }
       ];
-    
+
       // Remove any null cards just in case
       const played = cardsPlayed.filter(cp => cp.card !== null);
-    
+
       // IMPORTANT: Start winner as the lead player's card
       let winner = played.find(cp => cp.player === leadPlayer);
-    
+
       for (let i = 0; i < played.length; i++) {
-    
+
         const current = played[i];
-    
+
         if (current.player === winner.player) continue;
-    
+
         // Ignore cards that are neither lead suit nor trump
         if (current.card.suit !== leadSuit && current.card.suit !== trumpSuit) {
           continue;
         }
-    
+
         // Trump beats non-trump
         if (trumpSuit) {
           if (current.card.suit === trumpSuit && winner.card.suit !== trumpSuit) {
             winner = current;
             continue;
           }
-    
+
           if (winner.card.suit === trumpSuit && current.card.suit !== trumpSuit) {
             continue;
           }
         }
-    
+
         // Same suit comparison
         if (current.card.suit === winner.card.suit) {
           if (valueOrder[current.card.value] > valueOrder[winner.card.value]) {
@@ -1110,13 +1740,14 @@
           }
         }
       }
-    
+
       // Count 10s
       let tensInTrick = 0;
+
       played.forEach(cp => {
         if (cp.card.value === '10') tensInTrick++;
       });
-    
+
       // Assign trick
       if (winner.player === 'player' || winner.player === 'cpu2') {
         tricksWon.yourTeam++;
@@ -1125,16 +1756,22 @@
         tricksWon.opponentTeam++;
         tensWon.opponentTeam += tensInTrick;
       }
-    
+
       showMessage(`${winner.player.toUpperCase()} wins the trick!`, 'playing');
-    
-      currentTrick = { player: null, cpu1: null, cpu2: null, cpu3: null };
+
+      currentTrick = {
+        player: null,
+        cpu1: null,
+        cpu2: null,
+        cpu3: null
+      };
+
       leadSuit = null;
       leadPlayer = winner.player;
       currentPlayer = winner.player;
-    
+
       updateDisplay();
-    
+
       if (hands.player.length === 0) {
         setTimeout(() => endGame(), 1500);
       } else {
@@ -1143,20 +1780,31 @@
         }
       }
     }
-    
 
     function endGame() {
       gameActive = false;
 
       if (tensWon.yourTeam > tensWon.opponentTeam) {
-        showMessage(`You win! Your team got ${tensWon.yourTeam} tens vs ${tensWon.opponentTeam}`, 'win');
+        showMessage(
+          `You win! Your team got ${tensWon.yourTeam} tens vs ${tensWon.opponentTeam}`,
+          'win'
+        );
       } else if (tensWon.opponentTeam > tensWon.yourTeam) {
-        showMessage(`Opponents win! They got ${tensWon.opponentTeam} tens vs ${tensWon.yourTeam}`, 'lose');
+        showMessage(
+          `Opponents win! They got ${tensWon.opponentTeam} tens vs ${tensWon.yourTeam}`,
+          'lose'
+        );
       } else {
         if (tricksWon.yourTeam > tricksWon.opponentTeam) {
-          showMessage(`You win on tricks! (${tricksWon.yourTeam} vs ${tricksWon.opponentTeam})`, 'win');
+          showMessage(
+            `You win on tricks! (${tricksWon.yourTeam} vs ${tricksWon.opponentTeam})`,
+            'win'
+          );
         } else {
-          showMessage(`Opponents win on tricks! (${tricksWon.opponentTeam} vs ${tricksWon.yourTeam})`, 'lose');
+          showMessage(
+            `Opponents win on tricks! (${tricksWon.opponentTeam} vs ${tricksWon.yourTeam})`,
+            'lose'
+          );
         }
       }
     }
@@ -1171,13 +1819,28 @@
       createDeck();
       dealCards();
 
-      currentTrick = { player: null, cpu1: null, cpu2: null, cpu3: null };
+      currentTrick = {
+        player: null,
+        cpu1: null,
+        cpu2: null,
+        cpu3: null
+      };
+
       leadSuit = null;
       trumpSuit = null;
-      tricksWon = { yourTeam: 0, opponentTeam: 0 };
-      tensWon = { yourTeam: 0, opponentTeam: 0 };
+
+      tricksWon = {
+        yourTeam: 0,
+        opponentTeam: 0
+      };
+
+      tensWon = {
+        yourTeam: 0,
+        opponentTeam: 0
+      };
 
       const players = ['player', 'cpu1', 'cpu2', 'cpu3'];
+
       leadPlayer = players[Math.floor(Math.random() * 4)];
       currentPlayer = leadPlayer;
 

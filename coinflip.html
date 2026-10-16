@@ -1,384 +1,1241 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Coin Flip - Ansh Patel</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="style.css">
+<meta name="theme-color" content="#102b24">
+<title>Coin Flip — Ansh Patel</title>
+
 <style>
+:root {
+  --bg: #f4f5ef;
+  --surface: #ffffff;
+  --surface-soft: #f7f8f3;
+  --green: #174c3b;
+  --green-dark: #102b24;
+  --green-light: #e5f0e9;
+  --gold: #c69b42;
+  --gold-light: #f2dfaa;
+  --text: #1c3028;
+  --muted: #77857c;
+  --border: #e3e8df;
+  --danger: #bd4141;
+  --shadow: 0 18px 50px rgba(24, 48, 37, .08);
+}
 
-      .game-header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-      background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #c026d3 100%);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      transition: transform 0.3s ease-in-out;
-      padding: 1rem 0;
-    }
-    
-    .game-header-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .game-header h1 {
-      color: white;
-      margin: 0;
-      font-size: 1.8rem;
-    }
-    
-    .header-links {
-      display: flex;
-      gap: 1.5rem;
-    }
-    
-    .game-header .back-link {
-      color: white;
-      text-decoration: none;
-      opacity: 0.9;
-      font-weight: 500;
-      transition: opacity 0.2s;
-    }
-    
-    .game-header .back-link:hover {
-      opacity: 1;
-    }
-    
-    .game-container {
-      margin-top: 100px; /* Adjust based on your header height */
-    }
-    
-    @media (max-width: 768px) {
-      .game-container {
-        margin-top: 90px;
-      }
-    }
-    /* END ADDED */
-    
-  /* Full page height */
-  html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(198,155,66,.10), transparent 38%),
+    var(--bg);
+  color: var(--text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.5;
+}
+
+button, input, select {
+  font: inherit;
+}
+
+button, select {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+a:focus-visible {
+  outline: 3px solid rgba(198,155,66,.65);
+  outline-offset: 3px;
+}
+
+.topbar {
+  background: var(--green-dark);
+  color: white;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.topbar-inner {
+  max-width: 1180px;
+  min-height: 76px;
+  padding: 14px 28px;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.brand-icon {
+  width: 43px;
+  height: 43px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: rgba(242,223,170,.13);
+  border: 1px solid rgba(242,223,170,.25);
+  color: var(--gold-light);
+  font-size: 24px;
+}
+
+.brand h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -.5px;
+}
+
+.brand p {
+  color: #a9bdb1;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #e0eae3;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 13px;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 10px;
+  transition: background .2s, border-color .2s;
+}
+
+.nav-links a:hover {
+  background: rgba(255,255,255,.09);
+  border-color: rgba(255,255,255,.32);
+}
+
+.page {
+  max-width: 1180px;
+  margin: auto;
+  padding: 48px 28px 60px;
+}
+
+.intro {
+  text-align: center;
+  margin-bottom: 34px;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #8b6a28;
+  background: #f8efd9;
+  border: 1px solid #eddfbc;
+  border-radius: 99px;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.7px;
+  text-transform: uppercase;
+}
+
+.intro h2 {
+  margin-top: 15px;
+  font: 500 clamp(32px, 5vw, 48px)/1.1 Georgia, "Times New Roman", serif;
+  letter-spacing: -1.5px;
+}
+
+.intro p {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 12px auto 0;
+  max-width: 440px;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(280px, .85fr);
+  align-items: start;
+  gap: 22px;
+}
+
+.panel {
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.panel-heading {
+  padding: 22px 24px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.panel-heading h3 {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -.2px;
+}
+
+.panel-heading p {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 3px;
+}
+
+.status-pill {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 99px;
+  padding: 6px 9px;
+  background: var(--green-light);
+  color: var(--green);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4e9d72;
+}
+
+.table {
+  background:
+    radial-gradient(ellipse at center, rgba(255,255,255,.035), transparent 65%),
+    var(--green);
+  padding: 30px 24px 26px;
+  text-align: center;
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.table-label {
+  color: #c3d5c8;
+  font-size: 10px;
+  letter-spacing: 2.4px;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-bottom: 22px;
+}
+
+.results {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  width: 100%;
+}
+
+.coin {
+  --coin-size: clamp(76px, 10vw, 100px);
+  width: var(--coin-size);
+  height: var(--coin-size);
+  flex: 0 0 var(--coin-size);
+  position: relative;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 5px double #a77b2c;
+  background:
+    radial-gradient(circle at 32% 25%, #fff3c9 0%, #f3d77e 22%, #d4a744 62%, #a87a2d 100%);
+  color: #5c4013;
+  box-shadow:
+    inset 0 0 0 3px rgba(255,255,255,.35),
+    inset 0 -5px 9px rgba(104,67,12,.2),
+    0 9px 15px rgba(0,0,0,.24);
+  transform-style: preserve-3d;
+}
+
+.coin::before {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border: 1px solid rgba(109,75,17,.52);
+  border-radius: 50%;
+}
+
+.coin-face {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  font-weight: 900;
+  font-size: clamp(10px, 1.6vw, 13px);
+  letter-spacing: .4px;
+}
+
+.coin-symbol {
+  font-size: clamp(22px, 3vw, 32px);
+  line-height: 1.1;
+}
+
+.coin.side-result {
+  background: linear-gradient(145deg, #cbd6d0, #899b90 65%, #61776a);
+  border-color: #60756a;
+  color: #20392c;
+}
+
+.coin.side-result::before {
+  border-color: rgba(32,57,44,.4);
+}
+
+.coin.flip-animation {
+  animation: flip 1s cubic-bezier(.15,.7,.2,1) both;
+}
+
+.coin.placeholder {
+  opacity: .62;
+}
+
+@keyframes flip {
+  0% { transform: rotateY(0) translateY(0); }
+  25% { transform: rotateY(250deg) translateY(-16px); }
+  60% { transform: rotateY(760deg) translateY(-7px); }
+  100% { transform: rotateY(1080deg) translateY(0); }
+}
+
+.table-hint {
+  color: #bfd0c3;
+  font-size: 12px;
+  margin-top: 22px;
+}
+
+.flip-action {
+  padding: 22px 24px 24px;
+}
+
+.field-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.quantity-row {
+  display: flex;
+  gap: 10px;
+}
+
+.number-input {
+  min-width: 0;
+  width: 100%;
+  height: 48px;
+  padding: 0 14px;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.flip-button {
+  flex-shrink: 0;
+  min-height: 48px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 11px;
+  background: var(--green);
+  color: white;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: 0 5px 12px rgba(23,76,59,.16);
+  transition: transform .18s, background .18s;
+}
+
+.flip-button:hover {
+  background: #22644d;
+  transform: translateY(-1px);
+}
+
+.flip-button:active {
+  transform: translateY(0);
+}
+
+.flip-button:disabled {
+  cursor: wait;
+  opacity: .7;
+  transform: none;
+}
+
+.reset-button {
+  display: block;
+  margin: 12px auto 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 8px 12px;
+}
+
+.reset-button:hover {
+  color: var(--green);
+}
+
+.settings-body {
+  padding: 22px 24px 24px;
+}
+
+.field-group {
+  margin-bottom: 20px;
+}
+
+.select-input {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-soft);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.helper {
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.weights {
+  padding: 15px;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  display: grid;
+  gap: 13px;
+}
+
+.weight-heading {
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 1px;
+}
+
+.weight-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 94px;
+  align-items: center;
+  gap: 12px;
+}
+
+.weight-name {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.weight-marker {
+  width: 9px;
+  height: 9px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.weight-marker.heads { background: #c69b42; }
+.weight-marker.tails { background: #648f79; }
+.weight-marker.side { background: #94a39a; }
+
+.weight-input-wrap {
+  position: relative;
+}
+
+.weight-input {
+  width: 100%;
+  min-height: 39px;
+  padding: 0 24px 0 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: white;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.weight-unit {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 10px;
+  pointer-events: none;
+}
+
+.weight-total {
+  padding-top: 12px;
+  margin-top: 2px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.weight-total strong {
+  color: var(--green);
+  font-size: 12px;
+}
+
+.weight-total strong.invalid {
+  color: var(--danger);
+}
+
+.error {
+  color: var(--danger);
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 10px;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.stats-panel {
+  margin-top: 22px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.stat {
+  padding: 20px 24px;
+  min-width: 0;
+}
+
+.stat + .stat {
+  border-left: 1px solid var(--border);
+}
+
+.stat-label {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.stat-value {
+  margin-top: 6px;
+  font: 500 clamp(25px, 4vw, 34px)/1 Georgia, "Times New Roman", serif;
+  color: var(--green);
+  overflow-wrap: anywhere;
+}
+
+.stat-note {
+  color: #9aa59d;
+  font-size: 10px;
+  margin-top: 7px;
+}
+
+.results-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.results-heading strong {
+  font-size: 12px;
+}
+
+.results-heading span {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.result-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.summary-tile {
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 12px;
+  text-align: center;
+  min-width: 0;
+}
+
+.summary-label {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.summary-value {
+  color: var(--text);
+  font: 600 24px/1.2 Georgia, "Times New Roman", serif;
+  margin-top: 5px;
+  overflow-wrap: anywhere;
+}
+
+.summary-percent {
+  color: var(--muted);
+  font-size: 10px;
+  margin-top: 4px;
+}
+
+.empty-state {
+  color: #d0ded4;
+  font-size: 13px;
+  padding: 16px;
+  text-align: center;
+}
+
+.footer {
+  padding-top: 28px;
+  text-align: center;
+  color: #8b968e;
+  font-size: 11px;
+}
+
+@media (max-width: 850px) {
+  .workspace {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  body {
-    font-family: Arial, sans-serif;
+  .settings-panel {
+    order: 2;
   }
 
-  /* Center the game card */
-  .game-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;  /* Fill the viewport vertically */
-    padding: 2rem;
+  .game-panel {
+    order: 1;
   }
 
-  /* Number of coins input and flip button */
-  input[type="number"], select {
-    width: 60px;
-    padding: 0.5rem;
-    font-size: 1rem;
-    text-align: center;
-    margin-left: 0.3rem;
+  .settings-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 18px;
   }
 
-  .flip-button {
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    color: white;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    margin-top: 1rem;
-    transition: all 0.3s ease;
+  .field-group {
+    margin-bottom: 0;
   }
 
-  .flip-button:hover {
-    transform: scale(1.05);
+  .weights {
+    align-self: start;
   }
+}
 
-  /* Coins display */
-  .results {
-    margin-top: 2rem;
-    display: flex;
+@media (max-width: 560px) {
+  .topbar-inner {
+    min-height: 0;
+    padding: 13px 16px;
     flex-wrap: wrap;
-    justify-content: center;
-    gap: 1rem;
+    gap: 12px;
+  }
+
+  .brand-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+  }
+
+  .brand h1 {
+    font-size: 19px;
+  }
+
+  .brand p {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+  }
+
+  .nav-links {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .nav-links a {
+    text-align: center;
+    padding: 9px 7px;
+    font-size: 12px;
+  }
+
+  .page {
+    padding: 30px 13px 35px;
+  }
+
+  .intro {
+    margin-bottom: 24px;
+  }
+
+  .intro h2 {
+    letter-spacing: -1px;
+  }
+
+  .intro p {
+    font-size: 13px;
+    max-width: 320px;
+  }
+
+  .panel {
+    border-radius: 17px;
+  }
+
+  .panel-heading {
+    padding: 17px;
+  }
+
+  .table {
+    min-height: 230px;
+    padding: 24px 13px;
+  }
+
+  .table-label {
+    margin-bottom: 19px;
+  }
+
+  .results {
+    gap: 10px;
   }
 
   .coin {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: black;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 1rem;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-    transform-style: preserve-3d;
-    perspective: 600px;
+    --coin-size: clamp(65px, 19vw, 84px);
   }
 
-  .coin.flip-animation {
-    animation: spinCoin 1s ease-out forwards;
+  .table-hint {
+    margin-top: 18px;
+    font-size: 11px;
   }
 
-  @keyframes spinCoin {
-    0% { transform: rotateY(0deg); }
-    100% { transform: rotateY(1080deg) rotateX(720deg); }
+  .flip-action {
+    padding: 18px 16px 20px;
   }
 
-  .statistics {
-    margin-top: 1.5rem;
-    font-size: 1rem;
-    font-weight: bold;
-    color: var(--primary, #4facfe);
+  .quantity-row {
+    flex-direction: column;
   }
 
-  /* Layout for coin panel and settings panel */
-  .coin-flip-row {
-    display: flex;
-    justify-content: center;
-    gap: 3rem;
-    align-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  /* Game box */
-  .game-card {
+  .flip-button {
     width: 100%;
-    max-width: 1200px;   /* Make the card wider */
-    padding: 4rem;       /* More space inside */
-    border-radius: 15px;
-    background: #f9f9f9;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-    min-height: 600px;   /* Makes it taller */
   }
 
-  /* Coin type panel */
-  .coin-settings {
+  .settings-body {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    padding: 1rem;
-    border-radius: 12px;
-    background: #f0f0f0;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    min-width: 260px;  /* wider panel */
-    max-width: 320px;  /* optional */
+    gap: 19px;
+    padding: 18px 16px 20px;
   }
 
-  .coin-settings label {
-    font-weight: bold;
+  .weight-row {
+    grid-template-columns: minmax(0, 1fr) 90px;
   }
 
-  /* Dropdown selector bigger */
-  .coin-settings select {
-    font-size: 1.1rem;
-    padding: 0.5rem 0.7rem;
-    width: 100%;
-    box-sizing: border-box;
+  .stat {
+    padding: 16px 12px;
   }
 
-  /* Weights container */
-  .weights-container {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-    margin-top: 0.3rem;
+  .stat-label {
+    font-size: 10px;
   }
 
-  /* Heads/Tails/Side inputs bigger */
-  .weights-container input {
-    font-size: 1.1rem;
-    padding: 0.4rem 0.6rem;
-    width: 100%;
-    box-sizing: border-box;
+  .stat-value {
+    font-size: 27px;
   }
 
-  /* Error display */
-  .error {
-    color: red;
-    font-weight: bold;
-    margin-top: 0.5rem;
+  .stat-note {
+    font-size: 9px;
   }
+
+  .result-summary {
+    gap: 7px;
+  }
+
+  .summary-tile {
+    padding: 12px 5px;
+  }
+
+  .summary-value {
+    font-size: 21px;
+  }
+
+  .summary-label {
+    font-size: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
 </style>
 </head>
-<body>
 
-<header class="game-header">
-  <div class="game-header-content">
-    <h1>🪙 Coin Flip</h1>
-    <div class="header-links">
-      <a href="widgets.html" class="back-link">← Back to Widgets</a>
-      <a href="index.html" class="back-link">🏠 Home</a>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-icon" aria-hidden="true">🪙</div>
+      <div>
+        <h1>Coin Flip</h1>
+        <p>Chance, your way</p>
+      </div>
     </div>
+
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="widgets.html">← Back to Widgets</a>
+      <a href="index.html">⌂ Home</a>
+    </nav>
   </div>
 </header>
 
-<main class="game-container">
-  <div class="game-card">
-    <div class="coin-container">
-      <div class="coin-flip-row">
-        <!-- Left panel: Number of coins and flip button -->
+<main class="page">
+  <section class="intro">
+    <span class="eyebrow">✦ The flip studio</span>
+    <h2>Leave it to chance.</h2>
+    <p>One coin or twenty. A fair toss or your own custom odds. The choice is yours.</p>
+  </section>
+
+  <div class="workspace">
+    <section class="panel game-panel" aria-labelledby="tableTitle">
+      <div class="panel-heading">
         <div>
-          <label for="numCoins">Number of coins:</label>
-          <input type="number" id="numCoins" value="1" min="1" max="20">
-          <br>
-          <button class="flip-button" onclick="flipCoins()">Flip Coins</button>
+          <h3 id="tableTitle">The flipping table</h3>
+          <p>Your next result is one flip away.</p>
+        </div>
+        <span class="status-pill"><span class="status-dot"></span><span id="statusText">Ready</span></span>
+      </div>
+
+      <div class="table" aria-label="Coin flip results">
+        <div class="table-label">Place your bets · Flip your coins</div>
+        <div class="results" id="results" aria-live="polite">
+          <div class="coin placeholder">
+            <div class="coin-face">
+              <span class="coin-symbol">?</span>
+              <span>READY</span>
+            </div>
+          </div>
+        </div>
+        <p class="table-hint" id="tableHint">Your results will appear here.</p>
+      </div>
+
+      <div class="flip-action">
+        <label class="field-label" for="numCoins">Number of coins</label>
+        <div class="quantity-row">
+          <input class="number-input" type="number" id="numCoins"
+            value="1" min="1" max="1001" step="1" inputmode="numeric">
+          <button class="flip-button" id="flipButton" type="button" onclick="flipCoins()">
+            Flip coins ↗
+          </button>
+        </div>
+        <button class="reset-button" type="button" onclick="resetResults()">
+          ↺ Clear results
+        </button>
+        <div class="error" id="weightError" role="alert"></div>
+      </div>
+    </section>
+
+    <section class="panel settings-panel" aria-labelledby="settingsTitle">
+      <div class="panel-heading">
+        <div>
+          <h3 id="settingsTitle">Flip settings</h3>
+          <p>Fine-tune the odds of every toss.</p>
+        </div>
+        <span class="status-pill">Controls</span>
+      </div>
+
+      <div class="settings-body">
+        <div class="field-group">
+          <label class="field-label" for="coinType">Coin type</label>
+          <select class="select-input" id="coinType" onchange="setDefaultWeights()">
+            <option value="fair">Fair coin · 50/50</option>
+            <option value="biased">Biased coin · Custom odds</option>
+          </select>
+          <p class="helper" id="coinTypeHelp">Equal odds for heads and tails.</p>
         </div>
 
-        <!-- Right panel: Coin type and weights -->
-        <div class="coin-settings">
-          <label for="coinType">Coin Type:</label>
-          <select id="coinType" onchange="setDefaultWeights()">
-            <option value="fair">Fair Coin</option>
-            <option value="biased">Biased Coin</option>
-          </select>
+        <div class="weights" id="weightsContainer" hidden>
+          <div class="weight-heading">Custom probabilities</div>
 
-          <div class="weights-container" id="weightsContainer">
-            <div>
-              <label for="headsWeight">Heads:</label>
-              <input type="number" id="headsWeight" value="0.49" min="0" max="1" step="0.01">
-            </div>
-            <div>
-              <label for="tailsWeight">Tails:</label>
-              <input type="number" id="tailsWeight" value="0.49" min="0" max="1" step="0.01">
-            </div>
-            <div>
-              <label for="sideWeight">Side:</label>
-              <input type="number" id="sideWeight" value="0.02" min="0" max="1" step="0.01">
+          <div class="weight-row">
+            <label class="weight-name" for="headsWeight">
+              <span class="weight-marker heads"></span>Heads
+            </label>
+            <div class="weight-input-wrap">
+              <input class="weight-input" type="number" id="headsWeight"
+                value="0.49" min="0" max="1" step="0.01" inputmode="decimal">
+              <span class="weight-unit">p</span>
             </div>
           </div>
 
-          <div class="error" id="weightError"></div>
+          <div class="weight-row">
+            <label class="weight-name" for="tailsWeight">
+              <span class="weight-marker tails"></span>Tails
+            </label>
+            <div class="weight-input-wrap">
+              <input class="weight-input" type="number" id="tailsWeight"
+                value="0.49" min="0" max="1" step="0.01" inputmode="decimal">
+              <span class="weight-unit">p</span>
+            </div>
+          </div>
+
+          <div class="weight-row">
+            <label class="weight-name" for="sideWeight">
+              <span class="weight-marker side"></span>Side
+            </label>
+            <div class="weight-input-wrap">
+              <input class="weight-input" type="number" id="sideWeight"
+                value="0.02" min="0" max="1" step="0.01" inputmode="decimal">
+              <span class="weight-unit">p</span>
+            </div>
+          </div>
+
+          <div class="weight-total">
+            <span>Total probability</span>
+            <strong id="weightTotal">1.00 / 1.00</strong>
+          </div>
+          <p class="helper">All three probabilities must add up to 1.00.</p>
         </div>
       </div>
-
-      <div class="results" id="results"></div>
-      <div class="statistics" id="statistics"></div>
-    </div>
+    </section>
   </div>
+
+  <section class="panel stats-panel" aria-labelledby="statsTitle">
+    <div class="panel-heading">
+      <div>
+        <h3 id="statsTitle">Your results</h3>
+        <p>A running summary of your latest flip.</p>
+      </div>
+      <span class="status-pill" id="flipCountPill">0 flips</span>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat">
+        <div class="stat-label">Total flips</div>
+        <div class="stat-value" id="totalFlips">0</div>
+        <div class="stat-note">Coins tossed</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Most common</div>
+        <div class="stat-value" id="mostCommon">—</div>
+        <div class="stat-note">Leading result</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Last batch</div>
+        <div class="stat-value" id="batchCount">—</div>
+        <div class="stat-note">Coins in last flip</div>
+      </div>
+    </div>
+
+    <div style="padding: 0 20px 22px;">
+      <div class="results-heading">
+        <strong>Result breakdown</strong>
+        <span id="resultMode">Fair coin</span>
+      </div>
+
+      <div class="result-summary">
+        <div class="summary-tile">
+          <div class="summary-label">Heads</div>
+          <div class="summary-value" id="headsCount">0</div>
+          <div class="summary-percent" id="headsPercent">0% of flips</div>
+        </div>
+        <div class="summary-tile">
+          <div class="summary-label">Tails</div>
+          <div class="summary-value" id="tailsCount">0</div>
+          <div class="summary-percent" id="tailsPercent">0% of flips</div>
+        </div>
+        <div class="summary-tile">
+          <div class="summary-label">Side</div>
+          <div class="summary-value" id="sideCount">0</div>
+          <div class="summary-percent" id="sidePercent">0% of flips</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    A little randomness goes a long way. · Coin Flip Studio
+  </footer>
 </main>
 
 <script>
+const $ = id => document.getElementById(id);
 
-  // ADDED: Hide/show header on scroll
-  let lastScrollTop = 0;
-  const header = document.querySelector('.game-header');
-  let scrollTimeout;
-  
-  window.addEventListener('scroll', function() {
-    clearTimeout(scrollTimeout);
-    
-    scrollTimeout = setTimeout(() => {
-      let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      
-      if (scrollTop > lastScrollTop && scrollTop > 100) {
-        // Scrolling down & past threshold
-        header.style.transform = 'translateY(-100%)';
-      } else {
-        // Scrolling up
-        header.style.transform = 'translateY(0)';
-      }
-      
-      lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
-    }, 50); // Small delay to smooth out rapid scroll events
-  }, false);
-  // END ADDED
-
+let isFlipping = false;
+let flipRunId = 0;
+let totals = { heads: 0, tails: 0, side: 0 };
+let lastBatchSize = 0;
 
 function setDefaultWeights() {
-  const coinType = document.getElementById('coinType').value;
-  const weightsContainer = document.getElementById('weightsContainer');
-  const errorDiv = document.getElementById('weightError');
-  errorDiv.textContent = '';
+  const isBiased = $('coinType').value === 'biased';
 
-  if (coinType === 'fair') {
-    weightsContainer.style.display = 'none';
-  } else {
-    weightsContainer.style.display = 'flex';
-    document.getElementById('headsWeight').value = 0.49;
-    document.getElementById('tailsWeight').value = 0.49;
-    document.getElementById('sideWeight').value = 0.02;
+  $('weightsContainer').hidden = !isBiased;
+  $('coinTypeHelp').textContent = isBiased
+    ? 'Set the probability for each possible outcome.'
+    : 'Equal odds for heads and tails.';
+
+  $('weightError').textContent = '';
+
+  if (isBiased) {
+    $('headsWeight').value = '0.49';
+    $('tailsWeight').value = '0.49';
+    $('sideWeight').value = '0.02';
   }
+
+  updateWeightTotal();
+  $('resultMode').textContent = isBiased ? 'Biased coin' : 'Fair coin';
+}
+
+function readWeights() {
+  return {
+    heads: Number($('headsWeight').value),
+    tails: Number($('tailsWeight').value),
+    side: Number($('sideWeight').value)
+  };
+}
+
+function updateWeightTotal() {
+  const weights = readWeights();
+  const values = [weights.heads, weights.tails, weights.side];
+  const validNumbers = values.every(Number.isFinite);
+  const total = validNumbers
+    ? values.reduce((sum, value) => sum + value, 0)
+    : NaN;
+
+  const valid = validNumbers &&
+    values.every(value => value >= 0 && value <= 1) &&
+    Math.abs(total - 1) <= 0.001;
+
+  $('weightTotal').textContent = Number.isFinite(total)
+    ? `${total.toFixed(2)} / 1.00`
+    : 'Invalid';
+
+  $('weightTotal').classList.toggle('invalid', !valid);
+  return valid;
+}
+
+['headsWeight', 'tailsWeight', 'sideWeight'].forEach(id => {
+  $(id).addEventListener('input', updateWeightTotal);
+});
+
+function setStatus(text) {
+  $('statusText').textContent = text;
+}
+
+function setError(message) {
+  $('weightError').textContent = message;
+}
+
+function renderCoin(result, animate = false) {
+  const coin = document.createElement('div');
+  coin.className = 'coin';
+
+  if (result === 'Side') coin.classList.add('side-result');
+  if (animate) coin.classList.add('flip-animation');
+
+  const face = document.createElement('div');
+  face.className = 'coin-face';
+
+  const symbol = document.createElement('span');
+  symbol.className = 'coin-symbol';
+  symbol.textContent = result === 'Heads' ? 'H' :
+                       result === 'Tails' ? 'T' : 'S';
+
+  const label = document.createElement('span');
+  label.textContent = result.toUpperCase();
+
+  face.append(symbol, label);
+  coin.appendChild(face);
+  return coin;
+}
+
+function chooseResult(weights) {
+  const random = Math.random();
+
+  if (random < weights.heads) return 'Heads';
+  if (random < weights.heads + weights.tails) return 'Tails';
+  return 'Side';
 }
 
 function flipCoins() {
-  const resultsDiv = document.getElementById('results');
-  const statisticsDiv = document.getElementById('statistics');
-  const errorDiv = document.getElementById('weightError');
-  const numCoins = parseInt(document.getElementById('numCoins').value);
+  if (isFlipping) return;
 
-  const coinType = document.getElementById('coinType').value;
+  const numCoins = Number($('numCoins').value);
+  const isBiased = $('coinType').value === 'biased';
 
-  let headsWeight = 0.5, tailsWeight = 0.5, sideWeight = 0;
+  if (!Number.isInteger(numCoins) || numCoins < 1 || numCoins > 1001) {
+    setError('Choose a whole number between 1 and 20.');
+    $('numCoins').focus();
+    return;
+  }
 
-  if (coinType === 'biased') {
-    headsWeight = parseFloat(document.getElementById('headsWeight').value);
-    tailsWeight = parseFloat(document.getElementById('tailsWeight').value);
-    sideWeight = parseFloat(document.getElementById('sideWeight').value);
+  let weights = { heads: 0.5, tails: 0.5, side: 0 };
 
-    const totalWeight = headsWeight + tailsWeight + sideWeight;
-    if (Math.abs(totalWeight - 1) > 0.001) {
-      errorDiv.textContent = "Error: Weights must add up to 1!";
+  if (isBiased) {
+    if (!updateWeightTotal()) {
+      setError('Please use probabilities between 0 and 1 that add up to 1.00.');
       return;
     }
+    weights = readWeights();
   }
 
-  errorDiv.textContent = '';
-  resultsDiv.innerHTML = '';
-  statisticsDiv.textContent = '';
+  setError('');
+  isFlipping = true;
+  const runId = ++flipRunId;
 
-  let headsCount = 0;
-  let tailsCount = 0;
-  let sideCount = 0;
+  $('flipButton').disabled = true;
+  $('flipButton').textContent = 'Flipping…';
+  setStatus('Flipping');
+  $('tableHint').textContent = 'The coins are in the air…';
+
+  const resultsDiv = $('results');
+  resultsDiv.replaceChildren();
+
+  const outcomes = [];
 
   for (let i = 0; i < numCoins; i++) {
-    const coin = document.createElement('div');
-    coin.classList.add('coin');
+    const coin = renderCoin('?', true);
+    coin.querySelector('.coin-symbol').textContent = '✦';
+    coin.querySelector('.coin-face span:last-child').textContent = 'FLIP';
     resultsDiv.appendChild(coin);
-
-    coin.classList.add('flip-animation');
-
-    setTimeout(() => {
-      const rand = Math.random();
-      let sideResult;
-      if (rand < headsWeight) {
-        sideResult = 'Heads';
-        headsCount++;
-      } else if (rand < headsWeight + tailsWeight) {
-        sideResult = 'Tails';
-        tailsCount++;
-      } else {
-        sideResult = 'Side';
-        sideCount++;
-      }
-
-      coin.textContent = sideResult;
-      coin.classList.remove('flip-animation');
-
-      statisticsDiv.textContent = `Heads: ${headsCount} | Tails: ${tailsCount} | Side: ${sideCount}`;
-    }, 1000);
+    outcomes.push(chooseResult(weights));
   }
+
+  // One shared completion timer prevents overlapping batches from
+  // updating the results out of order.
+  window.setTimeout(() => {
+    if (runId !== flipRunId) return;
+
+    const batch = { heads: 0, tails: 0, side: 0 };
+
+    [...resultsDiv.children].forEach((coin, index) => {
+      const outcome = outcomes[index];
+      const key = outcome.toLowerCase();
+      batch[key]++;
+      coin.replaceWith(renderCoin(outcome));
+    });
+
+    totals.heads += batch.heads;
+    totals.tails += batch.tails;
+    totals.side += batch.side;
+    lastBatchSize = numCoins;
+
+    isFlipping = false;
+    $('flipButton').disabled = false;
+    $('flipButton').textContent = 'Flip coins ↗';
+
+    setStatus('Complete');
+    $('tableHint').textContent =
+      `Flip complete · ${numCoins} coin${numCoins === 1 ? '' : 's'} tossed`;
+
+    updateStatistics(batch, numCoins);
+  }, 1050);
 }
 
-// Initialize display
-setDefaultWeights();
-</script>
+function updateStatistics(batch, numCoins) {
+  const total = totals.heads + totals.tails + totals.side;
+  const entries = [
+    ['heads', 'Heads'],
+    ['tails', 'Tails'],
+    ['side', 'Side']
+  ];
 
+  $('totalFlips').textContent = total;
+  $('batchCount').textContent = numCoins;
+  $('flipCountPill').textContent = `${total} flip${total === 1 ? '' : 's'}`;
+
+  entries.forEach(([key]) => {
+    $(key + 'Count').textContent = totals[key];
+    $(key + 'Percent').textContent =
+      `${total ? (totals[key] / total * 100).toFixed(1) : '0'}% of flips`;
+  });
+
+  const highest = Math.max(totals.heads, totals.tails, totals.side);
+  const leaders = entries.filter(([key]) => totals[key] === highest && highest > 0);
+
+  $('mostCommon').textContent = leaders.length === 1
+    ? leaders[0][1]
+    : leaders.length > 1 ? 'Tie' : '—';
+
+  $('resultMode').textContent = $('coinType').value === 'biased'
+    ? 'Biased coin' : 'Fair coin';
+}
+
+function resetResults() {
+  // Invalidate pending animation callbacks so they cannot overwrite a reset.
+  flipRunId++;
+  isFlipping = false;
+
+  totals = { heads: 0, tails: 0, side: 0 };
+  lastBatchSize = 0;
+
+  $('flipButton').disabled = false;
+  $('flipButton').textContent = 'Flip coins ↗';
+
+  $('results').replaceChildren();
+  const placeholder = renderCoin('?', false);
+  placeholder.classList.add('placeholder');
+  placeholder.querySelector('.coin-symbol').textContent = '?';
+  placeholder.querySelector('.coin-face span:last-child').textContent = 'READY';
+  $('results').appendChild(placeholder);
+
+  $('tableHint').textContent = 'Your results will appear here.';
+  $('weightError').textContent = '';
+  setStatus('Ready');
+  updateStatistics({ heads: 0, tails: 0, side: 0 }, 0);
+
+  // Keep the selected coin type and custom probabilities.
+}
+
+setDefaultWeights();
+updateStatistics({ heads: 0, tails: 0, side: 0 }, 0);
+</script>
 </body>
 </html>

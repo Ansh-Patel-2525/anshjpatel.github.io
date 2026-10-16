@@ -1,401 +1,834 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Bitcoin Miner - Ansh Patel</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
-  <style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b0d12">
+<title>Bitcoin Miner</title>
 
-    /* ADDED: Header auto-hide styles */
-    .game-header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-      background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #c026d3 100%);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      transition: transform 0.3s ease-in-out;
-      padding: 1rem 0;
-    }
-    
-    .game-header-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .game-header h1 {
-      color: white;
-      margin: 0;
-      font-size: 1.8rem;
-    }
-    
-    .header-links {
-      display: flex;
-      gap: 1.5rem;
-    }
-    
-    .game-header .back-link {
-      color: white;
-      text-decoration: none;
-      opacity: 0.9;
-      font-weight: 500;
-      transition: opacity 0.2s;
-    }
-    
-    .game-header .back-link:hover {
-      opacity: 1;
-    }
-    
-    .game-container {
-      margin-top: 100px; /* Adjust based on your header height */
-    }
-    
-    @media (max-width: 768px) {
-      .game-container {
-        margin-top: 90px;
-      }
-    }
-    /* END ADDED */
+<style>
+:root {
+  --bg: #0b0d12;
+  --panel: #131720;
+  --gold: #f7b733;
+  --gold-light: #ffdc82;
+  --text: #f5f7fb;
+  --muted: #929bad;
+  --border: rgba(255,255,255,.09);
+  --green: #4adea3;
+}
 
-    
-    .miner-container {
-      max-width: 800px;
-      margin: 3rem auto;
-      padding: 2rem;
-      transform: scale(0.9);       /* scale down everything to 80% */
-      transform-origin: top center; /* keeps it aligned nicely */
-    }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-    .miner-card {
-      background: white;
-      border-radius: 20px;
-      padding: 3rem 2rem;
-      box-shadow: var(--shadow-xl);
-      text-align: center;
-    }
+body {
+  min-height: 100vh;
+  color: var(--text);
+  background:
+    radial-gradient(ellipse at 50% 0%, #30220f 0%, transparent 45%),
+    var(--bg);
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.6;
+}
 
-    .miner-icon {
-      font-size: 5rem;
-      margin-bottom: 1rem;
-      animation: float 3s ease-in-out infinite;
-    }
+button, a { font: inherit; }
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; }
 
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-20px); }
-    }
+button:focus-visible, a:focus-visible {
+  outline: 3px solid var(--gold-light);
+  outline-offset: 4px;
+}
 
-    .miner-title {
-      font-size: 2.5rem;
-      color: var(--primary);
-      margin-bottom: 0.5rem;
-    }
+header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid var(--border);
+  background: rgba(11,13,18,.88);
+  backdrop-filter: blur(18px);
+}
 
-    .miner-subtitle {
-      color: var(--text-light);
-      font-size: 1.1rem;
-      margin-bottom: 2rem;
-    }
+.nav {
+  width: min(1100px, calc(100% - 36px));
+  min-height: 76px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
 
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1.5rem;
-      margin: 2rem 0;
-    }
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 800;
+  letter-spacing: -.5px;
+}
 
-    .stat-box {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 1.5rem;
-      border-radius: 15px;
-      box-shadow: var(--shadow-md);
-    }
+.brand-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #ffdf88, #e99512);
+  color: #211605;
+  font-size: 25px;
+  box-shadow: 0 5px 24px #f7b73325;
+}
 
-    .stat-label {
-      font-size: 0.9rem;
-      opacity: 0.9;
-      margin-bottom: 0.5rem;
-    }
+.brand small {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
 
-    .stat-value {
-      font-size: 1.8rem;
-      font-weight: bold;
-    }
+.nav-links {
+  display: flex;
+  gap: 10px;
+}
 
-    .mine-button {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      color: white;
-      border: none;
-      padding: 1.5rem 3rem;
-      font-size: 1.3rem;
-      font-weight: bold;
-      border-radius: 50px;
-      cursor: pointer;
-      box-shadow: var(--shadow-lg);
-      transition: all 0.3s ease;
-      margin: 2rem 0;
-    }
+.nav-links a {
+  padding: 9px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: #dce1ec;
+  background: #ffffff06;
+  font-size: 13px;
+  font-weight: 650;
+  transition: .2s;
+}
 
-    .mine-button:hover {
-      transform: scale(1.05);
-      box-shadow: var(--shadow-xl);
-    }
+.nav-links a:hover {
+  background: #ffffff12;
+  border-color: #ffffff30;
+  transform: translateY(-2px);
+}
 
-    .mine-button:active {
-      transform: scale(0.98);
-    }
+main {
+  width: min(1000px, calc(100% - 36px));
+  margin: auto;
+  padding: 55px 0 65px;
+}
 
-    .disclaimer {
-      margin-top: 2rem;
-      padding: 1rem;
-      background: #fff3cd;
-      border-radius: 10px;
-      color: #856404;
-      font-size: 0.9rem;
-    }
+.intro {
+  text-align: center;
+  margin-bottom: 34px;
+}
 
-    
+.eyebrow {
+  display: inline-block;
+  margin-bottom: 17px;
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
 
-    .back-link:hover {
-      transform: translateX(-5px);
-    }
+h1 {
+  font-size: clamp(40px, 7vw, 72px);
+  line-height: 1.05;
+  letter-spacing: -4px;
+}
 
-    .mining-animation {
-      display: none;
-      margin: 2rem 0;
-    }
+h1 span { color: var(--gold); }
 
-    .mining-animation.active {
-      display: block;
-    }
+.subtitle {
+  max-width: 530px;
+  margin: 17px auto 0;
+  color: var(--muted);
+  font-size: 16px;
+}
 
-    .progress-bar {
-      width: 100%;
-      height: 30px;
-      background: #e0e0e0;
-      border-radius: 15px;
-      overflow: hidden;
-      margin-top: 1rem;
-    }
+.dashboard {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: linear-gradient(145deg, #171b25, #10131b);
+  box-shadow: 0 30px 80px #0006;
+}
 
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
-      width: 0%;
-      transition: width 0.1s linear;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: bold;
-    }
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 22px 26px;
+  border-bottom: 1px solid var(--border);
+}
 
-    /* Video overlay styles */
-    .video-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.95);
-      z-index: 9999;
-      justify-content: center;
-      align-items: center;
-    }
+.dashboard-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 
-    .video-overlay.active {
-      display: flex;
-    }
+.heading-icon {
+  display: grid;
+  place-items: center;
+  width: 43px;
+  height: 43px;
+  border-radius: 13px;
+  color: var(--gold);
+  background: #f7b73312;
+  font-size: 23px;
+}
 
-    .video-container {
-      position: relative;
-      width: 90%;
-      max-width: 1200px;
-    }
+.dashboard-heading h2 { font-size: 15px; }
+.dashboard-heading p { color: var(--muted); font-size: 12px; }
 
-    .video-container video {
-      width: 100%;
-      height: auto;
-      border-radius: 10px;
-      box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
-    }
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
 
-    .close-video {
-      position: absolute;
-      top: -40px;
-      right: 0;
-      background: white;
-      color: black;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 1rem;
-      font-weight: bold;
-      transition: all 0.3s ease;
-    }
+.status.active { color: var(--green); }
 
-    .close-video:hover {
-      background: #f0f0f0;
-      transform: scale(1.05);
-    }
-  </style>
+.status.active .status-dot {
+  background: var(--green);
+  animation: pulse 1.2s infinite;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #71798a;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 13px;
+  padding: 22px 26px 8px;
+}
+
+.stat-card {
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: #ffffff04;
+  transition: .25s;
+}
+
+.stat-card:hover {
+  border-color: #f7b73335;
+  background: #ffffff07;
+  transform: translateY(-3px);
+}
+
+.stat-label {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.stat-value {
+  margin-top: 12px;
+  overflow-wrap: anywhere;
+  font-size: clamp(19px, 2.5vw, 28px);
+  font-weight: 800;
+  letter-spacing: -1px;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-foot {
+  margin-top: 7px;
+  color: #788397;
+  font-size: 11px;
+}
+
+.mining-area {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 26px;
+  padding: 22px 26px 28px;
+}
+
+.coin-panel {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 285px;
+  overflow: hidden;
+  border: 1px solid #f7b7331b;
+  border-radius: 19px;
+  background: radial-gradient(circle, #f7b73312, transparent 65%);
+}
+
+.orbit {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  border: 1px solid #f7b73320;
+  border-radius: 50%;
+}
+
+.orbit.second {
+  width: 280px;
+  height: 280px;
+  border-style: dashed;
+  opacity: .6;
+}
+
+.coin {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 125px;
+  height: 125px;
+  border: 5px solid #ffe3a0;
+  border-radius: 50%;
+  color: #513006;
+  background: linear-gradient(140deg, #ffe9a8, #ffbc36 60%, #dc8509);
+  box-shadow: inset 0 0 0 5px #a467152b, 0 0 55px #f7b73325;
+  font-size: 75px;
+  font-weight: 900;
+  transition: .3s;
+}
+
+.mining .coin {
+  animation: float 1.6s ease-in-out infinite;
+  box-shadow: 0 0 70px #f7b73360;
+}
+
+.mining .orbit.second {
+  animation: rotate 12s linear infinite;
+}
+
+.coin-caption {
+  position: absolute;
+  bottom: 20px;
+  color: #8791a4;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.controls h3 {
+  font-size: 25px;
+  letter-spacing: -1px;
+}
+
+.controls p {
+  margin: 10px 0 23px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+#progressPercent { color: var(--gold); }
+
+.progress-track {
+  height: 9px;
+  margin-top: 11px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #292e39;
+}
+
+.progress-fill {
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #e99512, #ffdc82);
+  box-shadow: 0 0 20px #f7b73345;
+  transition: width .08s linear;
+}
+
+.mine-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 57px;
+  margin-top: 24px;
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 14px;
+  color: #241704;
+  background: linear-gradient(135deg, #ffe19a, #f4ae2c 75%);
+  box-shadow: 0 9px 28px #f7b73320;
+  font-weight: 850;
+  transition: .2s;
+}
+
+.mine-button:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 32px #f7b73335;
+  filter: brightness(1.06);
+}
+
+.mine-button:active:not(:disabled) { transform: scale(.99); }
+.mine-button:disabled { opacity: .7; cursor: wait; }
+
+.microcopy {
+  margin-top: 12px;
+  color: #778195;
+  font-size: 11px;
+  text-align: center;
+}
+
+footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  margin-top: 27px;
+  color: #697387;
+  font-size: 11px;
+}
+
+/* VIDEO */
+
+.video-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+  background: #050609ed;
+  backdrop-filter: blur(14px);
+  opacity: 0;
+  visibility: hidden;
+  transition: .25s;
+}
+
+.video-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.video-dialog {
+  width: min(900px, 100%);
+  transform: translateY(12px);
+  transition: .25s;
+}
+
+.video-overlay.active .video-dialog { transform: translateY(0); }
+
+.video-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 14px;
+}
+
+.video-heading h2 { font-size: clamp(19px, 4vw, 27px); }
+.video-heading p { color: var(--muted); font-size: 12px; }
+
+.close-button {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: white;
+  background: #ffffff0c;
+  font-size: 25px;
+}
+
+.close-button:hover { background: #ffffff20; }
+
+.video-frame {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: black;
+  box-shadow: 0 25px 80px #0009;
+}
+
+video {
+  display: block;
+  width: 100%;
+  max-height: 72vh;
+  background: black;
+}
+
+.video-hint {
+  margin-top: 12px;
+  color: #7d8799;
+  font-size: 11px;
+  text-align: center;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-8px) rotate(2deg); }
+}
+
+@keyframes rotate { to { transform: rotate(360deg); } }
+@keyframes pulse { 50% { box-shadow: 0 0 0 6px #4adea300; } }
+
+@media (max-width: 700px) {
+  main { padding-top: 38px; }
+  h1 { letter-spacing: -2px; }
+
+  .stats {
+    grid-template-columns: 1fr;
+    padding: 16px 17px 4px;
+  }
+
+  .stat-card {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 3px 12px;
+    align-items: center;
+    padding: 15px;
+  }
+
+  .stat-value {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    margin: 0;
+    text-align: right;
+    font-size: 20px;
+  }
+
+  .stat-foot { margin: 0; }
+
+  .mining-area {
+    grid-template-columns: 1fr;
+    padding: 16px 17px 22px;
+    gap: 22px;
+  }
+
+  .coin-panel { min-height: 235px; }
+  .dashboard-header { padding: 18px; }
+  .dashboard-heading p { max-width: 190px; }
+
+  .nav-links a {
+    padding: 9px 10px;
+    font-size: 12px;
+  }
+
+  footer { flex-direction: column; gap: 5px; }
+}
+
+@media (max-width: 400px) {
+  .nav, main { width: calc(100% - 24px); }
+  .brand { gap: 8px; font-size: 13px; }
+  .brand-icon { width: 36px; height: 36px; }
+  .nav-links { gap: 5px; }
+  .nav-links a { padding: 8px; }
+  .status { font-size: 10px; }
+  .video-overlay { padding: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+</style>
 </head>
+
 <body>
+<header>
+  <nav class="nav" aria-label="Main navigation">
+    <a href="index.html" class="brand">
+      <span class="brand-icon">₿</span>
+      <span>Bitcoin Miner<small>Mining dashboard</small></span>
+    </a>
 
-  <header class="game-header">
-      <div class="game-header-content">
-        <h1>₿ Bitcoin Miner</h1>
-        <div class="header-links">
-          <a href="widgets.html" class="back-link">← Back to Widgets</a>
-          <a href="index.html" class="back-link">🏠 Home</a>
-        </div>
-      </div>
-    </header>
-
-  <div class="miner-container">
-    <div class="miner-card">
-      <div class="miner-icon">₿</div>
-      <h1 class="miner-title">Bitcoin Miner Pro</h1>
-      <p class="miner-subtitle">Mine Bitcoin directly from your browser!</p>
-
-      <div class="stats-grid">
-        <div class="stat-box">
-          <div class="stat-label">Hash Rate</div>
-          <div class="stat-value">1.21 TH/s</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">BTC Mined</div>
-          <div class="stat-value">0.00000000</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">Estimated Value</div>
-          <div class="stat-value">$0.00</div>
-        </div>
-      </div>
-
-      <button class="mine-button" onclick="startMining()">
-        🚀 Start Mining Now!
-      </button>
-
-      <div class="mining-animation" id="miningAnimation">
-        <p style="font-size: 1.2rem; color: var(--primary); font-weight: bold;">
-          ⛏️ Mining in progress...
-        </p>
-        <div class="progress-bar">
-          <div class="progress-fill" id="progressFill">0%</div>
-        </div>
-      </div>
-
-      <div class="disclaimer">
-        ⚠️ Warning: This mining operation requires significant computational resources. 
-        Your device may experience unusual behavior during the mining process.
-      </div>
-
+    <div class="nav-links">
+      <a href="widgets.html">← Widgets</a>
+      <a href="index.html">⌂ Home</a>
     </div>
-  </div>
+  </nav>
+</header>
 
-  <!-- Video Overlay -->
-  <div class="video-overlay" id="videoOverlay">
-    <div class="video-container">
-      <button class="close-video" onclick="closeVideo()">✕ Close</button>
-      <video id="rickrollVideo" controls loop>
+<main>
+  <section class="intro">
+    <div class="eyebrow">Digital mining terminal</div>
+    <h1>Bitcoin <span>Miner</span></h1>
+    <p class="subtitle">
+      Power up your rig and watch your mining progress unfold.
+    </p>
+  </section>
+
+  <section class="dashboard">
+    <div class="dashboard-header">
+      <div class="dashboard-heading">
+        <div class="heading-icon">⌘</div>
+        <div>
+          <h2>Mining dashboard</h2>
+          <p>Mining performance and account overview</p>
+        </div>
+      </div>
+
+      <div class="status" id="status" aria-live="polite">
+        <span class="status-dot"></span>
+        <span id="statusText">Rig idle</span>
+      </div>
+    </div>
+
+    <div class="stats">
+      <article class="stat-card">
+        <div class="stat-label">Hash rate</div>
+        <div class="stat-value" id="hashRate">0.00 TH/s</div>
+        <div class="stat-foot">Current processing rate</div>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-label">BTC mined</div>
+        <div class="stat-value" id="btcMined">0.00000000</div>
+        <div class="stat-foot">Total mined</div>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-label">Estimated value</div>
+        <div class="stat-value" id="btcValue">$0.00</div>
+        <div class="stat-foot">Estimated BTC value</div>
+      </article>
+    </div>
+
+    <div class="mining-area">
+      <div class="coin-panel" id="coinPanel" aria-hidden="true">
+        <div class="orbit"></div>
+        <div class="orbit second"></div>
+        <div class="coin">₿</div>
+        <div class="coin-caption">Bitcoin network</div>
+      </div>
+
+      <div class="controls">
+        <h3 id="controlTitle">Ready to mine?</h3>
+        <p id="controlCopy">
+          Start your mining session and watch your progress.
+        </p>
+
+        <div class="progress-label">
+          <span>Mining progress</span>
+          <span id="progressPercent">0%</span>
+        </div>
+
+        <div class="progress-track"
+             id="progressTrack"
+             role="progressbar"
+             aria-label="Mining progress"
+             aria-valuemin="0"
+             aria-valuemax="100"
+             aria-valuenow="0">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <button class="mine-button" id="mineButton" type="button">
+          <span>⚡</span>
+          <span id="buttonText">Start mining</span>
+        </button>
+
+        <p class="microcopy">Your next block is waiting.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>₿ Bitcoin Miner</span>
+    <span>Built for the curious.</span>
+  </footer>
+</main>
+
+<div class="video-overlay"
+     id="videoOverlay"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="videoTitle"
+     aria-hidden="true">
+
+  <div class="video-dialog">
+    <div class="video-heading">
+      <div>
+        <h2 id="videoTitle">Block successfully found! 🎉</h2>
+        <p>Your reward is ready.</p>
+      </div>
+      <button class="close-button" id="closeVideo"
+              type="button" aria-label="Close video">×</button>
+    </div>
+
+    <div class="video-frame">
+      <video id="rickrollVideo" controls playsinline preload="metadata">
         <source src="rick.mp4" type="video/mp4">
-        Your browser does not support the video tag.
+        Your browser does not support this video.
       </video>
     </div>
+
+    <p class="video-hint">Press Escape or close this window to return.</p>
   </div>
+</div>
 
-  <script>
-    // ADDED: Hide/show header on scroll
-    let lastScrollTop = 0;
-    const header = document.querySelector('.game-header');
-    let scrollTimeout;
-    
-    window.addEventListener('scroll', function() {
-      clearTimeout(scrollTimeout);
-      
-      scrollTimeout = setTimeout(() => {
-        let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        
-        if (scrollTop > lastScrollTop && scrollTop > 100) {
-          // Scrolling down & past threshold
-          header.style.transform = 'translateY(-100%)';
-        } else {
-          // Scrolling up
-          header.style.transform = 'translateY(0)';
-        }
-        
-        lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
-      }, 50); // Small delay to smooth out rapid scroll events
-    }, false);
-    // END ADDED
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
 
+  const button = $('mineButton');
+  const buttonText = $('buttonText');
+  const panel = $('coinPanel');
+  const status = $('status');
+  const statusText = $('statusText');
+  const progressFill = $('progressFill');
+  const progressPercent = $('progressPercent');
+  const progressTrack = $('progressTrack');
+  const overlay = $('videoOverlay');
+  const video = $('rickrollVideo');
+  const closeButton = $('closeVideo');
 
-    function startMining() {
-      // Show mining animation
-      const animation = document.getElementById('miningAnimation');
-      const progressFill = document.getElementById('progressFill');
-      const button = document.querySelector('.mine-button');
-      
-      animation.classList.add('active');
-      button.disabled = true;
-      button.style.opacity = '0.6';
-      button.style.cursor = 'not-allowed';
-      
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += 2;
-        progressFill.style.width = progress + '%';
-        progressFill.textContent = progress + '%';
-        
-        if (progress >= 100) {
-          clearInterval(interval);
-          // Show video after progress completes
-          setTimeout(() => {
-            showVideo();
-          }, 500);
-        }
-      }, 50);
-    }
+  let mining = false;
+  let timer = null;
+  let completionTimer = null;
+  let previousFocus = null;
 
-    function showVideo() {
-      const overlay = document.getElementById('videoOverlay');
-      const video = document.getElementById('rickrollVideo');
-      
-      overlay.classList.add('active');
-      video.play();
-    }
+  function setProgress(value) {
+    const progress = Math.max(0, Math.min(100, value));
 
-    function closeVideo() {
-      const overlay = document.getElementById('videoOverlay');
-      const video = document.getElementById('rickrollVideo');
-      
-      overlay.classList.remove('active');
-      video.pause();
+    progressFill.style.width = progress + '%';
+    progressPercent.textContent = Math.round(progress) + '%';
+    progressTrack.setAttribute('aria-valuenow', String(Math.round(progress)));
+  }
+
+  function setMining(active) {
+    mining = active;
+    button.disabled = active;
+    panel.classList.toggle('mining', active);
+    status.classList.toggle('active', active);
+    statusText.textContent = active ? 'Mining in progress' : 'Rig idle';
+    buttonText.textContent = active ? 'Mining in progress…' : 'Start mining';
+  }
+
+  function startMining() {
+    if (mining || overlay.classList.contains('active')) return;
+
+    clearInterval(timer);
+    clearTimeout(completionTimer);
+
+    setMining(true);
+    setProgress(0);
+
+    $('hashRate').textContent = '1.21 TH/s';
+    $('controlTitle').textContent = 'Mining in progress…';
+    $('controlCopy').textContent = 'Processing blocks and updating your mining progress.';
+
+    const duration = 5200;
+    const start = performance.now();
+
+    timer = setInterval(() => {
+      const progress = Math.min(
+        100,
+        ((performance.now() - start) / duration) * 100
+      );
+
+      setProgress(progress);
+
+      const btc = progress / 100 * 0.00000042;
+      $('btcMined').textContent = btc.toFixed(8);
+      $('btcValue').textContent = '$' + (btc * 67000).toFixed(2);
+
+      if (progress >= 100) {
+        clearInterval(timer);
+        timer = null;
+
+        setMining(false);
+        statusText.textContent = 'Block found';
+        $('controlTitle').textContent = 'Block successfully found!';
+        $('controlCopy').textContent = 'Your mining session is complete.';
+        buttonText.textContent = 'Block found';
+        button.disabled = true;
+
+        completionTimer = setTimeout(openVideo, 650);
+      }
+    }, 40);
+  }
+
+  function openVideo() {
+    previousFocus = document.activeElement;
+    overlay.classList.add('active');
+    overlay.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    closeButton.focus();
+
+    const attempt = video.play();
+    if (attempt && attempt.catch) attempt.catch(() => {});
+  }
+
+  function closeVideo() {
+    clearTimeout(completionTimer);
+
+    overlay.classList.remove('active');
+    overlay.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+
+    video.pause();
+    try {
       video.currentTime = 0;
-      
-      // Reset the miner
-      const animation = document.getElementById('miningAnimation');
-      const progressFill = document.getElementById('progressFill');
-      const button = document.querySelector('.mine-button');
-      
-      animation.classList.remove('active');
-      progressFill.style.width = '0%';
-      progressFill.textContent = '0%';
-      button.disabled = false;
-      button.style.opacity = '1';
-      button.style.cursor = 'pointer';
-    }
-  </script>
+    } catch (_) {}
 
+    setProgress(0);
+    $('hashRate').textContent = '0.00 TH/s';
+    $('btcMined').textContent = '0.00000000';
+    $('btcValue').textContent = '$0.00';
+    $('controlTitle').textContent = 'Ready to mine?';
+    $('controlCopy').textContent = 'Start your mining session and watch your progress.';
+
+    setMining(false);
+
+    if (previousFocus) previousFocus.focus();
+  }
+
+  button.addEventListener('click', startMining);
+  closeButton.addEventListener('click', closeVideo);
+
+  overlay.addEventListener('click', event => {
+    if (event.target === overlay) closeVideo();
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && overlay.classList.contains('active')) {
+      closeVideo();
+    }
+  });
+
+  video.addEventListener('error', () => {
+    const frame = video.parentElement;
+
+    if (!frame.querySelector('.video-error')) {
+      const message = document.createElement('p');
+      message.className = 'video-error';
+      message.style.cssText = 'padding:20px;color:#ddd;text-align:center';
+      message.textContent = 'Video unavailable. Check that rick.mp4 is in the same folder as this HTML file.';
+      frame.appendChild(message);
+    }
+  });
+})();
+</script>
 </body>
 </html>

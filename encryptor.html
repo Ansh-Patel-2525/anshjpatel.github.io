@@ -1,635 +1,1448 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Encryptor - Ansh Patel</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+  <meta name="theme-color" content="#10141f">
+  <meta name="description" content="A modern password-based text encryption and decryption tool.">
+  <title>Encryptor — Secure Text Tool</title>
+
   <style>
-    /* ADDED: Header auto-hide styles */
-    .game-header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-      background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #c026d3 100%);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      transition: transform 0.3s ease-in-out;
-      padding: 1rem 0;
+    :root {
+      --bg: #10141f;
+      --surface: #181e2b;
+      --surface-2: #202838;
+      --surface-3: #283247;
+      --text: #f3f5fa;
+      --muted: #9aa7bc;
+      --border: rgba(255,255,255,.09);
+      --accent: #a78bfa;
+      --accent-2: #c4b5fd;
+      --green: #6ee7b7;
+      --red: #fda4af;
+      --radius: 18px;
     }
-    
-    .game-header-content {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .game-card {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    
-    .game-header h1 {
-      color: white;
+
+    * {
+      box-sizing: border-box;
       margin: 0;
-      font-size: 1.8rem;
+      padding: 0;
     }
-    
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse at 12% 0%, rgba(139,92,246,.13), transparent 36%),
+        radial-gradient(ellipse at 90% 30%, rgba(45,212,191,.06), transparent 35%),
+        var(--bg);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+    }
+
+    button, input, textarea {
+      font: inherit;
+    }
+
+    button, a, input {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:focus-visible, a:focus-visible,
+    input:focus-visible, textarea:focus-visible {
+      outline: 3px solid var(--accent-2);
+      outline-offset: 3px;
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: wait !important;
+      transform: none !important;
+    }
+
+    .topbar {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      border-bottom: 1px solid var(--border);
+      background: rgba(16,20,31,.86);
+      backdrop-filter: blur(16px);
+    }
+
+    .topbar-inner {
+      width: min(1180px, 100%);
+      min-height: 76px;
+      padding: 14px 26px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -.5px;
+    }
+
+    .brand-icon {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      flex-shrink: 0;
+      border: 1px solid rgba(196,181,253,.22);
+      border-radius: 14px;
+      background: rgba(167,139,250,.14);
+      color: var(--accent-2);
+      font-size: 22px;
+    }
+
+    .brand small {
+      display: block;
+      margin-top: -2px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1.7px;
+      text-transform: uppercase;
+    }
+
     .header-links {
       display: flex;
-      gap: 1.5rem;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 9px;
     }
-    
-    .game-header .back-link {
-      color: white;
+
+    .nav-link {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 40px;
+      padding: 9px 13px;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      color: #d6ddec;
       text-decoration: none;
-      opacity: 0.9;
-      font-weight: 500;
-      transition: opacity 0.2s;
-    }
-    
-    .game-header .back-link:hover {
-      opacity: 1;
-    }
-    
-    .game-container {
-      margin-top: 100px;
-      max-width: 1400px !important;
-      width: 95% !important;
-      margin-left: auto !important;
-      margin-right: auto !important;
-      padding-bottom: 2rem;
+      font-size: 12px;
+      font-weight: 650;
+      transition: background .2s, border-color .2s;
     }
 
-    .game-card {
-      max-width: 100% !important;
-      width: 100% !important;
+    .nav-link:hover {
+      background: var(--surface-2);
+      border-color: rgba(196,181,253,.3);
     }
 
-    .encryptor-display {
-      padding: 2rem;
-      max-width: 100% !important;
+    .page {
+      width: min(1180px, 100%);
+      padding: 48px 26px 60px;
+      margin: auto;
     }
 
-    .emoji {
-      font-size: 3rem;
+    .hero {
       text-align: center;
-      margin-bottom: 1rem;
+      margin: 8px auto 34px;
+      max-width: 690px;
     }
 
-    .dual-panel-container {
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid rgba(167,139,250,.22);
+      border-radius: 100px;
+      background: rgba(167,139,250,.09);
+      color: var(--accent-2);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1.6px;
+      text-transform: uppercase;
+      margin-bottom: 17px;
+    }
+
+    .eyebrow-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 12px rgba(110,231,183,.5);
+    }
+
+    h1 {
+      font-size: clamp(34px, 6vw, 54px);
+      line-height: 1.12;
+      letter-spacing: -2.5px;
+      font-weight: 850;
+      margin-bottom: 15px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(100deg, #c4b5fd, #8bdbed);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-description {
+      max-width: 560px;
+      margin: auto;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .security-strip {
       display: flex;
-      gap: 2rem;
-      max-width: 1400px;
-      margin: 0 auto;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px 22px;
+      margin: 25px auto 0;
+    }
+
+    .security-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: #b7c3d5;
+      font-size: 11px;
+      font-weight: 650;
+    }
+
+    .security-check {
+      color: var(--green);
+      font-weight: 900;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+      align-items: start;
     }
 
     .panel {
-      flex: 1;
-      background: #f9fafb;
-      padding: 2rem;
-      border-radius: 15px;
-      border: 2px solid #e5e7eb;
+      min-width: 0;
+      overflow: hidden;
+      background: rgba(24,30,43,.92);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 18px 55px rgba(0,0,0,.12);
     }
 
-    .panel-header {
-      text-align: center;
-      margin-bottom: 1.5rem;
+    .panel-top {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding: 21px 22px;
+      border-bottom: 1px solid var(--border);
     }
 
-    .panel-header h2 {
-      margin: 0;
-      font-size: 1.5rem;
-      color: #667eea;
+    .panel-icon {
+      width: 45px;
+      height: 45px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      border-radius: 14px;
+      font-size: 21px;
     }
 
-    .panel-header .emoji {
-      font-size: 2.5rem;
-      margin-bottom: 0.5rem;
+    .encrypt-panel .panel-icon {
+      background: rgba(167,139,250,.13);
+      border: 1px solid rgba(167,139,250,.18);
     }
 
-    .input-section {
-      width: 100%;
+    .decrypt-panel .panel-icon {
+      background: rgba(110,231,183,.10);
+      border: 1px solid rgba(110,231,183,.18);
     }
 
-    .input-group {
-      margin-bottom: 1.5rem;
+    .panel-title {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -.4px;
     }
 
-    .input-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 600;
-      color: #333;
+    .panel-subtitle {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 11px;
     }
 
-    .input-group input,
-    .input-group textarea {
-      width: 100%;
-      padding: 1rem;
-      border: 2px solid #e5e7eb;
-      border-radius: 10px;
-      font-size: 1rem;
-      font-family: monospace;
-      transition: border-color 0.2s;
-      box-sizing: border-box;
+    .panel-step {
+      margin-left: auto;
+      align-self: flex-start;
+      padding: 4px 8px;
+      border-radius: 7px;
+      background: var(--surface-2);
+      color: #aebad0;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1px;
     }
 
-    .input-group input:focus,
-    .input-group textarea:focus {
-      outline: none;
-      border-color: #667eea;
+    .panel-body {
+      padding: 23px;
     }
 
-    .input-group textarea {
-      min-height: 150px;
-      resize: vertical;
+    .field {
+      margin-bottom: 19px;
     }
 
-    .action-btn {
-      width: 100%;
-      padding: 1.2rem;
-      font-size: 1.1rem;
-      font-weight: 600;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
-      color: white;
-      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    .field-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 9px;
     }
 
-    .action-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    .field label {
+      color: #e0e6f0;
+      font-size: 12px;
+      font-weight: 750;
     }
 
-    .action-btn:active {
-      transform: translateY(0);
+    .field-hint {
+      color: #8391a8;
+      font-size: 10px;
     }
 
-    .output-section {
-      margin-top: 2rem;
-    }
-
-    .output-box {
-      background: white;
-      border: 2px solid #e5e7eb;
-      border-radius: 10px;
-      padding: 1.5rem;
-      margin-top: 1rem;
+    .input-wrap {
       position: relative;
     }
 
-    .output-header {
+    .field input,
+    .field textarea {
+      display: block;
+      width: 100%;
+      min-width: 0;
+      border: 1px solid #333e52;
+      border-radius: 12px;
+      background: #111724;
+      color: var(--text);
+      padding: 13px 14px;
+      font-size: 14px;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .field input {
+      min-height: 49px;
+      padding-right: 78px;
+    }
+
+    .field textarea {
+      min-height: 160px;
+      resize: vertical;
+      line-height: 1.65;
+      overflow-wrap: anywhere;
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder {
+      color: #66738a;
+    }
+
+    .field input:focus,
+    .field textarea:focus {
+      outline: none;
+      border-color: #9c83f4;
+      box-shadow: 0 0 0 3px rgba(167,139,250,.10);
+    }
+
+    .show-password {
+      position: absolute;
+      top: 50%;
+      right: 9px;
+      transform: translateY(-50%);
+      min-height: 33px;
+      padding: 5px 8px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface-2);
+      color: #c3cde0;
+      font-size: 10px;
+      font-weight: 750;
+      cursor: pointer;
+    }
+
+    .show-password:hover {
+      background: var(--surface-3);
+    }
+
+    .field textarea.monospace,
+    .output-text {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+    }
+
+    .field-footer {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 7px;
+      color: #77859b;
+      font-size: 10px;
+    }
+
+    .primary-button {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      min-height: 52px;
+      padding: 13px 18px;
+      border: 0;
+      border-radius: 12px;
+      color: #171525;
+      background: linear-gradient(105deg, #c4b5fd, #a5b4fc);
+      font-size: 13px;
+      font-weight: 850;
+      cursor: pointer;
+      transition: filter .2s, transform .15s, box-shadow .2s;
+      box-shadow: 0 6px 20px rgba(167,139,250,.12);
+    }
+
+    .primary-button:hover:not(:disabled) {
+      filter: brightness(1.08);
+      box-shadow: 0 8px 25px rgba(167,139,250,.2);
+    }
+
+    .primary-button:active:not(:disabled) {
+      transform: scale(.99);
+    }
+
+    .decrypt-panel .primary-button {
+      color: #10231e;
+      background: linear-gradient(105deg, #a7f3d0, #6ee7b7);
+      box-shadow: 0 6px 20px rgba(110,231,183,.09);
+    }
+
+    .feedback {
+      display: none;
+      padding: 11px 13px;
+      margin-top: 13px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .feedback.show {
+      display: block;
+    }
+
+    .feedback.error {
+      background: rgba(251,113,133,.08);
+      border-color: rgba(251,113,133,.18);
+      color: var(--red);
+    }
+
+    .feedback.success {
+      background: rgba(110,231,183,.07);
+      border-color: rgba(110,231,183,.17);
+      color: var(--green);
+    }
+
+    .output-section {
+      display: none;
+      margin-top: 22px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .output-section.show {
+      display: block;
+      animation: fade-in .25s ease both;
+    }
+
+    .output-heading {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 10px;
     }
 
-    .output-header h3 {
-      margin: 0;
-      color: #667eea;
+    .output-title {
+      font-size: 12px;
+      font-weight: 800;
     }
 
-    .copy-btn {
-      padding: 0.5rem 1rem;
-      background: #667eea;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      font-size: 0.9rem;
-    }
-
-    .copy-btn:hover {
-      background: #764ba2;
+    .output-tag {
+      padding: 4px 7px;
+      border-radius: 6px;
+      background: rgba(110,231,183,.09);
+      color: var(--green);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .7px;
+      text-transform: uppercase;
     }
 
     .output-text {
-      font-family: monospace;
-      word-break: break-all;
+      max-height: 250px;
+      overflow: auto;
+      overflow-wrap: anywhere;
       white-space: pre-wrap;
-      background: #f9fafb;
-      padding: 1rem;
-      border-radius: 8px;
-      border: 1px solid #e5e7eb;
-      max-height: 300px;
-      overflow-y: auto;
+      padding: 13px;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      background: #101521;
+      color: #cbd5e1;
+      line-height: 1.8;
+      user-select: text;
     }
 
-    @media (max-width: 768px) {
-      .game-header {
-        padding: 0.5rem 0;
+    .output-actions {
+      display: flex;
+      gap: 9px;
+      margin-top: 11px;
+    }
+
+    .secondary-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 40px;
+      padding: 9px 12px;
+      border: 1px solid #39445a;
+      border-radius: 10px;
+      background: var(--surface-2);
+      color: #d6deec;
+      font-size: 11px;
+      font-weight: 750;
+      cursor: pointer;
+      transition: background .2s;
+    }
+
+    .secondary-button:hover {
+      background: var(--surface-3);
+    }
+
+    .output-actions .secondary-button {
+      flex: 1;
+    }
+
+    .info-section {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 13px;
+      margin-top: 22px;
+    }
+
+    .info-card {
+      padding: 17px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(24,30,43,.6);
+    }
+
+    .info-icon {
+      margin-bottom: 9px;
+      font-size: 20px;
+    }
+
+    .info-card h3 {
+      font-size: 12px;
+      margin-bottom: 5px;
+    }
+
+    .info-card p {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.7;
+    }
+
+    .notice {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(251,191,36,.15);
+      border-radius: 13px;
+      background: rgba(251,191,36,.045);
+    }
+
+    .notice-icon {
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .notice strong {
+      display: block;
+      color: #f3d69b;
+      font-size: 11px;
+      margin-bottom: 3px;
+    }
+
+    .notice p {
+      color: #a9a6a0;
+      font-size: 11px;
+      line-height: 1.7;
+    }
+
+    .footer {
+      padding-top: 29px;
+      text-align: center;
+      color: #748096;
+      font-size: 11px;
+    }
+
+    .footer a {
+      color: #b8a5ff;
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    @keyframes fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(5px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 800px) {
+      .page {
+        padding: 35px 18px 40px;
       }
 
-      .game-header-content {
-        padding: 0 1rem;
+      .workspace {
+        grid-template-columns: 1fr;
+        gap: 17px;
       }
 
-      .game-header h1 {
-        font-size: 1.1rem;
+      .hero {
+        margin-bottom: 27px;
       }
 
-      .header-links {
-        gap: 0.8rem;
-        font-size: 0.85rem;
+      .info-section {
+        grid-template-columns: 1fr;
+        gap: 10px;
       }
 
-      .game-container {
-        margin-top: 60px;
-        width: 100% !important;
-        padding: 0 0.5rem 1rem 0.5rem;
+      .info-card {
+        display: grid;
+        grid-template-columns: 34px 1fr;
+        column-gap: 8px;
+        padding: 14px;
       }
 
-      .encryptor-display {
-        padding: 1rem 0.5rem;
+      .info-icon {
+        grid-row: 1 / span 2;
+        margin: 0;
       }
 
-      .dual-panel-container {
-        flex-direction: column;
-        gap: 1.5rem;
+      .info-card h3 {
+        align-self: end;
       }
 
-      .panel {
-        padding: 1.5rem 1rem;
-      }
-
-      .panel-header h2 {
-        font-size: 1.3rem;
-      }
-
-      .panel-header .emoji {
-        font-size: 2rem;
-      }
-
-      .input-group {
-        margin-bottom: 1rem;
-      }
-
-      .input-group label {
-        font-size: 0.95rem;
-      }
-
-      .input-group input,
-      .input-group textarea {
-        padding: 0.8rem;
-        font-size: 0.95rem;
-      }
-
-      .input-group textarea {
-        min-height: 120px;
-      }
-
-      .action-btn {
-        padding: 1rem;
-        font-size: 1rem;
-        /* Prevent iOS zoom on input focus */
-        touch-action: manipulation;
-      }
-
-      .output-section {
-        margin-top: 1rem;
-      }
-
-      .output-box {
-        padding: 1rem;
-      }
-
-      .output-header h3 {
-        font-size: 1rem;
-      }
-
-      .copy-btn {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.85rem;
-      }
-
-      .output-text {
-        font-size: 0.85rem;
-        max-height: 200px;
+      .info-card p {
+        align-self: start;
       }
     }
 
     @media (max-width: 480px) {
-      .game-header {
-        padding: 0.4rem 0;
+      .topbar-inner {
+        padding: 12px 14px;
+        gap: 10px;
+        align-items: flex-start;
       }
 
-      .game-header-content {
-        padding: 0 0.5rem;
+      .brand {
+        gap: 8px;
+        font-size: 15px;
       }
 
-      .game-header h1 {
-        font-size: 0.95rem;
+      .brand-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 11px;
+      }
+
+      .brand small {
+        font-size: 8px;
+        letter-spacing: 1px;
       }
 
       .header-links {
-        gap: 0.4rem;
-        font-size: 0.75rem;
+        gap: 5px;
       }
 
-      .game-container {
-        margin-top: 55px;
+      .nav-link {
+        min-height: 36px;
+        padding: 7px 9px;
+        font-size: 10px;
       }
 
-      .panel {
-        padding: 1rem 0.8rem;
+      .page {
+        padding: 31px 12px 32px;
       }
 
-      .input-group input,
-      .input-group textarea {
-        font-size: 16px; /* Prevents iOS zoom */
+      .hero {
+        margin-top: 0;
+      }
+
+      h1 {
+        letter-spacing: -1.5px;
+      }
+
+      .hero-description {
+        font-size: 13px;
+      }
+
+      .security-strip {
+        gap: 8px 13px;
+      }
+
+      .security-item {
+        font-size: 10px;
+      }
+
+      .panel-top {
+        padding: 16px;
+      }
+
+      .panel-body {
+        padding: 17px 14px;
+      }
+
+      .panel-icon {
+        width: 39px;
+        height: 39px;
+        font-size: 18px;
+      }
+
+      .panel-title {
+        font-size: 15px;
+      }
+
+      .panel-subtitle {
+        font-size: 10px;
+      }
+
+      .panel-step {
+        font-size: 9px;
+      }
+
+      .field textarea {
+        min-height: 140px;
+      }
+
+      .field input,
+      .field textarea {
+        font-size: 16px;
+      }
+
+      .primary-button {
+        min-height: 49px;
+      }
+
+      .output-actions {
+        flex-direction: column;
+      }
+
+      .output-actions .secondary-button {
+        width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
       }
     }
   </style>
 </head>
-<body>
 
-  <header class="game-header">
-    <div class="game-header-content">
-      <h1>🔐 Encryptor</h1>
-      <div class="header-links">
-        <a href="widgets.html" class="back-link">← Back to Widgets</a>
-        <a href="index.html" class="back-link">🏠 Home</a>
-      </div>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html"
+         style="color:inherit;text-decoration:none">
+        <span class="brand-icon" aria-hidden="true">🔐</span>
+        <span>
+          Encryptor
+          <small>Private text tool</small>
+        </span>
+      </a>
+
+      <nav class="header-links" aria-label="Main navigation">
+        <a class="nav-link" href="widgets.html">← Widgets</a>
+        <a class="nav-link" href="index.html">⌂ Home</a>
+      </nav>
     </div>
   </header>
 
-  <main class="game-container">
-    <div class="game-card">
-      <div class="encryptor-display">
-        
-        <div class="dual-panel-container">
-          
-          <!-- ENCRYPT PANEL (LEFT) -->
-          <div class="panel">
-            <div class="panel-header">
-              <div class="emoji">🔒</div>
-              <h2>Encrypt</h2>
-            </div>
-
-            <div class="input-section">
-              <div class="input-group">
-                <label for="encryptPassword">Password:</label>
-                <input type="text" id="encryptPassword" placeholder="Enter password">
-              </div>
-
-              <div class="input-group">
-                <label for="encryptMessage">Message:</label>
-                <textarea id="encryptMessage" placeholder="Enter message to encrypt..."></textarea>
-              </div>
-
-              <button class="action-btn" onclick="encryptMessage()">
-                🔒 Encrypt
-              </button>
-            </div>
-
-            <div class="output-section" id="encryptOutput" style="display: none;">
-              <div class="output-box">
-                <div class="output-header">
-                  <h3>Encrypted:</h3>
-                  <button class="copy-btn" onclick="copyToClipboard('encryptResult')">📋 Copy</button>
-                </div>
-                <div class="output-text" id="encryptResult"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- DECRYPT PANEL (RIGHT) -->
-          <div class="panel">
-            <div class="panel-header">
-              <div class="emoji">🔓</div>
-              <h2>Decrypt</h2>
-            </div>
-
-            <div class="input-section">
-              <div class="input-group">
-                <label for="decryptPassword">Password:</label>
-                <input type="text" id="decryptPassword" placeholder="Enter password">
-              </div>
-
-              <div class="input-group">
-                <label for="decryptMessage">Encrypted Message:</label>
-                <textarea id="decryptMessage" placeholder="Paste encrypted message..."></textarea>
-              </div>
-
-              <button class="action-btn" onclick="decryptMessage()">
-                🔓 Decrypt
-              </button>
-            </div>
-
-            <div class="output-section" id="decryptOutput" style="display: none;">
-              <div class="output-box">
-                <div class="output-header">
-                  <h3>Decrypted:</h3>
-                  <button class="copy-btn" onclick="copyToClipboard('decryptResult')">📋 Copy</button>
-                </div>
-                <div class="output-text" id="decryptResult"></div>
-              </div>
-            </div>
-          </div>
-
-        </div>
+  <main class="page">
+    <section class="hero">
+      <div class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        Browser-based encryption
       </div>
-    </div>
+
+      <h1>Your words.<br><span class="gradient-text">Under your control.</span></h1>
+
+      <p class="hero-description">
+        Protect a message with a password, or unlock an encrypted message
+        whenever you need it. Simple, private, and easy to use.
+      </p>
+
+      <div class="security-strip">
+        <span class="security-item"><span class="security-check">✓</span> AES-256-GCM</span>
+        <span class="security-item"><span class="security-check">✓</span> Password-based keys</span>
+        <span class="security-item"><span class="security-check">✓</span> No account required</span>
+      </div>
+    </section>
+
+    <section class="workspace" aria-label="Encryption tools">
+
+      <!-- ENCRYPT -->
+      <article class="panel encrypt-panel">
+        <div class="panel-top">
+          <div class="panel-icon" aria-hidden="true">🔒</div>
+          <div>
+            <h2 class="panel-title">Encrypt a message</h2>
+            <p class="panel-subtitle">Turn readable text into ciphertext.</p>
+          </div>
+          <span class="panel-step">01 / 02</span>
+        </div>
+
+        <div class="panel-body">
+          <form id="encryptForm">
+            <div class="field">
+              <div class="field-heading">
+                <label for="encryptPassword">Your password</label>
+                <span class="field-hint">Keep it private</span>
+              </div>
+
+              <div class="input-wrap">
+                <input
+                  id="encryptPassword"
+                  type="password"
+                  placeholder="Create a strong password"
+                  autocomplete="new-password"
+                  required
+                  minlength="1"
+                >
+                <button class="show-password" type="button"
+                        data-toggle="encryptPassword"
+                        aria-label="Show password">Show</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <div class="field-heading">
+                <label for="encryptMessage">Message to protect</label>
+                <span class="field-hint">Text or Unicode</span>
+              </div>
+
+              <textarea
+                id="encryptMessage"
+                placeholder="Type or paste your message here..."
+                required
+                spellcheck="false"
+              ></textarea>
+
+              <div class="field-footer">
+                <span>Your original message stays in this page.</span>
+                <span id="encryptCharCount">0 characters</span>
+              </div>
+            </div>
+
+            <button class="primary-button" id="encryptButton" type="submit">
+              <span aria-hidden="true">✦</span>
+              <span>Encrypt message</span>
+              <span aria-hidden="true">→</span>
+            </button>
+
+            <div class="feedback" id="encryptFeedback"
+                 role="status" aria-live="polite"></div>
+          </form>
+
+          <section class="output-section" id="encryptOutput">
+            <div class="output-heading">
+              <h3 class="output-title">Encrypted message</h3>
+              <span class="output-tag">Encrypted</span>
+            </div>
+
+            <div class="output-text" id="encryptResult"></div>
+
+            <div class="output-actions">
+              <button class="secondary-button" type="button"
+                      data-copy="encryptResult" data-copy-default="Copy ciphertext">
+                <span aria-hidden="true">▣</span>
+                <span>Copy ciphertext</span>
+              </button>
+              <button class="secondary-button" type="button" id="sendToDecrypt">
+                <span aria-hidden="true">↘</span>
+                Use in decrypt
+              </button>
+            </div>
+          </section>
+        </div>
+      </article>
+
+      <!-- DECRYPT -->
+      <article class="panel decrypt-panel">
+        <div class="panel-top">
+          <div class="panel-icon" aria-hidden="true">🔓</div>
+          <div>
+            <h2 class="panel-title">Decrypt a message</h2>
+            <p class="panel-subtitle">Restore text with the right password.</p>
+          </div>
+          <span class="panel-step">02 / 02</span>
+        </div>
+
+        <div class="panel-body">
+          <form id="decryptForm">
+            <div class="field">
+              <div class="field-heading">
+                <label for="decryptPassword">Original password</label>
+                <span class="field-hint">Must match exactly</span>
+              </div>
+
+              <div class="input-wrap">
+                <input
+                  id="decryptPassword"
+                  type="password"
+                  placeholder="Enter the encryption password"
+                  autocomplete="current-password"
+                  required
+                >
+                <button class="show-password" type="button"
+                        data-toggle="decryptPassword"
+                        aria-label="Show password">Show</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <div class="field-heading">
+                <label for="decryptMessage">Encrypted message</label>
+                <span class="field-hint">Paste ciphertext</span>
+              </div>
+
+              <textarea
+                class="monospace"
+                id="decryptMessage"
+                placeholder="Paste the complete ENC1. ciphertext here..."
+                required
+                spellcheck="false"
+              ></textarea>
+
+              <div class="field-footer">
+                <span>Encrypted text begins with ENC1.</span>
+                <span id="decryptCharCount">0 characters</span>
+              </div>
+            </div>
+
+            <button class="primary-button" id="decryptButton" type="submit">
+              <span aria-hidden="true">✧</span>
+              <span>Decrypt message</span>
+              <span aria-hidden="true">→</span>
+            </button>
+
+            <div class="feedback" id="decryptFeedback"
+                 role="status" aria-live="polite"></div>
+          </form>
+
+          <section class="output-section" id="decryptOutput">
+            <div class="output-heading">
+              <h3 class="output-title">Original message</h3>
+              <span class="output-tag">Decrypted</span>
+            </div>
+
+            <div class="output-text" id="decryptResult"></div>
+
+            <div class="output-actions">
+              <button class="secondary-button" type="button"
+                      data-copy="decryptResult" data-copy-default="Copy message">
+                <span aria-hidden="true">▣</span>
+                <span>Copy message</span>
+              </button>
+            </div>
+          </section>
+        </div>
+      </article>
+    </section>
+
+    <section class="info-section" aria-label="How encryption works">
+      <article class="info-card">
+        <div class="info-icon" aria-hidden="true">🛡️</div>
+        <h3>Strong encryption</h3>
+        <p>AES-256-GCM protects your message and detects tampering with the encrypted data.</p>
+      </article>
+
+      <article class="info-card">
+        <div class="info-icon" aria-hidden="true">🔑</div>
+        <h3>Password-derived key</h3>
+        <p>PBKDF2 with SHA-256 derives the encryption key from your password and a random salt.</p>
+      </article>
+
+      <article class="info-card">
+        <div class="info-icon" aria-hidden="true">🌐</div>
+        <h3>Portable ciphertext</h3>
+        <p>Copy the encrypted text and decrypt it later with this tool and the same password.</p>
+      </article>
+    </section>
+
+    <aside class="notice">
+      <div class="notice-icon" aria-hidden="true">⚠️</div>
+      <div>
+        <strong>Important security note</strong>
+        <p>
+          Use a strong, unique password and keep a copy of your encrypted text.
+          If you lose the password, the message cannot be recovered. This tool
+          does not send messages to a server, but your browser, device, extensions,
+          or hosting environment may have their own risks. Do not use this page
+          as a substitute for an audited secure messaging system.
+        </p>
+      </div>
+    </aside>
+
+    <footer class="footer">
+      Encryptor · Made for private text processing ·
+      <a href="index.html">Back home</a>
+    </footer>
   </main>
 
   <script>
-    // Port of the C functions to JavaScript
-    function gF(a1) {
-      let b2 = 0;
-      for (let i = 0; i < a1.length; i++) {
-        b2 += (a1.charCodeAt(i) * 31 + i * 7);
-        b2 ^= (a1.charCodeAt(i) << (i % 8));
+    "use strict";
+
+    /*
+      Format:
+        ENC1.<base64(salt || iv || ciphertext-and-authentication-tag)>
+
+      Encryption:
+        AES-256-GCM
+        PBKDF2-SHA-256, 310,000 iterations
+        16-byte random salt
+        12-byte random IV
+
+      IMPORTANT:
+      This is a new format. Ciphertext produced by the old custom
+      character-shuffling algorithm is NOT compatible with this version.
+    */
+
+    const FORMAT_PREFIX = "ENC1.";
+    const SALT_LENGTH = 16;
+    const IV_LENGTH = 12;
+    const KEY_LENGTH = 256;
+    const PBKDF2_ITERATIONS = 310000;
+    const MAX_CIPHERTEXT_CHARS = 2_000_000;
+
+    const encoder = new TextEncoder();
+    const decoder = new TextDecoder("utf-8", { fatal: true });
+
+    const $ = id => document.getElementById(id);
+
+    function bytesToBase64(bytes) {
+      // Process chunks to avoid argument-size limits for larger messages.
+      const CHUNK_SIZE = 0x8000;
+      let binary = "";
+
+      for (let i = 0; i < bytes.length; i += CHUNK_SIZE) {
+        const chunk = bytes.subarray(i, i + CHUNK_SIZE);
+        binary += String.fromCharCode(...chunk);
       }
-      return b2 % 0xFFFFFF;
+
+      return btoa(binary);
     }
 
-    function sW(c3, i, j) {
-      const temp = c3[i];
-      c3[i] = c3[j];
-      c3[j] = temp;
+    function base64ToBytes(base64) {
+      const binary = atob(base64);
+      const bytes = new Uint8Array(binary.length);
+
+      for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+
+      return bytes;
     }
 
-    function pR(c3, len, b2, reverse = false) {
-      if (!reverse) {
-        for (let i = 0; i < len; i++) {
-          let j = (i + (b2 % (len + 1))) % len;
-          sW(c3, i, j);
-        }
-      } else {
-        for (let i = len - 1; i >= 0; i--) {
-          let j = (i + (b2 % (len + 1))) % len;
-          sW(c3, i, j);
-        }
+    function randomBytes(length) {
+      const bytes = new Uint8Array(length);
+      crypto.getRandomValues(bytes);
+      return bytes;
+    }
+
+    async function deriveKey(password, salt) {
+      const passwordBytes = encoder.encode(password);
+
+      const passwordKey = await crypto.subtle.importKey(
+        "raw",
+        passwordBytes,
+        "PBKDF2",
+        false,
+        ["deriveKey"]
+      );
+
+      return crypto.subtle.deriveKey(
+        {
+          name: "PBKDF2",
+          salt,
+          iterations: PBKDF2_ITERATIONS,
+          hash: "SHA-256"
+        },
+        passwordKey,
+        {
+          name: "AES-GCM",
+          length: KEY_LENGTH
+        },
+        false,
+        ["encrypt", "decrypt"]
+      );
+    }
+
+    async function encryptText(password, message) {
+      if (!window.crypto || !crypto.subtle) {
+        throw new Error(
+          "Secure cryptography is unavailable. Open this page on HTTPS or localhost in a supported browser."
+        );
+      }
+
+      const salt = randomBytes(SALT_LENGTH);
+      const iv = randomBytes(IV_LENGTH);
+      const key = await deriveKey(password, salt);
+
+      const ciphertext = await crypto.subtle.encrypt(
+        {
+          name: "AES-GCM",
+          iv,
+          tagLength: 128
+        },
+        key,
+        encoder.encode(message)
+      );
+
+      // Combine salt, IV and authenticated ciphertext into one portable value.
+      const combined = new Uint8Array(
+        SALT_LENGTH + IV_LENGTH + ciphertext.byteLength
+      );
+
+      combined.set(salt, 0);
+      combined.set(iv, SALT_LENGTH);
+      combined.set(new Uint8Array(ciphertext), SALT_LENGTH + IV_LENGTH);
+
+      return FORMAT_PREFIX + bytesToBase64(combined);
+    }
+
+    async function decryptText(password, encryptedMessage) {
+      if (!window.crypto || !crypto.subtle) {
+        throw new Error(
+          "Secure cryptography is unavailable. Open this page on HTTPS or localhost in a supported browser."
+        );
+      }
+
+      const value = encryptedMessage.trim();
+
+      if (!value.startsWith(FORMAT_PREFIX)) {
+        throw new Error(
+          "Unsupported format. This tool expects ciphertext beginning with ENC1. Text encrypted using the previous version cannot be decrypted by this new format."
+        );
+      }
+
+      const base64 = value.slice(FORMAT_PREFIX.length);
+
+      if (!base64 || base64.length > MAX_CIPHERTEXT_CHARS) {
+        throw new Error("The encrypted message is empty or too large.");
+      }
+
+      let combined;
+
+      try {
+        combined = base64ToBytes(base64);
+      } catch {
+        throw new Error("The encrypted message is not valid Base64.");
+      }
+
+      // Minimum size: salt + IV + 16-byte GCM authentication tag.
+      const minimumLength = SALT_LENGTH + IV_LENGTH + 16;
+
+      if (combined.length < minimumLength) {
+        throw new Error("The encrypted message is incomplete or corrupted.");
+      }
+
+      const salt = combined.slice(0, SALT_LENGTH);
+      const iv = combined.slice(SALT_LENGTH, SALT_LENGTH + IV_LENGTH);
+      const ciphertext = combined.slice(SALT_LENGTH + IV_LENGTH);
+
+      const key = await deriveKey(password, salt);
+
+      let plaintext;
+
+      try {
+        plaintext = await crypto.subtle.decrypt(
+          {
+            name: "AES-GCM",
+            iv,
+            tagLength: 128
+          },
+          key,
+          ciphertext
+        );
+      } catch {
+        // Deliberately do not reveal whether the password or data was wrong.
+        throw new Error(
+          "Decryption failed. Check your password and make sure the entire encrypted message was copied correctly."
+        );
+      }
+
+      try {
+        return decoder.decode(plaintext);
+      } catch {
+        throw new Error("The decrypted data is not valid UTF-8 text.");
       }
     }
 
-    function fX(c3, b2) {
-      const l4 = c3.length;
-      
-      // First transformation
-      for (let i = 0; i < l4; i++) {
-        c3[i] = (c3[i] + (b2 & 0xFF)) % 256;
-      }
-      
-      // XOR transformation
-      for (let i = 0; i < l4; i++) {
-        c3[i] ^= (b2 & 0xFF);
-      }
-      
-      // Block reversal
-      for (let i = 0; i < l4; i += 4) {
-        let e5 = i + 3;
-        if (e5 >= l4) e5 = l4 - 1;
-        for (let j = 0; j < Math.floor((e5 - i + 1) / 2); j++) {
-          sW(c3, i + j, e5 - j);
-        }
-      }
-      
-      // Permutation
-      pR(c3, l4, b2, false);
+    function showFeedback(id, message, type) {
+      const element = $(id);
+      element.textContent = message;
+      element.className = "feedback show " + type;
     }
 
-    function dY(c3, b2) {
-      const l4 = c3.length;
-      
-      // Reverse permutation
-      pR(c3, l4, b2, true);
-      
-      // Reverse block reversal
-      for (let i = 0; i < l4; i += 4) {
-        let e5 = i + 3;
-        if (e5 >= l4) e5 = l4 - 1;
-        for (let j = 0; j < Math.floor((e5 - i + 1) / 2); j++) {
-          sW(c3, i + j, e5 - j);
-        }
-      }
-      
-      // Reverse XOR transformation
-      for (let i = 0; i < l4; i++) {
-        c3[i] ^= (b2 & 0xFF);
-      }
-      
-      // Reverse first transformation
-      for (let i = 0; i < l4; i++) {
-        c3[i] = (c3[i] - (b2 & 0xFF) + 256) % 256;
+    function clearFeedback(id) {
+      const element = $(id);
+      element.textContent = "";
+      element.className = "feedback";
+    }
+
+    function showOutput(sectionId, resultId, text) {
+      $(resultId).textContent = text;
+      $(sectionId).classList.add("show");
+    }
+
+    function hideOutput(sectionId) {
+      $(sectionId).classList.remove("show");
+    }
+
+    function setBusy(buttonId, busy, label) {
+      const button = $(buttonId);
+      button.disabled = busy;
+
+      if (busy) {
+        button.dataset.originalHtml = button.innerHTML;
+        button.querySelector("span:nth-child(2)").textContent = label;
+      } else if (button.dataset.originalHtml) {
+        button.innerHTML = button.dataset.originalHtml;
+        delete button.dataset.originalHtml;
       }
     }
 
-    function encryptMessage() {
-      const password = document.getElementById('encryptPassword').value;
-      const message = document.getElementById('encryptMessage').value;
-      
-      if (!password || !message) {
-        alert('Please enter both password and message');
+    $("encryptForm").addEventListener("submit", async event => {
+      event.preventDefault();
+
+      const password = $("encryptPassword").value;
+      const message = $("encryptMessage").value;
+
+      clearFeedback("encryptFeedback");
+      hideOutput("encryptOutput");
+
+      if (!password.length || !message.length) {
+        showFeedback(
+          "encryptFeedback",
+          "Enter both a password and a message.",
+          "error"
+        );
         return;
       }
-      
-      try {
-        const b2 = gF(password);
-        
-        // Convert string to array of character codes
-        const charArray = [];
-        for (let i = 0; i < message.length; i++) {
-          charArray.push(message.charCodeAt(i));
-        }
-        
-        fX(charArray, b2);
-        
-        // Convert back to string
-        let result = '';
-        for (let i = 0; i < charArray.length; i++) {
-          result += String.fromCharCode(charArray[i]);
-        }
-        
-        document.getElementById('encryptResult').textContent = result;
-        document.getElementById('encryptOutput').style.display = 'block';
-      } catch (error) {
-        alert('An error occurred during encryption');
-        console.error(error);
-      }
-    }
 
-    function decryptMessage() {
-      const password = document.getElementById('decryptPassword').value;
-      const message = document.getElementById('decryptMessage').value;
-      
-      if (!password || !message) {
-        alert('Please enter both password and encrypted message');
+      setBusy("encryptButton", true, "Encrypting...");
+
+      try {
+        const result = await encryptText(password, message);
+
+        showOutput("encryptOutput", "encryptResult", result);
+        showFeedback(
+          "encryptFeedback",
+          "Encryption complete. Save the ciphertext and remember your password.",
+          "success"
+        );
+      } catch (error) {
+        showFeedback(
+          "encryptFeedback",
+          error.message || "Encryption failed. Please try again.",
+          "error"
+        );
+      } finally {
+        setBusy("encryptButton", false);
+      }
+    });
+
+    $("decryptForm").addEventListener("submit", async event => {
+      event.preventDefault();
+
+      const password = $("decryptPassword").value;
+      const message = $("decryptMessage").value;
+
+      clearFeedback("decryptFeedback");
+      hideOutput("decryptOutput");
+
+      if (!password.length || !message.trim().length) {
+        showFeedback(
+          "decryptFeedback",
+          "Enter the password and the encrypted message.",
+          "error"
+        );
         return;
       }
-      
-      try {
-        const b2 = gF(password);
-        
-        // Convert string to array of character codes
-        const charArray = [];
-        for (let i = 0; i < message.length; i++) {
-          charArray.push(message.charCodeAt(i));
-        }
-        
-        dY(charArray, b2);
-        
-        // Convert back to string
-        let result = '';
-        for (let i = 0; i < charArray.length; i++) {
-          result += String.fromCharCode(charArray[i]);
-        }
-        
-        document.getElementById('decryptResult').textContent = result;
-        document.getElementById('decryptOutput').style.display = 'block';
-      } catch (error) {
-        alert('An error occurred during decryption');
-        console.error(error);
-      }
-    }
 
-    function copyToClipboard(elementId) {
-      const outputText = document.getElementById(elementId).textContent;
-      navigator.clipboard.writeText(outputText).then(() => {
-        const copyBtns = document.querySelectorAll('.copy-btn');
-        copyBtns.forEach(btn => {
-          if (btn.onclick.toString().includes(elementId)) {
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '✓ Copied!';
-            setTimeout(() => {
-              btn.innerHTML = originalText;
-            }, 2000);
-          }
-        });
+      setBusy("decryptButton", true, "Decrypting...");
+
+      try {
+        const result = await decryptText(password, message);
+
+        showOutput("decryptOutput", "decryptResult", result);
+        showFeedback(
+          "decryptFeedback",
+          "Decryption successful. Your original message has been restored.",
+          "success"
+        );
+      } catch (error) {
+        showFeedback(
+          "decryptFeedback",
+          error.message || "Decryption failed.",
+          "error"
+        );
+      } finally {
+        setBusy("decryptButton", false);
+      }
+    });
+
+    // Show/hide password controls.
+    document.querySelectorAll("[data-toggle]").forEach(button => {
+      button.addEventListener("click", () => {
+        const input = $(button.dataset.toggle);
+        const reveal = input.type === "password";
+
+        input.type = reveal ? "text" : "password";
+        button.textContent = reveal ? "Hide" : "Show";
+        button.setAttribute(
+          "aria-label",
+          reveal ? "Hide password" : "Show password"
+        );
       });
+    });
+
+    // Character counts.
+    function updateCharacterCount(inputId, countId) {
+      const input = $(inputId);
+      const count = $(countId);
+
+      const update = () => {
+        const length = input.value.length;
+        count.textContent =
+          length.toLocaleString() +
+          (length === 1 ? " character" : " characters");
+      };
+
+      input.addEventListener("input", update);
+      update();
     }
 
-    // Header auto-hide on scroll
-    let lastScrollTop = 0;
-    const header = document.querySelector('.game-header');
-    const scrollThreshold = 5;
-    
-    window.addEventListener('scroll', function() {
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      
-      if (Math.abs(scrollTop - lastScrollTop) < scrollThreshold) {
+    updateCharacterCount("encryptMessage", "encryptCharCount");
+    updateCharacterCount("decryptMessage", "decryptCharCount");
+
+    // Copy results using Clipboard API with a fallback for older browsers.
+    async function copyText(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
         return;
       }
-      
-      if (scrollTop > lastScrollTop && scrollTop > 100) {
-        header.style.transform = 'translateY(-100%)';
-      } else {
-        header.style.transform = 'translateY(0)';
+
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      textarea.style.top = "0";
+
+      document.body.appendChild(textarea);
+      textarea.select();
+
+      try {
+        const copied = document.execCommand("copy");
+        if (!copied) throw new Error("Copy failed");
+      } finally {
+        textarea.remove();
       }
-      
-      lastScrollTop = scrollTop;
+    }
+
+    document.querySelectorAll("[data-copy]").forEach(button => {
+      button.addEventListener("click", async () => {
+        const result = $(button.dataset.copy);
+        const text = result.textContent;
+        const label = button.querySelector("span:last-child");
+        const originalLabel = button.dataset.copyDefault;
+
+        if (!text) return;
+
+        try {
+          await copyText(text);
+          label.textContent = "Copied!";
+          button.setAttribute("aria-label", "Copied to clipboard");
+
+          setTimeout(() => {
+            label.textContent = originalLabel;
+            button.removeAttribute("aria-label");
+          }, 1800);
+        } catch {
+          label.textContent = "Copy failed";
+          setTimeout(() => {
+            label.textContent = originalLabel;
+          }, 1800);
+        }
+      });
+    });
+
+    // Send ciphertext directly to the decryption panel.
+    $("sendToDecrypt").addEventListener("click", () => {
+      $("decryptMessage").value = $("encryptResult").textContent;
+      $("decryptPassword").value = $("encryptPassword").value;
+
+      $("decryptCharCount").textContent =
+        $("decryptMessage").value.length.toLocaleString() + " characters";
+
+      $("decryptFeedback").textContent = "";
+      $("decryptFeedback").className = "feedback";
+      hideOutput("decryptOutput");
+
+      $("decryptMessage").focus();
+      $("decryptForm").scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "auto"
+          : "smooth",
+        block: "center"
+      });
     });
   </script>
-
 </body>
 </html>
