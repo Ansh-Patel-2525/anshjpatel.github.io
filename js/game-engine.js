@@ -3,7 +3,7 @@
  * Never send state.hands or the full state object to a browser client.
  */
 import {
-  SEATS, createDeck, dealCards, emptyTrick, getValidCards, sameCard,
+  SEATS, DEFAULT_TEAMS, createDeck, dealCards, emptyTrick, getValidCards, sameCard,
   getCurrentWinnerEntry, getTeamForSeat, getGameResult
 } from './game-rules.js';
 import { chooseCpuCard } from './game-ai.js';
@@ -12,14 +12,22 @@ function cloneState(state) {
   return structuredClone(state);
 }
 
-export function createGame({ rng = Math.random, startingPlayer } = {}) {
+export function createGame({ rng = Math.random, startingPlayer, teams = DEFAULT_TEAMS } = {}) {
   const deck = createDeck(rng);
   const hands = dealCards(deck);
   const firstPlayer = startingPlayer ?? SEATS[Math.floor(rng() * SEATS.length)];
   if (!SEATS.includes(firstPlayer)) throw new Error('Invalid starting player.');
 
+  const chosenTeams = Object.fromEntries(SEATS.map((seat) => [seat, teams?.[seat] ?? DEFAULT_TEAMS[seat]]));
+  if (Object.values(chosenTeams).some((team) => team !== 'yourTeam' && team !== 'opponentTeam') ||
+      Object.values(chosenTeams).filter((team) => team === 'yourTeam').length !== 2 ||
+      Object.values(chosenTeams).filter((team) => team === 'opponentTeam').length !== 2) {
+    throw new Error('Each team must have exactly two seats.');
+  }
+
   return {
     version: 1,
+    teams: chosenTeams,
     hands,
     currentTrick: emptyTrick(),
     currentPlayer: firstPlayer,
@@ -30,6 +38,7 @@ export function createGame({ rng = Math.random, startingPlayer } = {}) {
     tricksWon: { yourTeam: 0, opponentTeam: 0 },
     tensWon: { yourTeam: 0, opponentTeam: 0 },
     completedTricks: [],
+    lastCompletedTrick: null,
     winner: null
   };
 }
@@ -60,7 +69,7 @@ function finishTrick(next) {
     .map(([player, card]) => ({ player, card }));
   if (cards.length !== 4) throw new Error('A trick must contain four cards.');
 
-  const team = getTeamForSeat(winnerEntry.player);
+  const team = getTeamForSeat(winnerEntry.player, next.teams);
   const tens = cards.filter(({ card }) => card.value === '10').length;
   next.tricksWon[team] += 1;
   next.tensWon[team] += tens;
@@ -72,6 +81,13 @@ function finishTrick(next) {
     trickNumber: next.completedTricks.length + 1
   });
 
+  next.lastCompletedTrick = {
+    winner: winnerEntry.player,
+    winningCard: winnerEntry.card,
+    cards: structuredClone(cards),
+    tens,
+    trickNumber: next.completedTricks.length
+  };
   next.currentTrick = emptyTrick();
   next.leadSuit = null;
   next.leadPlayer = winnerEntry.player;
@@ -87,6 +103,8 @@ function finishTrick(next) {
 export function playCard(state, seat, requestedCard) {
   const card = validateCardPlay(state, seat, requestedCard);
   const next = cloneState(state);
+  // Keep the previous completed trick visible until the next card is played.
+  next.lastCompletedTrick = null;
   const handIndex = next.hands[seat].findIndex((held) => sameCard(held, card));
   next.hands[seat].splice(handIndex, 1);
 
@@ -132,6 +150,8 @@ export function processCpuTurns(state, { maxMoves = 4 } = {}) {
 export function getPublicState(state) {
   return {
     version: state.version,
+    teams: { ...(state.teams ?? DEFAULT_TEAMS) },
+    lastCompletedTrick: structuredClone(state.lastCompletedTrick ?? null),
     handCounts: Object.fromEntries(SEATS.map((seat) => [seat, state.hands[seat].length])),
     currentTrick: structuredClone(state.currentTrick),
     currentPlayer: state.currentPlayer,

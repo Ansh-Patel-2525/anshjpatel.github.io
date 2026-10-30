@@ -1,1089 +1,2180 @@
 
+
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8">
-  <title>Mindi - Ansh Patel</title>
+
+  <title>Mindi Multiplayer — Ansh Patel</title>
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+
+
   <style>
+
     /* ========================================
+
        MINDI — INDIAN CARD TABLE DESIGN
+
        UI ONLY — ORIGINAL GAME LOGIC PRESERVED
+
     ======================================== */
 
+
+
     :root {
+
       --felt: #12664b;
+
       --felt-dark: #084b38;
+
       --felt-light: #19815b;
+
       --gold: #e9c779;
+
       --gold-dark: #b88b3c;
+
       --cream: #fffaf0;
+
       --ink: #24332e;
+
       --muted: #78867f;
+
       --border: #e6e8df;
+
       --shadow-sm: 0 3px 10px rgba(28,45,35,.08);
+
       --shadow-md: 0 12px 32px rgba(28,45,35,.12);
+
       --shadow-lg: 0 20px 55px rgba(13,50,36,.16);
+
     }
+
+
 
     * {
+
       margin: 0;
+
       padding: 0;
+
       box-sizing: border-box;
+
     }
+
+
 
     html {
+
       scroll-behavior: smooth;
+
     }
+
+
 
     body {
+
       min-height: 100vh;
+
       overflow-x: hidden;
+
       color: var(--ink);
+
       background:
+
         radial-gradient(ellipse at 10% 5%, rgba(233,199,121,.16), transparent 35%),
+
         radial-gradient(ellipse at 90% 90%, rgba(18,102,75,.09), transparent 35%),
+
         #f7f5ed;
+
       font-family: "Segoe UI", Inter, -apple-system, BlinkMacSystemFont,
+
         Roboto, sans-serif;
+
       line-height: 1.5;
+
     }
 
+
+
     button, a {
+
       -webkit-tap-highlight-color: transparent;
+
     }
+
+
 
     /* HEADER */
 
+
+
     .game-header {
+
       position: fixed;
+
       inset: 0 0 auto;
+
       z-index: 1000;
+
       padding: 14px 0;
+
       color: white;
+
       background: linear-gradient(110deg, #104c3a, #12664b 58%, #247657);
+
       border-bottom: 1px solid rgba(233,199,121,.45);
+
       box-shadow: 0 5px 24px rgba(8,42,30,.22);
+
       transition: transform .3s ease;
+
     }
+
+
 
     .game-header-content {
+
       width: min(1440px, 100%);
+
       margin: 0 auto;
+
       padding: 0 28px;
+
       display: flex;
+
       justify-content: space-between;
+
       align-items: center;
+
       gap: 18px;
+
     }
+
+
 
     .game-header h1 {
+
       display: flex;
+
       align-items: center;
+
       gap: 12px;
+
       color: #fff8e8;
+
       font-size: clamp(1.4rem, 2.4vw, 2rem);
+
       font-weight: 850;
+
       letter-spacing: -.8px;
+
     }
+
+
 
     .game-header h1::before {
+
       content: "♠";
+
       width: 43px;
+
       height: 43px;
+
       display: grid;
+
       place-items: center;
+
       border: 1px solid rgba(233,199,121,.75);
+
       border-radius: 13px;
+
       color: var(--gold);
+
       background: rgba(255,255,255,.07);
+
       font-size: 1.55rem;
+
     }
+
+
 
     .header-links {
+
       display: flex;
+
       align-items: center;
+
       justify-content: flex-end;
+
       flex-wrap: wrap;
+
       gap: 10px;
+
     }
+
+
 
     .game-header .back-link {
+
       display: inline-flex;
+
       align-items: center;
+
       justify-content: center;
+
       gap: 8px;
+
       min-height: 40px;
+
       padding: 9px 16px;
+
       color: #fff9e9;
+
       background: rgba(255,255,255,.09);
+
       border: 1px solid rgba(255,255,255,.2);
+
       border-radius: 12px;
+
       text-decoration: none;
+
       font-size: .88rem;
+
       font-weight: 700;
+
       transition: background .2s ease, transform .2s ease;
+
     }
+
+
 
     .game-header .back-link:hover {
+
       background: rgba(255,255,255,.19);
+
       transform: translateY(-2px);
+
     }
 
+
+
     .game-header .back-link:focus-visible,
+
     button:focus-visible {
+
       outline: 3px solid var(--gold);
+
       outline-offset: 3px;
+
     }
+
+
 
     /* PAGE LAYOUT */
 
+
+
     .game-container {
+
       max-width: 600px;
+
       margin: 0 auto;
+
       padding: 120px 24px 48px;
+
       min-height: 100vh;
+
     }
+
+
 
     .mindi-container {
+
       width: min(1440px, 100%);
+
       margin: 0 auto;
+
       padding: 112px 28px 36px;
+
     }
+
+
 
     .mindi-card {
+
       display: grid;
+
       grid-template-columns: 245px minmax(0,1fr);
+
       align-items: start;
+
       gap: 24px;
+
       padding: 24px;
+
       background: rgba(255,255,255,.94);
+
       border: 1px solid rgba(221,222,208,.9);
+
       border-radius: 25px;
+
       box-shadow: var(--shadow-lg);
+
       transform: none;
+
     }
 
+
+
     .left-panel,
+
     .right-panel {
+
       min-width: 0;
+
       display: flex;
+
       flex-direction: column;
+
       gap: 16px;
+
     }
+
+
 
     /* TRUMP AND SCORE PANELS */
 
+
+
     .game-info-section,
+
     .tricks-won {
+
       padding: 19px;
+
       background: linear-gradient(145deg, #fffefa, #f8f7ef);
+
       border: 1px solid var(--border);
+
       border-radius: 17px;
+
       box-shadow: var(--shadow-sm);
+
     }
+
+
 
     .game-info-section {
+
       position: relative;
+
       overflow: hidden;
+
       border-top: 3px solid var(--gold-dark);
+
     }
+
+
 
     .info-label {
+
       margin-bottom: 9px;
+
       color: var(--muted);
+
       font-size: .76rem;
+
       font-weight: 800;
+
       letter-spacing: 1.3px;
+
       text-transform: uppercase;
+
     }
+
+
 
     .trump-display {
+
       min-height: 64px;
+
       display: grid;
+
       place-items: center;
+
       color: var(--felt-dark);
+
       font-size: 2.8rem;
+
       font-weight: 800;
+
     }
+
+
 
     .tricks-won {
+
       border-left: 4px solid var(--felt-light);
+
     }
+
+
 
     .tricks-won:nth-child(3) {
+
       border-left-color: #d97757;
+
     }
+
+
 
     .tricks-label {
+
       margin-bottom: 11px;
+
       color: var(--muted);
+
       font-size: .76rem;
+
       font-weight: 800;
+
       letter-spacing: .4px;
+
       line-height: 1.5;
+
     }
+
+
 
     .tricks-display {
+
       color: var(--ink);
+
       font-size: 1.02rem;
+
       font-weight: 700;
+
     }
+
+
 
     .tricks-display span {
+
       display: inline-block;
+
       min-width: 27px;
+
       color: var(--felt);
+
       font-size: 1.35rem;
+
       font-weight: 900;
+
       text-align: center;
+
       font-variant-numeric: tabular-nums;
+
     }
+
+
 
     .tens-display {
+
       display: flex;
+
       align-items: baseline;
+
       gap: 5px;
+
       margin-top: 7px;
+
       color: var(--gold-dark);
+
       font-size: .86rem;
+
       font-weight: 800;
+
     }
 
+
+
     .tens-display span {
+
       color: #b1842f;
+
       font-size: 1.65rem;
+
       font-weight: 900;
+
       font-variant-numeric: tabular-nums;
+
     }
+
+
 
     /* GAME STATUS */
 
+
+
     .game-message {
+
       min-height: 56px;
+
       padding: 14px 18px;
+
       display: flex;
+
       align-items: center;
+
       justify-content: center;
+
       border: 1px solid transparent;
+
       border-radius: 15px;
+
       font-size: .94rem;
+
       font-weight: 750;
+
       line-height: 1.5;
+
       text-align: center;
+
       transition: background .25s ease, color .25s ease;
+
     }
+
+
 
     .message-playing {
+
       color: #215a47;
+
       background: #e7f4eb;
+
       border-color: #c8e5d0;
+
     }
+
+
 
     .message-win {
+
       color: #176341;
+
       background: #d9f5e3;
+
       border-color: #9edbb6;
+
     }
 
+
+
     .message-lose {
+
       color: #9d3737;
+
       background: #fff0e9;
+
       border-color: #f3c7b9;
+
     }
+
+
 
     /* CARD TABLE */
 
+
+
     .game-board {
+
       position: relative;
+
       isolation: isolate;
+
       height: 570px;
+
       padding: 14px;
+
       display: grid;
+
       grid-template-rows: 90px minmax(0,1fr) 112px;
+
       gap: 4px;
+
       overflow: hidden;
+
       border: 7px solid #a8793f;
+
       border-radius: 24px;
+
       background:
+
         radial-gradient(ellipse at center, rgba(255,255,255,.055), transparent 65%),
+
         repeating-linear-gradient(
+
           135deg,
+
           rgba(255,255,255,.012) 0,
+
           rgba(255,255,255,.012) 2px,
+
           transparent 2px,
+
           transparent 5px
+
         ),
+
         linear-gradient(145deg, #197653, #10573f 60%, #0c4936);
+
       box-shadow:
+
         inset 0 0 0 2px rgba(255,238,188,.35),
+
         inset 0 0 32px rgba(0,0,0,.15),
+
         0 9px 18px rgba(36,52,39,.13);
+
     }
+
+
 
     .game-board::before {
+
       content: "";
+
       position: absolute;
+
       inset: 12px;
+
       z-index: -1;
+
       border: 1px solid rgba(239,212,150,.22);
+
       border-radius: 13px;
+
       pointer-events: none;
+
     }
+
+
 
     .player-area {
+
       position: relative;
+
       z-index: 2;
+
       min-width: 0;
+
       display: flex;
+
       flex-direction: column;
+
       align-items: center;
+
     }
+
+
 
     .player-top {
+
       justify-content: flex-start;
+
     }
+
+
 
     .player-bottom {
+
       justify-content: flex-end;
+
     }
+
+
 
     .player-left,
+
     .player-right {
+
       position: absolute;
+
       top: 50%;
+
       z-index: 5;
+
       transform: translateY(-50%);
+
     }
+
+
 
     .player-left {
+
       left: 5px;
+
     }
+
+
 
     .player-right {
+
       right: 5px;
+
     }
+
+
 
     .player-label {
+
       max-width: 100%;
+
       margin-bottom: 7px;
+
       padding: 5px 11px;
+
       overflow: hidden;
+
       color: #fff8e7;
+
       background: rgba(4,43,30,.56);
+
       border: 1px solid rgba(255,255,255,.15);
+
       border-radius: 20px;
+
       font-size: .73rem;
+
       font-weight: 800;
+
       line-height: 1.35;
+
       text-align: center;
+
       text-overflow: ellipsis;
+
       white-space: nowrap;
+
       text-shadow: 0 1px 2px rgba(0,0,0,.3);
+
     }
+
+
 
     .player-label.active {
+
       color: #42300d;
+
       background: linear-gradient(135deg, #ffedb0, #e8c56e);
+
       border-color: #fff0b9;
+
       box-shadow: 0 0 0 3px rgba(235,197,103,.17),
+
         0 3px 12px rgba(0,0,0,.16);
+
       animation: activeTurn 1.8s ease-in-out infinite;
+
     }
+
+
 
     @keyframes activeTurn {
+
       0%, 100% {
+
         box-shadow: 0 0 0 2px rgba(235,197,103,.15);
+
       }
+
       50% {
+
         box-shadow: 0 0 0 5px rgba(235,197,103,.28);
+
       }
+
     }
+
+
 
     .cards-hand {
+
       display: flex;
+
       align-items: center;
+
       justify-content: center;
+
       gap: 3px;
+
       min-width: 0;
+
     }
 
+
+
     .player-bottom .cards-hand {
+
       width: 100%;
+
       max-width: 100%;
+
       flex-wrap: wrap;
+
       gap: 5px;
+
     }
+
+
 
     /* CARD FACES */
 
+
+
     .card {
+
       position: relative;
+
       flex: 0 0 auto;
+
       width: 51px;
+
       height: 71px;
+
       padding: 5px;
+
       display: flex;
+
       flex-direction: column;
+
       justify-content: space-between;
+
       overflow: hidden;
+
       color: #202a28;
+
       background: linear-gradient(145deg, #fffefa, #f7f4e9);
+
       border: 1px solid #e5dfcf;
+
       border-radius: 8px;
+
       box-shadow: 0 4px 7px rgba(0,0,0,.23);
+
       font-size: .72rem;
+
       font-weight: 900;
+
       line-height: 1;
+
       transition: transform .18s ease, box-shadow .18s ease,
+
         border-color .18s ease;
+
     }
+
+
 
     .card > div:first-child,
+
     .card > div:last-child {
+
       line-height: 1;
+
       white-space: nowrap;
+
     }
+
+
 
     .card > div:nth-child(2) {
+
       font-size: 1.35rem;
+
       line-height: 1;
+
     }
+
+
 
     .card.red {
+
       color: #d12f43;
+
     }
+
+
 
     .card.black {
+
       color: #25342f;
+
     }
+
+
 
     .card.clickable {
+
       cursor: pointer;
+
       border-color: #e7d6a8;
+
       box-shadow: 0 4px 8px rgba(0,0,0,.28);
+
     }
+
+
 
     .card.clickable:hover {
+
       z-index: 100;
+
       transform: translateY(-13px) rotate(-2deg);
+
       border-color: var(--gold);
+
       box-shadow: 0 10px 18px rgba(0,0,0,.32);
+
     }
+
+
 
     .player-bottom .card {
+
       width: 56px;
+
       height: 78px;
+
       padding: 6px;
+
       font-size: .77rem;
+
     }
 
+
+
     .player-bottom .card > div:nth-child(2) {
+
       font-size: 1.5rem;
+
     }
+
+
 
     /* FACE-DOWN CARDS */
 
+
+
     .card-back {
+
       position: relative;
+
       flex: 0 0 auto;
+
       width: 51px;
+
       height: 71px;
+
       display: flex;
+
       align-items: center;
+
       justify-content: center;
+
       overflow: hidden;
+
       color: #f9e7b0;
+
       background:
+
         repeating-linear-gradient(
+
           45deg,
+
           transparent 0,
+
           transparent 5px,
+
           rgba(255,255,255,.075) 5px,
+
           rgba(255,255,255,.075) 7px
+
         ),
+
         linear-gradient(135deg, #214e82, #16375f);
+
       border: 3px double #d6b76c;
+
       border-radius: 8px;
+
       box-shadow: 0 4px 8px rgba(0,0,0,.25);
+
     }
+
+
 
     .card-back::before {
+
       content: "✦";
+
       display: grid;
+
       place-items: center;
+
       width: 31px;
+
       height: 45px;
+
       color: #f9e7b0;
+
       border: 1px solid rgba(249,231,176,.65);
+
       border-radius: 5px;
+
       font-size: 1.35rem;
+
     }
 
+
+
     .card-count {
+
       position: absolute;
+
       top: 2px;
+
       right: 2px;
+
       z-index: 2;
+
       min-width: 20px;
+
       padding: 2px 4px;
+
       color: white;
+
       background: #c18b38;
+
       border: 1px solid rgba(255,255,255,.7);
+
       border-radius: 7px;
+
       font-size: .62rem;
+
       font-weight: 900;
+
       text-align: center;
+
     }
+
+
 
     /* TRICK AREA */
 
+
+
     .trick-area {
+
       position: relative;
+
       min-width: 0;
+
       min-height: 220px;
+
       display: flex;
+
       align-items: center;
+
       justify-content: center;
+
     }
+
+
 
     .trick-cards-container {
+
       position: relative;
+
       width: 250px;
+
       height: 250px;
+
       max-width: 100%;
+
     }
+
+
 
     .trick-cards-container::before {
+
       content: "MINDI";
+
       position: absolute;
+
       top: 50%;
+
       left: 50%;
+
       transform: translate(-50%,-50%);
+
       color: rgba(255,239,193,.18);
+
       font-family: Georgia, serif;
+
       font-size: 1.35rem;
+
       font-weight: 900;
+
       letter-spacing: 5px;
+
       pointer-events: none;
+
     }
+
+
 
     .trick-card-slot {
+
       position: absolute;
+
       z-index: 3;
+
       display: flex;
+
       align-items: center;
+
       justify-content: center;
+
     }
+
+
 
     .trick-card-slot.top {
+
       top: 3px;
+
       left: 50%;
+
       transform: translateX(-50%);
+
     }
+
+
 
     .trick-card-slot.bottom {
+
       bottom: 3px;
+
       left: 50%;
+
       transform: translateX(-50%);
+
     }
+
+
 
     .trick-card-slot.left {
+
       left: 3px;
+
       top: 50%;
+
       transform: translateY(-50%);
+
     }
+
+
 
     .trick-card-slot.right {
+
       right: 3px;
+
       top: 50%;
+
       transform: translateY(-50%);
+
     }
 
+
+
     .trick-card-slot .card {
+
       width: 53px;
+
       height: 74px;
+
       font-size: .73rem;
+
       box-shadow: 0 6px 14px rgba(0,0,0,.3);
+
     }
+
+
 
     /* NEW GAME BUTTON */
 
+
+
     .game-controls {
+
       display: grid;
+
       grid-template-columns: 1fr;
+
       gap: 10px;
+
     }
+
+
 
     .game-controls button {
+
       min-height: 51px;
+
       padding: 13px 20px;
+
       color: white;
+
       background: linear-gradient(120deg, #17694c, #25835d);
+
       border: 1px solid #267653;
+
       border-radius: 14px;
+
       box-shadow: 0 5px 0 #0c4c36,
+
         0 8px 15px rgba(16,86,61,.16);
+
       font: inherit;
+
       font-size: .95rem;
+
       font-weight: 850;
+
       cursor: pointer;
+
       transition: transform .2s ease, box-shadow .2s ease,
+
         filter .2s ease;
+
     }
+
+
 
     .game-controls button:hover {
+
       filter: brightness(1.08);
+
       transform: translateY(-2px);
+
       box-shadow: 0 7px 0 #0c4c36,
+
         0 12px 20px rgba(16,86,61,.2);
+
     }
 
+
+
     .game-controls button:active {
+
       transform: translateY(2px);
+
       box-shadow: 0 2px 0 #0c4c36;
+
     }
+
+
 
     /* TABLET */
 
+
+
     @media (max-width: 1050px) {
+
       .mindi-container {
+
         padding: 106px 18px 28px;
+
       }
+
+
 
       .mindi-card {
+
         grid-template-columns: 1fr;
+
         gap: 20px;
+
         padding: 20px;
+
       }
+
+
 
       .left-panel {
+
         display: grid;
+
         grid-template-columns: repeat(3,minmax(0,1fr));
+
         gap: 12px;
+
         order: 2;
+
       }
+
+
 
       .right-panel {
+
         order: 1;
+
       }
+
+
 
       .game-info-section,
+
       .tricks-won {
+
         min-width: 0;
+
         padding: 15px;
+
       }
+
+
 
       .game-board {
+
         height: 550px;
+
       }
 
+
+
       .tricks-label {
+
         font-size: .7rem;
+
       }
+
     }
+
+
 
     /* MOBILE */
 
+
+
     @media (max-width: 600px) {
+
       .game-header {
+
         padding: 10px 0;
+
       }
+
+
 
       .game-header-content {
+
         padding: 0 13px;
+
         gap: 10px;
+
       }
+
+
 
       .game-header h1 {
+
         gap: 7px;
+
         font-size: 1.25rem;
+
       }
+
+
 
       .game-header h1::before {
+
         width: 34px;
+
         height: 34px;
+
         border-radius: 10px;
+
         font-size: 1.2rem;
+
       }
+
+
 
       .header-links {
+
         gap: 6px;
+
       }
+
+
 
       .game-header .back-link {
+
         min-height: 35px;
+
         padding: 7px 10px;
+
         border-radius: 10px;
+
         font-size: .76rem;
+
       }
+
+
 
       .mindi-container {
+
         padding: 88px 9px 22px;
+
       }
+
+
 
       .mindi-card {
+
         gap: 14px;
+
         padding: 11px;
+
         border-radius: 18px;
+
       }
+
+
 
       .right-panel,
+
       .left-panel {
+
         gap: 12px;
+
       }
+
+
 
       .game-message {
+
         min-height: 48px;
+
         padding: 11px;
+
         border-radius: 12px;
+
         font-size: .84rem;
+
       }
+
+
 
       .game-board {
+
         height: 430px;
+
         min-height: 0;
+
         padding: 8px 4px;
+
         grid-template-rows: 66px minmax(0,1fr) 100px;
+
         gap: 0;
+
         border-width: 4px;
+
         border-radius: 17px;
+
       }
+
+
 
       .player-label {
+
         margin-bottom: 5px;
+
         padding: 4px 7px;
+
         font-size: .62rem;
+
       }
+
+
 
       .player-left {
+
         left: 0;
+
       }
+
+
 
       .player-right {
+
         right: 0;
+
       }
+
+
 
       .card {
+
         width: 36px;
+
         height: 51px;
+
         padding: 3px;
+
         border-radius: 5px;
+
         font-size: .56rem;
+
       }
+
+
 
       .card > div:nth-child(2) {
+
         font-size: .94rem;
+
       }
+
+
 
       .player-bottom .cards-hand {
+
         gap: 3px;
+
       }
+
+
 
       .player-bottom .card {
+
         width: 39px;
+
         height: 55px;
+
         padding: 3px;
+
         font-size: .58rem;
+
       }
+
+
 
       .player-bottom .card > div:nth-child(2) {
+
         font-size: 1rem;
+
       }
+
+
 
       .card-back {
+
         width: 36px;
+
         height: 51px;
+
         border-width: 2px;
+
         border-radius: 5px;
+
       }
+
+
 
       .card-back::before {
+
         width: 22px;
+
         height: 32px;
+
         font-size: .95rem;
+
       }
+
+
 
       .card-count {
+
         top: 1px;
+
         right: 1px;
+
         min-width: 16px;
+
         padding: 1px 3px;
+
         font-size: .53rem;
+
       }
+
+
 
       .trick-area {
+
         min-height: 180px;
+
       }
+
+
 
       .trick-cards-container {
+
         width: 174px;
+
         height: 205px;
+
       }
+
+
 
       .trick-cards-container::before {
+
         font-size: .85rem;
+
         letter-spacing: 3px;
+
       }
+
+
 
       .trick-card-slot.top {
+
         top: 0;
+
       }
+
+
 
       .trick-card-slot.bottom {
+
         bottom: 0;
+
       }
+
+
 
       .trick-card-slot.left {
+
         left: 0;
+
       }
+
+
 
       .trick-card-slot.right {
+
         right: 0;
+
       }
+
+
 
       .trick-card-slot .card {
+
         width: 39px;
+
         height: 55px;
+
         padding: 3px;
+
         font-size: .58rem;
+
       }
+
+
 
       .trick-card-slot .card > div:nth-child(2) {
+
         font-size: 1rem;
+
       }
+
+
 
       .left-panel {
+
         grid-template-columns: 1fr 1fr;
+
         gap: 9px;
+
       }
+
+
 
       .game-info-section {
+
         grid-column: 1 / -1;
+
       }
+
+
 
       .game-info-section,
+
       .tricks-won {
+
         padding: 12px;
+
         border-radius: 13px;
+
       }
+
+
 
       .info-label {
+
         font-size: .69rem;
+
       }
+
+
 
       .trump-display {
+
         min-height: 44px;
+
         font-size: 2rem;
+
       }
+
+
 
       .tricks-label {
+
         margin-bottom: 7px;
+
         font-size: .65rem;
+
       }
+
+
 
       .tricks-display {
+
         font-size: .82rem;
+
       }
+
+
 
       .tricks-display span {
+
         min-width: 20px;
+
         font-size: 1.1rem;
+
       }
+
+
 
       .tens-display {
+
         font-size: .75rem;
+
       }
+
+
 
       .tens-display span {
+
         font-size: 1.3rem;
+
       }
 
+
+
       .game-controls button {
+
         min-height: 47px;
+
         border-radius: 12px;
+
         font-size: .9rem;
+
       }
+
     }
+
+
 
     /* VERY NARROW PHONES */
 
+
+
     @media (max-width: 370px) {
+
       .game-header-content {
+
         padding: 0 8px;
+
       }
+
+
 
       .game-header h1 {
+
         font-size: 1.08rem;
+
       }
+
+
 
       .game-header .back-link {
+
         padding: 6px 7px;
+
         font-size: .69rem;
+
       }
+
+
 
       .mindi-container {
+
         padding-right: 5px;
+
         padding-left: 5px;
+
       }
+
+
 
       .mindi-card {
+
         padding: 7px;
+
       }
+
+
 
       .game-board {
+
         height: 400px;
+
       }
+
+
 
       .card {
+
         width: 32px;
+
         height: 47px;
+
         font-size: .5rem;
+
       }
+
+
 
       .player-bottom .card {
+
         width: 34px;
+
         height: 49px;
+
         font-size: .52rem;
+
       }
+
+
 
       .card-back {
+
         width: 32px;
+
         height: 47px;
+
       }
+
+
 
       .trick-cards-container {
+
         width: 158px;
+
         height: 190px;
+
       }
+
+
 
       .trick-card-slot .card {
+
         width: 35px;
+
         height: 50px;
+
       }
+
     }
+
+
 
     @media (prefers-reduced-motion: reduce) {
+
       *,
+
       *::before,
+
       *::after {
+
         scroll-behavior: auto !important;
+
         animation-duration: .01ms !important;
+
         animation-iteration-count: 1 !important;
+
         transition-duration: .01ms !important;
+
       }
+
     }
 
+
+
     /* Keep CPU2's teammate label visible above its cards */
+
 .player-top {
+
   justify-content: flex-start;
+
   align-self: start;
+
   min-width: 0;
+
   width: 100%;
+
   overflow: visible;
+
 }
+
+
 
 .player-top .player-label {
+
   position: relative;
+
   z-index: 20;
+
   flex-shrink: 0;
+
   width: max-content;
+
   max-width: calc(100% - 12px);
+
   overflow: visible;
+
   white-space: normal;
+
   overflow-wrap: anywhere;
+
   text-overflow: clip;
+
   margin-top: 3px;
+
   margin-bottom: 7px;
+
   line-height: 1.25;
+
 }
+
+
 
 /* Keep the CPU2 card back below the label */
+
 .player-top .cards-hand {
+
   position: relative;
+
   z-index: 2;
+
 }
+
+
 
 /* Mobile: prevent CPU2's name from being covered */
+
 @media (max-width: 600px) {
+
   .game-board {
+
     grid-template-rows: 82px minmax(0, 1fr) 100px;
+
   }
+
+
 
   .player-top .player-label {
+
     max-width: calc(100% - 8px);
+
     padding: 4px 8px;
+
     font-size: 0.65rem;
+
   }
+
 }
-  
-    /* MULTIPLAYER ACCESS AND LOBBY */
-    .mp-shell { width:min(760px, calc(100% - 32px)); margin:110px auto 36px; }
-    .mp-panel { background:#fffefa; border:1px solid var(--border); border-radius:20px; padding:26px; box-shadow:var(--shadow-lg); }
-    .mp-panel h2 { color:var(--felt-dark); margin-bottom:8px; }
+
+
+
+    
+    /* Multiplayer lobby and controls */
+    .mp-shell { width:min(980px, calc(100% - 32px)); margin:108px auto 36px; }
+    .mp-panel { background:rgba(255,254,250,.97); border:1px solid var(--border); border-radius:22px; padding:clamp(20px,3vw,32px); box-shadow:var(--shadow-lg); }
+    .mp-panel h2 { color:var(--felt-dark); margin-bottom:8px; font-size:clamp(1.45rem,3vw,2rem); }
     .mp-muted { color:var(--muted); margin-bottom:18px; }
     .mp-form { display:grid; gap:12px; }
-    .mp-form input { width:100%; padding:13px 14px; border:1px solid #d8ddd5; border-radius:10px; font:inherit; }
+    .mp-form input,.mp-form select,.mp-config-select { width:100%; min-width:0; padding:13px 14px; border:1px solid #d8ddd5; border-radius:11px; background:#fff; color:var(--ink); font:inherit; }
     .mp-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; }
-    .mp-actions button, .mp-form button { border:0; border-radius:10px; padding:12px 17px; background:var(--felt); color:white; font-weight:750; cursor:pointer; }
-    .mp-actions button.secondary { background:#e9eee8; color:var(--felt-dark); }
+    .mp-actions button,.mp-form button { min-height:44px; border:0; border-radius:11px; padding:11px 17px; background:linear-gradient(120deg,#17694c,#25835d); color:white; font-weight:800; cursor:pointer; transition:transform .18s,filter .18s; }
+    .mp-actions button:hover,.mp-form button:hover { transform:translateY(-1px); filter:brightness(1.06); }
+    .mp-actions button.secondary,.mp-form button.secondary { background:#e9eee8; color:var(--felt-dark); border:1px solid #d8e2d7; }
+    .mp-actions button.danger { background:linear-gradient(120deg,#9f3434,#c34d42); }
     .mp-status { min-height:24px; margin-top:14px; color:var(--felt-dark); font-weight:650; overflow-wrap:anywhere; }
-    .mp-room-code { font-size:2rem; font-weight:900; letter-spacing:5px; color:var(--felt-dark); margin:8px 0 16px; }
-    .mp-player-list { list-style:none; padding:0; display:grid; gap:8px; }
-    .mp-player-list li { padding:10px 12px; background:#f4f5ed; border-radius:9px; }
+    .mp-room-top { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; margin-top:20px; }
+    .mp-room-code { font-size:clamp(1.8rem,5vw,2.5rem); font-weight:950; letter-spacing:7px; color:var(--felt-dark); margin:3px 0 0; }
+    .mp-copy { border:1px solid #d8e2d7; border-radius:10px; background:#f1f6ef; color:var(--felt-dark); padding:9px 13px; font-weight:800; cursor:pointer; }
+    .mp-seat-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:14px 0 18px; }
+    .mp-seat-card { min-width:0; padding:14px; border:1px solid #e0e5d9; border-radius:15px; background:linear-gradient(145deg,#fffefa,#f5f6ed); }
+    .mp-seat-card h4 { margin:0 0 5px; color:var(--felt-dark); }
+    .mp-seat-meta { color:var(--muted); font-size:.82rem; margin-bottom:10px; min-height:20px; }
+    .mp-seat-fields { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .mp-seat-fields label { min-width:0; display:grid; gap:4px; color:var(--muted); font-size:.75rem; font-weight:800; }
+    .mp-config-select { padding:9px 8px; font-size:.88rem; }
+    .mp-seat-card.is-you { border-color:#d5b45f; box-shadow:0 0 0 2px rgba(213,180,95,.12); }
+    .mp-seat-card.is-cpu { background:#f2f4f1; }
+    .mp-seat-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; margin:14px 0; padding:0; }
+    .mp-seat-list li { list-style:none; padding:12px 14px; border:1px solid #e4e8df; background:#f8f8f2; border-radius:12px; }
+    .mp-section-kicker { margin:22px 0 8px; color:var(--gold-dark); font-size:.74rem; font-weight:900; letter-spacing:1.2px; text-transform:uppercase; }
+    .mp-game-actions { display:flex; flex-wrap:wrap; gap:10px; justify-content:flex-end; }\n    .mp-game-actions button { min-height:43px; border:0; border-radius:11px; padding:10px 15px; background:#e9eee8; color:var(--felt-dark); font-weight:800; cursor:pointer; }\n    .mp-game-actions button.danger { background:linear-gradient(120deg,#9f3434,#c34d42); color:#fff; }
+    .mp-turn-note { padding:10px 14px; border:1px solid rgba(233,199,121,.5); border-radius:12px; background:#fff9e9; color:#6b501d; font-size:.88rem; font-weight:750; text-align:center; }
     .mp-hidden { display:none !important; }
-    @media (max-width:600px) { .mp-panel {padding:20px;} .mp-actions button {flex:1;} }
+    .mp-auth-note { padding:12px 14px; background:#f2f6ef; border:1px solid #e0e8dc; border-radius:12px; color:#52645a; font-size:.86rem; }
+    #mpGameContainer { padding-top:104px; }
+    .mp-game-footer { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-top:12px; }
+    .mp-feed { color:var(--muted); font-size:.84rem; }
+    @media (max-width:600px) {
+      .mp-panel {padding:18px;}
+      .mp-seat-grid,.mp-seat-list {grid-template-columns:1fr;}
+      .mp-seat-fields {grid-template-columns:1fr 1fr;}
+      .mp-actions button {flex:1;}
+      #mpGameContainer {padding-top:88px;}
+    }
 
   </style>
+
 </head>
+
+
 
 <body>
 
+
+
   <header class="game-header">
+
     <div class="game-header-content">
-      <h1>𝟙𝟘 Mindi</h1>
+
+      <h1>𝟙𝟘 Mindi Multiplayer</h1>
+
       <div class="header-links">
+
         <a href="widgets.html" class="back-link">← Widgets</a>
+
         <a href="index.html" class="back-link">🏠 Home</a>
+
       </div>
+
     </div>
+
   </header>
 
+
+
   <section class="mp-shell" id="mpAuthPanel">
+
     <div class="mp-panel">
+
       <h2>Play Mindi Online</h2>
+
       <p class="mp-muted">Sign in or create an account to host a private game or join with a room code.</p>
+
       <div class="mp-form">
+
         <input id="mpEmail" type="email" autocomplete="email" placeholder="Email address">
+
         <input id="mpPassword" type="password" autocomplete="current-password" placeholder="Password (at least 6 characters)">
+
       </div>
+
       <div class="mp-actions">
+
         <button id="mpSignIn">Sign in</button>
+
         <button id="mpSignUp" class="secondary">Create account</button>
+
       </div>
+
+      <div class="mp-auth-note">Create an account with your email and password. If email confirmation is enabled, confirm the message we send before signing in.</div>
       <div class="mp-status" id="mpAuthStatus" role="status"></div>
+
     </div>
+
   </section>
 
+
+
+  
   <section class="mp-shell mp-hidden" id="mpLobbyPanel">
     <div class="mp-panel">
-      <h2>Mindi Lobby</h2>
-      <p class="mp-muted" id="mpLobbyDescription">Create a private room or join a friend's room.</p>
-      <div class="mp-actions" id="mpRoomActions">
-        <button id="mpCreateRoom">Create room</button>
-      </div>
-      <div class="mp-form" id="mpJoinForm" style="margin-top:14px;">
+      <p class="mp-section-kicker">Private table · 4 seats · 2 teams</p>
+      <h2>Mindi Multiplayer Lobby</h2>
+      <p class="mp-muted" id="mpLobbyDescription">Create a private room or join a friend's room. The host controls seats, teams and the start of each game.</p>
+      <div class="mp-actions" id="mpRoomActions"><button id="mpCreateRoom">＋ Create a room</button></div>
+      <div class="mp-form" id="mpJoinForm" style="margin-top:16px;">
         <input id="mpRoomCodeInput" maxlength="6" autocomplete="off" placeholder="Enter 6-character room code">
+        <button type="button" id="mpFindRoom" class="secondary">Find available seats</button>
+        <select id="mpJoinSeat" aria-label="Choose your seat"><option value="">Check the room first</option></select>
         <button id="mpJoinRoom">Join room</button>
       </div>
       <div id="mpRoomDetails" class="mp-hidden">
-        <div class="mp-muted" style="margin-top:18px;">Share this code with the other players:</div>
-        <div class="mp-room-code" id="mpRoomCode"></div>
-        <h3>Players</h3>
-        <ul class="mp-player-list" id="mpPlayerList"></ul>
+        <div class="mp-room-top">
+          <div><div class="mp-muted" style="margin:0;">ROOM CODE · SHARE WITH FRIENDS</div><div class="mp-room-code" id="mpRoomCode"></div></div>
+          <button type="button" class="mp-copy" id="mpCopyCode">Copy code</button>
+        </div>
+        <p class="mp-section-kicker">The table</p>
+        <ul class="mp-seat-list" id="mpPlayerList"></ul>
+        <div id="mpHostConfig" class="mp-hidden">
+          <p class="mp-section-kicker">Host controls · Configure seats and teams</p>
+          <p class="mp-muted">Choose whether each seat is a real player or CPU, then assign two seats to each team. Occupied seats stay human.</p>
+          <div class="mp-seat-grid" id="mpSeatConfig"></div>
+          <div class="mp-actions"><button id="mpSaveConfig">Save table setup</button></div>
+        </div>
+        <div class="mp-auth-note" id="mpLobbyHint">Waiting for the host to start the game.</div>
         <div class="mp-actions">
           <button id="mpStartGame">Start game</button>
+          <button id="mpLeaveRoom" class="secondary">Leave room</button>
           <button id="mpSignOut" class="secondary">Sign out</button>
         </div>
       </div>
@@ -1091,130 +2182,232 @@
     </div>
   </section>
 
+
+
+
   <div class="mindi-container mp-hidden" id="mpGameContainer">
+
     <div class="mindi-card">
+
+
 
       <!-- LEFT PANEL: GAME INFORMATION -->
 
+
+
       <div class="left-panel">
 
+
+
         <div class="game-info-section">
+
           <div class="info-label">Trump Suit</div>
+
           <div id="trumpDisplay" class="trump-display">None yet</div>
+
         </div>
 
+
+
         <div class="tricks-won">
+
           <div class="tricks-label">Your Team (You & CPU2)</div>
+
           <div class="tricks-display">
+
             Tricks: <span id="yourTricks">0</span>
+
           </div>
+
           <div class="tens-display">
+
             10s: <span id="yourTens">0</span>
+
           </div>
+
         </div>
 
+
+
         <div class="tricks-won">
+
           <div class="tricks-label">Opponent Team (CPU1 & CPU3)</div>
+
           <div class="tricks-display">
+
             Tricks: <span id="opponentTricks">0</span>
+
           </div>
+
           <div class="tens-display">
+
             10s: <span id="opponentTens">0</span>
+
           </div>
+
         </div>
+
+
 
       </div>
+
+
 
       <!-- RIGHT PANEL: GAME TABLE -->
 
+
+
       <div class="right-panel">
 
+
+
         <div id="gameMessage" class="game-message message-playing">
-          Click "New Game" to start playing!
+
+          The host will start the game when everyone is ready.
+
         </div>
+
+
 
         <div class="game-board">
 
+
+
           <!-- TOP PLAYER: CPU2 -->
 
+
+
           <div class="player-area player-top">
+
             <div id="labelCPU2" class="player-label">CPU2 (Teammate)</div>
+
             <div id="handCPU2" class="cards-hand"></div>
+
           </div>
+
+
 
           <!-- MIDDLE TABLE AREA -->
 
+
+
           <div style="position: relative;">
+
+
 
             <!-- LEFT PLAYER: CPU1 -->
 
+
+
             <div class="player-area player-left">
+
               <div id="labelCPU1" class="player-label">CPU1</div>
+
               <div id="handCPU1" class="cards-hand"></div>
+
             </div>
+
+
 
             <!-- TRICK AREA -->
 
+
+
             <div class="trick-area">
+
               <div class="trick-cards-container">
+
                 <div class="trick-card-slot top" id="trickTop"></div>
+
                 <div class="trick-card-slot left" id="trickLeft"></div>
+
                 <div class="trick-card-slot right" id="trickRight"></div>
+
                 <div class="trick-card-slot bottom" id="trickBottom"></div>
+
               </div>
+
             </div>
+
+
 
             <!-- RIGHT PLAYER: CPU3 -->
 
+
+
             <div class="player-area player-right">
+
               <div id="labelCPU3" class="player-label">CPU3</div>
+
               <div id="handCPU3" class="cards-hand"></div>
+
             </div>
 
+
+
           </div>
+
+
 
           <!-- BOTTOM PLAYER: YOU -->
 
+
+
           <div class="player-area player-bottom">
+
             <div id="labelPlayer" class="player-label">You</div>
+
             <div id="handPlayer" class="cards-hand"></div>
+
           </div>
 
+
+
         </div>
 
-        <div class="game-controls">
-          <button id="btnNewGame" class="btn-new-game" onclick="startNewGame()">
-            New Game
-          </button>
+
+
+        
+        <div class="mp-game-footer">
+          <div class="mp-feed" id="mpTurnFeed">Cards are revealed as each player acts.</div>
+          <div class="mp-game-actions">
+            <button id="mpEndGame" class="danger mp-hidden">End game &amp; return to lobby</button>
+            <button id="mpBackToLobby" class="secondary mp-hidden">Lobby</button>
+          </div>
         </div>
+
+
+
 
       </div>
 
+
+
     </div>
+
   </div>
+
+
 
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-    // The publishable/anon key is safe for browser use. Never put a service-role key here.
     const SUPABASE_URL = "https://jckqizjkbrxtkosdlxub.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_l2dP2MMiPnZTLRaxNXlTGQ_3gJau3z2";
     const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
     const $ = (id) => document.getElementById(id);
     const seats = ["player", "cpu1", "cpu2", "cpu3"];
-    let session = null;
-    let activeRoom = null;
-    let mySeat = null;
-    let gameState = null;
-    let myHand = [];
-    let roomPlayers = [];
-    let realtimeChannel = null;
-    let lobbyPoll = null;
-    let busy = false;
+    const seatNames = ["Seat 1", "Seat 2", "Seat 3", "Seat 4"];
+    const DEFAULT_MODES = { player: "human", cpu1: "human", cpu2: "cpu", cpu3: "cpu" };
+    const DEFAULT_TEAMS = { player: "yourTeam", cpu1: "opponentTeam", cpu2: "yourTeam", cpu3: "opponentTeam" };
+    let session = null, activeRoom = null, mySeat = null, gameState = null, myHand = [];
+    let roomPlayers = [], seatModes = {...DEFAULT_MODES}, seatTeams = {...DEFAULT_TEAMS};
+    let isHost = false, realtimeChannel = null, lobbyPoll = null, busy = false, activeRoomCode = "";
 
     function status(id, message, isError = false) {
       const el = $(id);
+      if (!el) return;
       el.textContent = message || "";
       el.style.color = isError ? "#b42318" : "var(--felt-dark)";
     }
@@ -1226,9 +2419,7 @@
     }
 
     async function callGame(action, extra = {}) {
-      const { data, error } = await supabase.functions.invoke("mindi-game", {
-        body: { action, ...extra }
-      });
+      const { data, error } = await supabase.functions.invoke("mindi-game", { body: { action, ...extra } });
       if (error) {
         let detail = error.message || "The game server request failed.";
         try {
@@ -1247,29 +2438,27 @@
     function seatLabel(seat) {
       const player = roomPlayers.find((p) => p.seat === seat);
       if (seat === mySeat) return "You";
-      if (player) return `Player ${player.seat + 1}`;
-      return `CPU ${seat.slice(-1)}`;
+      if (player) return `Player ${seats.indexOf(seat) + 1}`;
+      return "CPU";
     }
 
+    function teamLabel(team) { return team === "yourTeam" ? "Team A" : "Team B"; }
     function isMyTeam(seat) {
-      const teamA = ["player", "cpu2"];
-      return teamA.includes(mySeat) === teamA.includes(seat);
+      return Boolean(gameState?.teams) && gameState.teams[mySeat] === gameState.teams[seat];
     }
 
     async function authenticate(mode) {
       const email = $("mpEmail").value.trim();
       const password = $("mpPassword").value;
-      if (!email || !password) {
-        status("mpAuthStatus", "Enter your email and password.", true);
-        return;
-      }
+      if (!email || !password) { status("mpAuthStatus", "Enter your email and password.", true); return; }
+      if (password.length < 6) { status("mpAuthStatus", "Use a password with at least 6 characters.", true); return; }
       status("mpAuthStatus", mode === "signup" ? "Creating account…" : "Signing in…");
       const result = mode === "signup"
         ? await supabase.auth.signUp({ email, password, options: { emailRedirectTo: "https://anshjpatel.com/mindih.html" } })
         : await supabase.auth.signInWithPassword({ email, password });
       if (result.error) throw result.error;
       if (!result.data.session) {
-        status("mpAuthStatus", "Account created. Check your email to confirm it, then sign in.");
+        status("mpAuthStatus", "Account created. Check your email to confirm it, then return here and sign in.");
         return;
       }
       session = result.data.session;
@@ -1277,93 +2466,213 @@
     }
 
     async function afterLogin() {
-      $("mpLobbyDescription").textContent = `Signed in as ${session.user.email}. Create a room or join one using its code.`;
+      if (!session) return;
+      $("mpLobbyDescription").textContent = `Signed in as ${session.user.email}. Create a private table or join with a room code.`;
       showPanel("lobby");
       const savedRoom = localStorage.getItem("mindi-active-room");
-      if (savedRoom) {
-        try {
-          await openRoom(savedRoom);
-        } catch (_) {
-          localStorage.removeItem("mindi-active-room");
-        }
+      if (savedRoom && !activeRoom) {
+        try { await openRoom(savedRoom); }
+        catch (_) { localStorage.removeItem("mindi-active-room"); activeRoom = null; }
       }
     }
 
     async function createRoom() {
       const result = await callGame("create_room");
-      const room = result.room;
-      await openRoom(room.room_id);
+      await openRoom(result.room.room_id);
+    }
+
+    async function previewRoom() {
+      const code = $("mpRoomCodeInput").value.trim().toUpperCase();
+      if (!/^[A-HJ-NP-Z2-9]{6}$/.test(code)) {
+        status("mpLobbyStatus", "Enter a valid six-character room code first.", true); return;
+      }
+      const result = await callGame("preview_room", { room_code: code });
+      seatModes = result.room.seat_modes || {...DEFAULT_MODES};
+      seatTeams = result.room.seat_teams || {...DEFAULT_TEAMS};
+      roomPlayers = result.players || [];
+      renderJoinSeats();
+      status("mpLobbyStatus", `Room found. Choose one of the ${$("mpJoinSeat").options.length} available human seats, then join.`);
     }
 
     async function joinRoom() {
       const code = $("mpRoomCodeInput").value.trim().toUpperCase();
+      const seat = $("mpJoinSeat").value;
       if (!/^[A-HJ-NP-Z2-9]{6}$/.test(code)) {
-        status("mpLobbyStatus", "Enter a valid six-character room code.", true);
-        return;
+        status("mpLobbyStatus", "Enter a valid six-character room code.", true); return;
       }
-      const result = await callGame("join_room", { room_code: code });
+      if (!seat) { status("mpLobbyStatus", "Choose an available human seat first.", true); return; }
+      const result = await callGame("join_room", { room_code: code, seat });
       await openRoom(result.room.room_id);
     }
 
     async function openRoom(roomId) {
       activeRoom = roomId;
       localStorage.setItem("mindi-active-room", roomId);
-      await refreshRoom();
       $("mpRoomDetails").classList.remove("mp-hidden");
       $("mpRoomActions").classList.add("mp-hidden");
       $("mpJoinForm").classList.add("mp-hidden");
-      $("mpRoomCode").textContent = activeRoomCode;
+      await refreshRoom();
       subscribeToRoom();
       if (lobbyPoll) clearInterval(lobbyPoll);
-      lobbyPoll = setInterval(() => refreshRoom().catch((e) => status("mpLobbyStatus", e.message, true)), 3000);
-      showPanel(gameState ? "game" : "lobby");
+      lobbyPoll = setInterval(() => refreshRoom().catch((e) => status("mpLobbyStatus", e.message, true)), 2500);
     }
 
-    let activeRoomCode = "";
+    function renderJoinSeats() {
+      const select = $("mpJoinSeat");
+      const occupied = new Set(roomPlayers.map((p) => p.seat));
+      const open = seats.filter((seat) => seatModes[seat] === "human" && !occupied.has(seat));
+      select.innerHTML = "";
+      if (!open.length) {
+        const opt = document.createElement("option"); opt.value = ""; opt.textContent = "No human seats currently open";
+        select.appendChild(opt); select.disabled = true;
+      } else {
+        select.disabled = false;
+        for (const seat of open) {
+          const opt = document.createElement("option");
+          opt.value = seat; opt.textContent = `${seatNames[seats.indexOf(seat)]} · ${teamLabel(seatTeams[seat])}`;
+          select.appendChild(opt);
+        }
+      }
+    }
+
+    function renderSeatConfig() {
+      const wrap = $("mpSeatConfig");
+      wrap.innerHTML = "";
+      for (const seat of seats) {
+        const index = seats.indexOf(seat);
+        const player = roomPlayers.find((p) => p.seat === seat);
+        const card = document.createElement("div");
+        card.className = `mp-seat-card${player && seat === mySeat ? " is-you" : ""}${seatModes[seat] === "cpu" ? " is-cpu" : ""}`;
+        const title = document.createElement("h4"); title.textContent = seatNames[index];
+        const meta = document.createElement("div"); meta.className = "mp-seat-meta";
+        meta.textContent = player ? (seat === mySeat ? "Occupied by you" : "Occupied by a player") : (seatModes[seat] === "cpu" ? "Computer-controlled" : "Open for a player");
+        const fields = document.createElement("div"); fields.className = "mp-seat-fields";
+        const modeLabel = document.createElement("label"); modeLabel.textContent = "Seat type";
+        const mode = document.createElement("select"); mode.className = "mp-config-select"; mode.dataset.seatMode = seat;
+        for (const [value,label] of [["human","Human player"],["cpu","CPU player"]]) {
+          const opt=document.createElement("option"); opt.value=value; opt.textContent=label; mode.appendChild(opt);
+        }
+        mode.value = player ? "human" : seatModes[seat];
+        mode.disabled = Boolean(player) || seat === mySeat;
+        modeLabel.appendChild(mode);
+        const teamLabelEl = document.createElement("label"); teamLabelEl.textContent = "Team";
+        const team = document.createElement("select"); team.className = "mp-config-select"; team.dataset.seatTeam = seat;
+        for (const [value,label] of [["yourTeam","Team A"],["opponentTeam","Team B"]]) {
+          const opt=document.createElement("option"); opt.value=value; opt.textContent=label; team.appendChild(opt);
+        }
+        team.value = seatTeams[seat];
+        teamLabelEl.appendChild(team);
+        fields.append(modeLabel,teamLabelEl);
+        card.append(title,meta,fields); wrap.appendChild(card);
+      }
+    }
+
+    function renderPlayerList() {
+      const list = $("mpPlayerList"); list.innerHTML = "";
+      for (const seat of seats) {
+        const player = roomPlayers.find((p) => p.seat === seat);
+        const li = document.createElement("li");
+        li.style.display = "flex";
+        li.style.alignItems = "center";
+        li.style.justifyContent = "space-between";
+        li.style.gap = "10px";
+        const text = document.createElement("span");
+        const role = player ? (seat === mySeat ? "You" : "Human player") : (seatModes[seat] === "cpu" ? "CPU" : "Waiting for player");
+        text.textContent = `${seatNames[seats.indexOf(seat)]} · ${role} · ${teamLabel(seatTeams[seat])}`;
+        li.appendChild(text);
+        if (isHost && player && seat !== mySeat) {
+          const kick = document.createElement("button");
+          kick.type = "button"; kick.className = "mp-copy"; kick.textContent = "Remove";
+          kick.addEventListener("click", async () => {
+            if (!confirm(`Remove the player in ${seatNames[seats.indexOf(seat)]}?`)) return;
+            try { await callGame("kick_player", { room_id: activeRoom, seat }); await refreshRoom(); }
+            catch (error) { status("mpLobbyStatus", error.message, true); }
+          });
+          li.appendChild(kick);
+        }
+        list.appendChild(li);
+      }
+    }
 
     async function refreshRoom() {
-      if (!activeRoom) return;
+      if (!activeRoom || !session) return;
       const result = await callGame("get_state", { room_id: activeRoom });
       activeRoomCode = result.room.room_code;
       mySeat = result.seat;
       roomPlayers = result.players || [];
+      seatModes = result.room.seat_modes || {...DEFAULT_MODES};
+      seatTeams = result.room.seat_teams || {...DEFAULT_TEAMS};
       gameState = result.game_state;
       myHand = result.hand || [];
+      isHost = result.room.host_id === session.user.id;
       $("mpRoomCode").textContent = activeRoomCode;
-      $("mpPlayerList").innerHTML = "";
-      for (const seat of seats) {
-        const player = roomPlayers.find((p) => p.seat === seat);
-        const li = document.createElement("li");
-        li.textContent = player ? `Seat ${seats.indexOf(seat) + 1} — ${seatLabel(seat)}` : `Seat ${seats.indexOf(seat) + 1} — CPU`;
-        $("mpPlayerList").appendChild(li);
-      }
-      const isHost = result.room.host_id === session.user.id;
-      $("mpStartGame").classList.toggle("mp-hidden", !isHost || !!gameState);
-      if (gameState) {
-        showPanel("game");
-        renderGame();
-      } else {
-        showPanel("lobby");
-        status("mpLobbyStatus", isHost ? "Waiting for players. You need at least two human players to start." : "Waiting for the host to start the game.");
-      }
+      renderPlayerList();
+      renderJoinSeats();
+      $("mpHostConfig").classList.toggle("mp-hidden", !isHost || Boolean(gameState));
+      $("mpStartGame").classList.toggle("mp-hidden", !isHost || Boolean(gameState));
+      $("mpLeaveRoom").classList.toggle("mp-hidden", isHost);
+      $("mpSaveConfig").disabled = !isHost || Boolean(gameState);
+      $("mpLobbyHint").textContent = gameState
+        ? "A game is currently in progress."
+        : (isHost ? "Set the four seats and teams, then start when the table is ready. Every seat marked Human must be occupied." : "Waiting for the host to start. You can share the room code with another player.");
+      if (isHost && !gameState) renderSeatConfig();
+      if (gameState) { showPanel("game"); renderGame(); }
+      else { showPanel("lobby"); status("mpLobbyStatus", isHost ? "You are the host. Configure the table and start when ready." : "Waiting for the host to start the game."); }
     }
 
     function subscribeToRoom() {
       if (realtimeChannel) supabase.removeChannel(realtimeChannel);
       realtimeChannel = supabase.channel(`mindi-room-${activeRoom}`)
-        .on("postgres_changes", {
-          event: "*", schema: "public", table: "mindi_public_state", filter: `room_id=eq.${activeRoom}`
-        }, () => refreshRoom().catch((e) => console.error(e)))
+        .on("postgres_changes", { event:"*", schema:"public", table:"mindi_public_state", filter:`room_id=eq.${activeRoom}` },
+          () => refreshRoom().catch((e) => console.error(e)))
         .subscribe();
     }
 
-    async function startGame() {
-      status("mpLobbyStatus", "Starting game…");
-      const result = await callGame("start_game", { room_id: activeRoom });
-      gameState = result.game_state;
-      myHand = result.your_hand || [];
+    async function saveConfig() {
+      const modes = {...seatModes}, teams = {...seatTeams};
+      document.querySelectorAll("[data-seat-mode]").forEach((el) => { modes[el.dataset.seatMode] = el.value; });
+      document.querySelectorAll("[data-seat-team]").forEach((el) => { teams[el.dataset.seatTeam] = el.value; });
+      if (Object.values(teams).filter((t) => t === "yourTeam").length !== 2) {
+        status("mpLobbyStatus", "Each team must have exactly two seats.", true); return;
+      }
+      status("mpLobbyStatus", "Saving table setup…");
+      await callGame("configure_room", { room_id: activeRoom, seat_modes: modes, seat_teams: teams });
       await refreshRoom();
-      showPanel("game");
+      status("mpLobbyStatus", "Table setup saved.");
+    }
+
+    async function startGame() {
+      status("mpLobbyStatus", "Dealing cards…");
+      const result = await callGame("start_game", { room_id: activeRoom });
+      gameState = result.game_state; myHand = result.your_hand || [];
+      await refreshRoom(); showPanel("game");
+    }
+
+    async function endGame() {
+      if (!confirm("End this game and return everyone to the lobby? The host can start a new game afterwards.")) return;
+      status("mpLobbyStatus", "Ending game…");
+      await callGame("end_game", { room_id: activeRoom });
+      gameState = null; myHand = [];
+      await refreshRoom();
+      status("mpLobbyStatus", "Game ended. The room is back in the lobby.");
+    }
+
+    async function leaveRoom() {
+      await callGame("leave_room", { room_id: activeRoom });
+      if (realtimeChannel) supabase.removeChannel(realtimeChannel);
+      if (lobbyPoll) clearInterval(lobbyPoll);
+      realtimeChannel = null; lobbyPoll = null; activeRoom = null; mySeat = null; gameState = null; myHand = [];
+      localStorage.removeItem("mindi-active-room");
+      $("mpRoomDetails").classList.add("mp-hidden");
+      $("mpRoomActions").classList.remove("mp-hidden");
+      $("mpJoinForm").classList.remove("mp-hidden");
+      showPanel("lobby");
+      status("mpLobbyStatus", "You left the room.");
+    }
+
+    async function copyRoomCode() {
+      try { await navigator.clipboard.writeText(activeRoomCode); status("mpLobbyStatus", "Room code copied."); }
+      catch (_) { status("mpLobbyStatus", `Room code: ${activeRoomCode}`); }
     }
 
     function createCardElement(card, clickable = false) {
@@ -1371,9 +2680,7 @@
       const red = ["♥", "♦"].includes(card.suit);
       div.className = `card ${red ? "red" : "black"}${clickable ? " clickable" : ""}`;
       div.innerHTML = `<div>${card.value}${card.suit}</div><div style="text-align:center">${card.suit}</div><div style="text-align:right">${card.value}${card.suit}</div>`;
-      if (clickable) {
-        div.addEventListener("click", () => submitCard(card));
-      }
+      if (clickable) div.addEventListener("click", () => submitCard(card));
       return div;
     }
 
@@ -1381,103 +2688,108 @@
       if (!gameState || !mySeat) return;
       const myIndex = seats.indexOf(mySeat);
       const positions = {
-        player: mySeat,
-        cpu1: seats[(myIndex + 1) % 4],
-        cpu2: seats[(myIndex + 2) % 4],
-        cpu3: seats[(myIndex + 3) % 4]
+        player: mySeat, cpu1: seats[(myIndex + 1) % 4],
+        cpu2: seats[(myIndex + 2) % 4], cpu3: seats[(myIndex + 3) % 4]
       };
-      const ids = { player: "handPlayer", cpu1: "handCPU1", cpu2: "handCPU2", cpu3: "handCPU3" };
-      const labelIds = { player: "labelPlayer", cpu1: "labelCPU1", cpu2: "labelCPU2", cpu3: "labelCPU3" };
-      const trickIds = { player: "trickBottom", cpu1: "trickLeft", cpu2: "trickTop", cpu3: "trickRight" };
-
+      const ids = { player:"handPlayer", cpu1:"handCPU1", cpu2:"handCPU2", cpu3:"handCPU3" };
+      const labelIds = { player:"labelPlayer", cpu1:"labelCPU1", cpu2:"labelCPU2", cpu3:"labelCPU3" };
+      const trickIds = { player:"trickBottom", cpu1:"trickLeft", cpu2:"trickTop", cpu3:"trickRight" };
+      const lastCards = gameState.lastCompletedTrick?.cards || [];
       for (const pos of Object.keys(positions)) {
-        const seat = positions[pos];
-        const handEl = $(ids[pos]);
+        const seat = positions[pos], handEl = $(ids[pos]);
         handEl.innerHTML = "";
         if (pos === "player") {
           for (const card of myHand) {
             const follows = !gameState.leadSuit || !myHand.some((c) => c.suit === gameState.leadSuit) || card.suit === gameState.leadSuit;
-            handEl.appendChild(createCardElement(card, gameState.gameActive && gameState.currentPlayer === mySeat && follows));
+            handEl.appendChild(createCardElement(card, gameState.gameActive && gameState.currentPlayer === mySeat && follows && !busy));
           }
         } else {
           const count = gameState.handCounts?.[seat] ?? 0;
           if (count > 0) {
-            const back = document.createElement("div");
-            back.className = "card-back";
-            back.innerHTML = `<span class="card-count">${count}</span>`;
-            handEl.appendChild(back);
+            const back = document.createElement("div"); back.className = "card-back";
+            back.innerHTML = `<span class="card-count">${count}</span>`; handEl.appendChild(back);
           }
         }
         const label = $(labelIds[pos]);
-        label.textContent = `${seatLabel(seat)}${isMyTeam(seat) ? " (Team)" : ""}`;
+        label.textContent = `${seatLabel(seat)} · ${teamLabel(gameState.teams?.[seat] || seatTeams[seat])}`;
         label.classList.toggle("active", gameState.currentPlayer === seat && gameState.gameActive);
-        const slot = $(trickIds[pos]);
-        slot.innerHTML = "";
-        const card = gameState.currentTrick?.[seat];
+        const slot = $(trickIds[pos]); slot.innerHTML = "";
+        const card = gameState.currentTrick?.[seat] || lastCards.find((entry) => entry.player === seat)?.card;
         if (card) slot.appendChild(createCardElement(card));
       }
-
       $("trumpDisplay").textContent = gameState.trumpSuit || "None yet";
-      const ownTeam = isMyTeam(mySeat) ? "yourTeam" : "opponentTeam";
+      const ownTeam = gameState.teams?.[mySeat] || "yourTeam";
       const otherTeam = ownTeam === "yourTeam" ? "opponentTeam" : "yourTeam";
       $("yourTricks").textContent = gameState.tricksWon[ownTeam];
       $("yourTens").textContent = gameState.tensWon[ownTeam];
       $("opponentTricks").textContent = gameState.tricksWon[otherTeam];
       $("opponentTens").textContent = gameState.tensWon[otherTeam];
-      document.querySelector(".tricks-won .tricks-label").textContent = "Your Team";
-      document.querySelectorAll(".tricks-won .tricks-label")[1].textContent = "Opponents";
-      $("btnNewGame").classList.add("mp-hidden");
-
-      if (!gameState.gameActive) {
-        const won = gameState.winner === ownTeam;
-        $("gameMessage").textContent = won ? "Your team wins!" : "Your opponents win!";
-        $("gameMessage").className = `game-message message-${won ? "win" : "lose"}`;
-      } else {
+      document.querySelectorAll(".tricks-won .tricks-label")[0].textContent = `Your side · ${teamLabel(ownTeam)}`;
+      document.querySelectorAll(".tricks-won .tricks-label")[1].textContent = `Opposition · ${teamLabel(otherTeam)}`;
+      $("mpEndGame").classList.toggle("mp-hidden", !isHost);
+      const played = Object.values(gameState.currentTrick || {}).filter(Boolean).length;
+      if (gameState.gameActive) {
         $("gameMessage").textContent = gameState.currentPlayer === mySeat ? "Your turn — choose a card." : `${seatLabel(gameState.currentPlayer)} is playing…`;
         $("gameMessage").className = "game-message message-playing";
+        $("mpTurnFeed").textContent = gameState.lastCompletedTrick && played === 0
+          ? `Trick ${gameState.lastCompletedTrick.trickNumber} complete · ${seatLabel(gameState.lastCompletedTrick.winner)} won · ${gameState.lastCompletedTrick.tens} ten(s) captured`
+          : `Current trick · ${played} of 4 cards revealed`;
+      } else {
+        const won = gameState.winner === ownTeam;
+        $("gameMessage").textContent = won ? "Your team wins the game!" : "Your opponents win the game!";
+        $("gameMessage").className = `game-message message-${won ? "win" : "lose"}`;
+        $("mpTurnFeed").textContent = "Game complete. The host can end this game and start another from the lobby.";
       }
     }
 
     async function submitCard(card) {
       if (busy || !gameState || gameState.currentPlayer !== mySeat) return;
       busy = true;
-      status("mpLobbyStatus", "");
       try {
-        const result = await callGame("play_card", {
-          room_id: activeRoom,
-          version: gameState.version,
-          card
-        });
-        gameState = result.game_state;
-        myHand = result.your_hand || [];
+        const result = await callGame("play_card", { room_id:activeRoom, version:gameState.version, card });
+        gameState = result.game_state; myHand = result.your_hand || [];
         renderGame();
       } catch (error) {
-        alert(error.message);
+        status("mpLobbyStatus", error.message, true);
         await refreshRoom();
-      } finally {
-        busy = false;
-      }
+      } finally { busy = false; }
     }
 
+    async function signOut() {
+      if (realtimeChannel) supabase.removeChannel(realtimeChannel);
+      if (lobbyPoll) clearInterval(lobbyPoll);
+      realtimeChannel = null; lobbyPoll = null; activeRoom = null;
+      localStorage.removeItem("mindi-active-room");
+      await supabase.auth.signOut();
+      session = null; mySeat = null; gameState = null; myHand = [];
+      showPanel("auth");
+    }
 
     $("mpSignIn").addEventListener("click", () => authenticate("signin").catch((e) => status("mpAuthStatus", e.message, true)));
     $("mpSignUp").addEventListener("click", () => authenticate("signup").catch((e) => status("mpAuthStatus", e.message, true)));
     $("mpCreateRoom").addEventListener("click", () => createRoom().catch((e) => status("mpLobbyStatus", e.message, true)));
+    $("mpFindRoom").addEventListener("click", () => previewRoom().catch((e) => status("mpLobbyStatus", e.message, true)));
     $("mpJoinRoom").addEventListener("click", () => joinRoom().catch((e) => status("mpLobbyStatus", e.message, true)));
     $("mpStartGame").addEventListener("click", () => startGame().catch((e) => status("mpLobbyStatus", e.message, true)));
-    $("mpSignOut").addEventListener("click", async () => { await supabase.auth.signOut(); session = null; activeRoom = null; localStorage.removeItem("mindi-active-room"); showPanel("auth"); });
-    $("mpRoomCodeInput").addEventListener("input", (e) => { e.target.value = e.target.value.toUpperCase().replace(/[^A-HJ-NP-Z2-9]/g, "").slice(0, 6); });
+    $("mpSaveConfig").addEventListener("click", () => saveConfig().catch((e) => status("mpLobbyStatus", e.message, true)));
+    $("mpEndGame").addEventListener("click", () => endGame().catch((e) => status("mpLobbyStatus", e.message, true)));
+    $("mpLeaveRoom").addEventListener("click", () => leaveRoom().catch((e) => status("mpLobbyStatus", e.message, true)));
+    $("mpCopyCode").addEventListener("click", copyRoomCode);
+    $("mpSignOut").addEventListener("click", signOut);
+    $("mpRoomCodeInput").addEventListener("input", (e) => { e.target.value = e.target.value.toUpperCase().replace(/[^A-HJ-NP-Z2-9]/g, "").slice(0,6); });
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, newSession) => {
+    supabase.auth.onAuthStateChange((event, newSession) => {
       session = newSession;
+      if (event === "SIGNED_OUT") { showPanel("auth"); return; }
       if (newSession) setTimeout(() => afterLogin().catch((e) => status("mpLobbyStatus", e.message, true)), 0);
-      else showPanel("auth");
     });
     const { data: sessionData } = await supabase.auth.getSession();
     session = sessionData.session;
-    if (session) await afterLogin();
-    else showPanel("auth");
+    if (session) await afterLogin(); else showPanel("auth");
   </script>
 
+
+
 </body>
+
 </html>
