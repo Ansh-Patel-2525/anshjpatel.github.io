@@ -14,6 +14,7 @@ export const VALUE_ORDER = Object.freeze({
 export const SEATS = Object.freeze(['player', 'cpu1', 'cpu2', 'cpu3']);
 export const TEAM_YOURS = Object.freeze(['player', 'cpu2']);
 export const TEAM_OPPONENTS = Object.freeze(['cpu1', 'cpu3']);
+export const DEFAULT_TEAMS = Object.freeze({ player: 'yourTeam', cpu1: 'opponentTeam', cpu2: 'yourTeam', cpu3: 'opponentTeam' });
 
 export function createDeck(rng = Math.random) {
   const deck = [];
@@ -99,10 +100,11 @@ export function getCurrentWinnerEntry(state) {
   return winner;
 }
 
-export function getTeamForSeat(seat) {
-  if (TEAM_YOURS.includes(seat)) return 'yourTeam';
-  if (TEAM_OPPONENTS.includes(seat)) return 'opponentTeam';
-  throw new Error(`Unknown seat: ${seat}`);
+export function getTeamForSeat(seat, teams = DEFAULT_TEAMS) {
+  if (!SEATS.includes(seat)) throw new Error(`Unknown seat: ${seat}`);
+  const team = teams?.[seat] ?? DEFAULT_TEAMS[seat];
+  if (team !== 'yourTeam' && team !== 'opponentTeam') throw new Error(`Invalid team for seat: ${seat}`);
+  return team;
 }
 
 export function getGameResult(state) {

@@ -5,6 +5,8 @@ import { SEATS } from "./game-rules.js";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const SEAT_BY_NUMBER = ["player", "cpu1", "cpu2", "cpu3"] as const;
+const DEFAULT_MODES = { player: "human", cpu1: "human", cpu2: "cpu", cpu3: "cpu" };
+const DEFAULT_TEAMS = { player: "yourTeam", cpu1: "opponentTeam", cpu2: "yourTeam", cpu3: "opponentTeam" };
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -87,19 +89,27 @@ async function saveFullState(
   }
 }
 
-async function runEmptyCpuSeats(state: any, humanSeats: Set<string>) {
+function pause(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function runCpuTurnsAndSave(
+  admin: SupabaseClient,
+  roomId: string,
+  initialState: any,
+  humanSeats: Set<string>,
+) {
+  let state = initialState;
   let moves = 0;
-  // A 52-card cap is a safety guard; normally a human seat is reached quickly.
-  while (
-    state.gameActive &&
-    state.currentPlayer.startsWith("cpu") &&
-    !humanSeats.has(state.currentPlayer) &&
-    moves < 52
-  ) {
-    state = playCpuTurn(state);
+  // Persist each CPU card separately so every player sees the card land.
+  while (state.gameActive && !humanSeats.has(state.currentPlayer) && moves < 4) {
+    await pause(950);
+    const next = playCpuTurn(state);
+    await saveFullState(admin, roomId, state.version, next);
+    state = next;
     moves += 1;
   }
-  if (moves >= 52 && state.gameActive && state.currentPlayer.startsWith("cpu") && !humanSeats.has(state.currentPlayer)) {
+  if (moves >= 4 && state.gameActive && !humanSeats.has(state.currentPlayer)) {
     throw new Error("CPU turn safety limit reached");
   }
   return state;
@@ -138,9 +148,33 @@ Deno.serve(async (req: Request) => {
 
     if (action === "join_room") {
       if (typeof body.room_code !== "string") return httpError("A room code is required");
-      const { data, error } = await userDb.rpc("join_mindi_room", { p_code: body.room_code });
+      const seatNumber = SEAT_BY_NUMBER.indexOf(body.seat as typeof SEAT_BY_NUMBER[number]);
+      if (seatNumber < 0) return httpError("Choose an available human seat");
+      const { data, error } = await userDb.rpc("join_mindi_room_at", {
+        p_code: body.room_code,
+        p_seat: seatNumber,
+      });
       if (error) throw error;
       return jsonResponse({ room: data?.[0] ?? data });
+    }
+
+    if (action === "preview_room") {
+      if (typeof body.room_code !== "string") return httpError("A room code is required");
+      const { data: room, error: roomError } = await admin
+        .from("mindi_rooms")
+        .select("id,room_code,status,seat_modes,seat_teams")
+        .eq("room_code", body.room_code.toUpperCase().trim())
+        .eq("status", "waiting")
+        .maybeSingle();
+      if (roomError) throw roomError;
+      if (!room) return httpError("Room not found or game already started", 404);
+      const { data: players, error: playersError } = await admin
+        .from("mindi_room_players").select("seat,user_id").eq("room_id", room.id);
+      if (playersError) throw playersError;
+      return jsonResponse({
+        room: { room_code: room.room_code, seat_modes: room.seat_modes, seat_teams: room.seat_teams },
+        players: (players ?? []).map((p) => ({ seat: publicSeatName(p.seat), user_id: p.user_id })),
+      });
     }
 
     if (typeof body.room_id !== "string") return httpError("A room ID is required");
@@ -156,7 +190,7 @@ Deno.serve(async (req: Request) => {
       if (publicError) throw publicError;
       if (playersError) throw playersError;
       if (handError) throw handError;
-      const { data: room, error: roomError } = await admin.from("mindi_rooms").select("id,room_code,status,host_id").eq("id", roomId).single();
+      const { data: room, error: roomError } = await admin.from("mindi_rooms").select("id,room_code,status,host_id,seat_modes,seat_teams").eq("id", roomId).single();
       if (roomError) throw roomError;
       return jsonResponse({
         room,
@@ -167,21 +201,67 @@ Deno.serve(async (req: Request) => {
       });
     }
 
+    if (action === "configure_room") {
+      const { data: room, error: roomError } = await admin
+        .from("mindi_rooms")
+        .select("id,host_id,status")
+        .eq("id", roomId)
+        .single();
+      if (roomError) throw roomError;
+      if (room.host_id !== user.id) return httpError("Only the room host can configure the table", 403);
+      if (room.status !== "waiting") return httpError("The table can only be configured before a game starts", 409);
+
+      const modes = body.seat_modes;
+      const teams = body.seat_teams;
+      for (const seat of SEAT_BY_NUMBER) {
+        if (!modes || !["human", "cpu"].includes(modes[seat])) return httpError("Each seat must be set to Human or CPU");
+        if (!teams || !["yourTeam", "opponentTeam"].includes(teams[seat])) return httpError("Each seat must be assigned to Team A or Team B");
+      }
+      if (Object.values(teams).filter((team: unknown) => team === "yourTeam").length !== 2) {
+        return httpError("Each team must have exactly two seats");
+      }
+      const { data: members, error: membersError } = await admin
+        .from("mindi_room_players").select("seat,user_id").eq("room_id", roomId);
+      if (membersError) throw membersError;
+      const occupied = new Set<string>((members ?? []).map((p: any) => publicSeatName(p.seat)));
+      if (!occupied.has("player")) return httpError("The host must occupy Seat 1");
+      for (const seat of occupied) {
+        if (modes[seat] !== "human") return httpError("A seat with a signed-in player cannot be changed to CPU. Ask that player to leave first.");
+      }
+      const { error } = await admin.from("mindi_rooms")
+        .update({ seat_modes: modes, seat_teams: teams })
+        .eq("id", roomId);
+      if (error) throw error;
+      return jsonResponse({ ok: true });
+    }
+
     if (action === "start_game") {
-      const { data: room, error: roomError } = await admin.from("mindi_rooms").select("id,host_id,status").eq("id", roomId).single();
+      const { data: room, error: roomError } = await admin
+        .from("mindi_rooms")
+        .select("id,host_id,status,seat_modes,seat_teams")
+        .eq("id", roomId)
+        .single();
       if (roomError) throw roomError;
       if (room.host_id !== user.id) return httpError("Only the room host can start the game", 403);
-      if (room.status !== "waiting") return httpError("This room has already started", 409);
+      if (room.status !== "waiting") return httpError("End the current game before starting another", 409);
 
-      const { data: players, error: playersError } = await admin.from("mindi_room_players").select("seat,user_id").eq("room_id", roomId);
+      const { data: players, error: playersError } = await admin
+        .from("mindi_room_players").select("seat,user_id").eq("room_id", roomId);
       if (playersError) throw playersError;
-      if ((players ?? []).length < 2) return httpError("At least two human players are required", 400);
-
       const humanSeats = new Set<string>((players ?? []).map((p) => publicSeatName(p.seat)));
-      let state = createGame();
-      state = await runEmptyCpuSeats(state, humanSeats);
+      const modes = room.seat_modes ?? DEFAULT_MODES;
+      const requiredHumanSeats = SEAT_BY_NUMBER.filter((seat) => modes[seat] === "human");
+      if (requiredHumanSeats.some((seat) => !humanSeats.has(seat))) {
+        return httpError("Every seat marked Human must be filled. Change unused seats to CPU or invite the missing players.");
+      }
+      if (!humanSeats.has("player")) return httpError("The host must occupy Seat 1");
+      if (requiredHumanSeats.length < 1) return httpError("At least one human player is required");
+
+      let state = createGame({ teams: room.seat_teams ?? DEFAULT_TEAMS });
       await saveFullState(admin, roomId, -1, state);
-      return jsonResponse({ game_state: getPublicState(state), your_hand: getPlayerHand(state, publicSeatName((players ?? []).find((p) => p.user_id === user.id)!.seat)) });
+      state = await runCpuTurnsAndSave(admin, roomId, state, humanSeats);
+      const hostSeat = publicSeatName((players ?? []).find((p) => p.user_id === user.id)!.seat);
+      return jsonResponse({ game_state: getPublicState(state), your_hand: getPlayerHand(state, hostSeat) });
     }
 
     if (action === "play_card") {
@@ -190,13 +270,54 @@ Deno.serve(async (req: Request) => {
       const state = await loadFullState(admin, roomId);
       if (state.version !== body.version) return httpError("The game has changed. Refresh before playing.", 409);
       const nextState = playCard(state, membership.seat, body.card);
+      await saveFullState(admin, roomId, state.version, nextState);
 
-      const { data: players, error: playersError } = await admin.from("mindi_room_players").select("seat,user_id").eq("room_id", roomId);
+      const { data: players, error: playersError } = await admin
+        .from("mindi_room_players").select("seat,user_id").eq("room_id", roomId);
       if (playersError) throw playersError;
       const humanSeats = new Set<string>((players ?? []).map((p) => publicSeatName(p.seat)));
-      const finalState = await runEmptyCpuSeats(nextState, humanSeats);
-      await saveFullState(admin, roomId, state.version, finalState);
-      return jsonResponse({ game_state: getPublicState(finalState), your_hand: getPlayerHand(finalState, membership.seat) });
+      const finalState = await runCpuTurnsAndSave(admin, roomId, nextState, humanSeats);
+      return jsonResponse({
+        game_state: getPublicState(finalState),
+        your_hand: getPlayerHand(finalState, membership.seat),
+      });
+    }
+
+    if (action === "end_game") {
+      const { data: room, error: roomError } = await admin
+        .from("mindi_rooms").select("id,host_id").eq("id", roomId).single();
+      if (roomError) throw roomError;
+      if (room.host_id !== user.id) return httpError("Only the room host can end the game", 403);
+      const { error } = await admin.rpc("reset_mindi_game", { p_room_id: roomId });
+      if (error) throw error;
+      return jsonResponse({ ok: true });
+    }
+
+    if (action === "kick_player") {
+      const { data: room, error: roomError } = await admin
+        .from("mindi_rooms").select("id,host_id,status").eq("id", roomId).single();
+      if (roomError) throw roomError;
+      if (room.host_id !== user.id) return httpError("Only the room host can remove players", 403);
+      if (room.status !== "waiting") return httpError("Players can only be removed from the lobby", 409);
+      const seatNumber = SEAT_BY_NUMBER.indexOf(body.seat as typeof SEAT_BY_NUMBER[number]);
+      if (seatNumber <= 0) return httpError("The host cannot remove themselves");
+      const { error } = await admin.from("mindi_room_players")
+        .delete().eq("room_id", roomId).eq("seat", seatNumber);
+      if (error) throw error;
+      return jsonResponse({ ok: true });
+    }
+
+    if (action === "leave_room") {
+      const membership = await requireMember(admin, roomId, user.id);
+      const { data: room, error: roomError } = await admin
+        .from("mindi_rooms").select("id,host_id,status").eq("id", roomId).single();
+      if (roomError) throw roomError;
+      if (room.host_id === user.id) return httpError("The host cannot leave their own room. End the game or sign out instead.", 403);
+      if (room.status !== "waiting") return httpError("You can only leave while the room is in the lobby", 409);
+      const { error } = await admin.from("mindi_room_players")
+        .delete().eq("room_id", roomId).eq("user_id", user.id);
+      if (error) throw error;
+      return jsonResponse({ ok: true, seat: membership.seat });
     }
 
     return httpError("Unknown action", 400);

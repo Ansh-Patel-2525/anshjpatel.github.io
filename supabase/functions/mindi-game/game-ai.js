@@ -27,10 +27,9 @@ export function chooseLeadCard(hand) {
 export function isTeammateWinning(state, seat = state.currentPlayer) {
   const winner = getCurrentWinnerEntry(state);
   if (!winner) return false;
-  const teammates = {
-    player: 'cpu2', cpu2: 'player', cpu1: 'cpu3', cpu3: 'cpu1'
-  };
-  return winner.player === teammates[seat];
+  const defaultTeams = { player: 'yourTeam', cpu1: 'opponentTeam', cpu2: 'yourTeam', cpu3: 'opponentTeam' };
+  const teams = state.teams ?? defaultTeams;
+  return teams[winner.player] === teams[seat];
 }
 
 export function chooseFollowCard(validCards, hand, state, seat = state.currentPlayer) {
