@@ -37,6 +37,18 @@ function publicSeatName(seatNumber: number): string {
   return seat;
 }
 
+async function addPlayerUsernames(admin: SupabaseClient, players: Array<{ seat: number; user_id: string; joined_at?: string }>) {
+  const ids = [...new Set(players.map((player) => player.user_id))];
+  if (!ids.length) return players.map((player) => ({ ...player, username: null }));
+  const { data, error } = await admin.from("mindi_profiles").select("user_id,username").in("user_id", ids);
+  if (error) throw error;
+  const names = new Map((data ?? []).map((profile) => [profile.user_id, profile.username]));
+  return players.map((player) => ({
+    ...player,
+    username: names.get(player.user_id) ?? `Player${player.user_id.replaceAll("-", "").slice(0, 8)}`,
+  }));
+}
+
 async function requireMember(admin: SupabaseClient, roomId: string, userId: string) {
   const { data, error } = await admin
     .from("mindi_room_players")
@@ -171,9 +183,10 @@ Deno.serve(async (req: Request) => {
       const { data: players, error: playersError } = await admin
         .from("mindi_room_players").select("seat,user_id").eq("room_id", room.id);
       if (playersError) throw playersError;
+      const playersWithNames = await addPlayerUsernames(admin, (players ?? []).map((p) => ({ seat: p.seat, user_id: p.user_id })));
       return jsonResponse({
         room: { room_code: room.room_code, seat_modes: room.seat_modes, seat_teams: room.seat_teams },
-        players: (players ?? []).map((p) => ({ seat: publicSeatName(p.seat), user_id: p.user_id })),
+        players: playersWithNames.map((p) => ({ seat: publicSeatName(p.seat), user_id: p.user_id, username: p.username })),
       });
     }
 
@@ -192,10 +205,11 @@ Deno.serve(async (req: Request) => {
       if (handError) throw handError;
       const { data: room, error: roomError } = await admin.from("mindi_rooms").select("id,room_code,status,host_id,seat_modes,seat_teams").eq("id", roomId).single();
       if (roomError) throw roomError;
+      const playersWithNames = await addPlayerUsernames(admin, (players ?? []).map((p) => ({ seat: p.seat, user_id: p.user_id, joined_at: p.joined_at })));
       return jsonResponse({
         room,
         seat: membership.seat,
-        players: (players ?? []).map((p) => ({ seat: publicSeatName(p.seat), user_id: p.user_id, joined_at: p.joined_at })),
+        players: playersWithNames.map((p) => ({ seat: publicSeatName(p.seat), user_id: p.user_id, username: p.username, joined_at: p.joined_at })),
         game_state: publicRow ? { ...publicRow.game_state, version: publicRow.version } : null,
         hand: ownHand?.hand ?? null,
       });

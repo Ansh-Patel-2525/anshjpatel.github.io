@@ -2066,6 +2066,12 @@
     .mp-seat-card.is-cpu { background:#f2f4f1; }
     .mp-seat-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; margin:14px 0; padding:0; }
     .mp-seat-list li { list-style:none; padding:12px 14px; border:1px solid #e4e8df; background:#f8f8f2; border-radius:12px; }
+    .mp-profile { margin:14px 0 18px; padding:14px; border:1px solid #e4e8df; border-radius:14px; background:#fbfcf8; }
+    .mp-profile-row { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:9px; align-items:end; }
+    .mp-profile label { display:grid; gap:6px; color:var(--muted); font-size:.82rem; font-weight:800; }
+    .mp-profile input { width:100%; min-width:0; padding:12px 13px; border:1px solid #d8ddd5; border-radius:10px; font:inherit; }
+    .mp-profile small { display:block; margin-top:7px; color:var(--muted); }
+    @media(max-width:520px) { .mp-profile-row { grid-template-columns:1fr; } }
     .mp-section-kicker { margin:22px 0 8px; color:var(--gold-dark); font-size:.74rem; font-weight:900; letter-spacing:1.2px; text-transform:uppercase; }
     .mp-game-actions { display:flex; flex-wrap:wrap; gap:10px; justify-content:flex-end; }\n    .mp-game-actions button { min-height:43px; border:0; border-radius:11px; padding:10px 15px; background:#e9eee8; color:var(--felt-dark); font-weight:800; cursor:pointer; }\n    .mp-game-actions button.danger { background:linear-gradient(120deg,#9f3434,#c34d42); color:#fff; }
     .mp-turn-note { padding:10px 14px; border:1px solid rgba(233,199,121,.5); border-radius:12px; background:#fff9e9; color:#6b501d; font-size:.88rem; font-weight:750; text-align:center; }
@@ -2122,6 +2128,7 @@
 
       <div class="mp-form">
 
+        <input id="mpSignupUsername" type="text" autocomplete="nickname" maxlength="20" placeholder="Username (required only when creating an account)">
         <input id="mpEmail" type="email" autocomplete="email" placeholder="Email address">
 
         <input id="mpPassword" type="password" autocomplete="current-password" placeholder="Password (at least 6 characters)">
@@ -2151,6 +2158,16 @@
       <p class="mp-section-kicker">Private table · 4 seats · 2 teams</p>
       <h2>Mindi Multiplayer Lobby</h2>
       <p class="mp-muted" id="mpLobbyDescription">Create a private room or join a friend's room. The host controls seats, teams and the start of each game.</p>
+      <div class="mp-profile" id="mpProfilePanel">
+        <div class="mp-profile-row">
+          <label for="mpProfileUsername">Your username
+            <input id="mpProfileUsername" type="text" maxlength="20" autocomplete="nickname" placeholder="Your username">
+          </label>
+          <button type="button" id="mpSaveUsername" class="secondary">Save username</button>
+        </div>
+        <small>3–20 characters. Letters, numbers and underscores only. Usernames are visible to other players.</small>
+        <div class="mp-status" id="mpProfileStatus" role="status"></div>
+      </div>
       <div class="mp-actions" id="mpRoomActions"><button id="mpCreateRoom">＋ Create a room</button></div>
       <div class="mp-form" id="mpJoinForm" style="margin-top:16px;">
         <input id="mpRoomCodeInput" maxlength="6" autocomplete="off" placeholder="Enter 6-character room code">
@@ -2403,7 +2420,7 @@
     const DEFAULT_TEAMS = { player: "yourTeam", cpu1: "opponentTeam", cpu2: "yourTeam", cpu3: "opponentTeam" };
     let session = null, activeRoom = null, mySeat = null, gameState = null, myHand = [];
     let roomPlayers = [], seatModes = {...DEFAULT_MODES}, seatTeams = {...DEFAULT_TEAMS};
-    let isHost = false, realtimeChannel = null, lobbyPoll = null, busy = false, activeRoomCode = "", configDirty = false;
+    let isHost = false, realtimeChannel = null, lobbyPoll = null, busy = false, activeRoomCode = "", configDirty = false, myUsername = "";
 
     function status(id, message, isError = false) {
       const el = $(id);
@@ -2437,9 +2454,33 @@
 
     function seatLabel(seat) {
       const player = roomPlayers.find((p) => p.seat === seat);
-      if (seat === mySeat) return "You";
-      if (player) return `Player ${seats.indexOf(seat) + 1}`;
+      if (player) return `${player.username || `Player ${seats.indexOf(seat) + 1}`}${seat === mySeat ? " (you)" : ""}`;
       return "CPU";
+    }
+
+    function validUsername(value) { return /^[A-Za-z0-9_]{3,20}$/.test(value); }
+
+    async function loadMyProfile() {
+      const { data, error } = await supabase.from("mindi_profiles").select("username").eq("user_id", session.user.id).single();
+      if (error) throw new Error(`Could not load your username. Run the Mindi username SQL migration first. (${error.message})`);
+      myUsername = data.username;
+      $("mpProfileUsername").value = myUsername;
+      return data;
+    }
+
+    async function saveUsername() {
+      const username = $("mpProfileUsername").value.trim();
+      if (!validUsername(username)) { status("mpProfileStatus", "Use 3–20 characters: letters, numbers or underscores.", true); return; }
+      status("mpProfileStatus", "Saving username…");
+      const { data, error } = await supabase.from("mindi_profiles").update({ username, updated_at: new Date().toISOString() }).eq("user_id", session.user.id).select("username").single();
+      if (error) {
+        const message = error.code === "23505" ? "That username is already taken. Choose another." : error.message;
+        status("mpProfileStatus", message, true); return;
+      }
+      myUsername = data.username;
+      $("mpLobbyDescription").textContent = `Signed in as ${myUsername}. Create a private table or join with a room code.`;
+      status("mpProfileStatus", "Username saved.");
+      if (activeRoom) await refreshRoom();
     }
 
     function teamLabel(team) { return team === "yourTeam" ? "Team A" : "Team B"; }
@@ -2451,10 +2492,12 @@
       const email = $("mpEmail").value.trim();
       const password = $("mpPassword").value;
       if (!email || !password) { status("mpAuthStatus", "Enter your email and password.", true); return; }
+      const requestedUsername = $("mpSignupUsername").value.trim();
+      if (mode === "signup" && !validUsername(requestedUsername)) { status("mpAuthStatus", "Choose a username using 3–20 letters, numbers or underscores.", true); return; }
       if (password.length < 6) { status("mpAuthStatus", "Use a password with at least 6 characters.", true); return; }
       status("mpAuthStatus", mode === "signup" ? "Creating account…" : "Signing in…");
       const result = mode === "signup"
-        ? await supabase.auth.signUp({ email, password, options: { emailRedirectTo: "https://anshjpatel.com/mindih.html" } })
+        ? await supabase.auth.signUp({ email, password, options: { emailRedirectTo: "https://anshjpatel.com/mindih.html", data: { username: requestedUsername } } })
         : await supabase.auth.signInWithPassword({ email, password });
       if (result.error) throw result.error;
       if (!result.data.session) {
@@ -2467,7 +2510,8 @@
 
     async function afterLogin() {
       if (!session) return;
-      $("mpLobbyDescription").textContent = `Signed in as ${session.user.email}. Create a private table or join with a room code.`;
+      await loadMyProfile();
+      $("mpLobbyDescription").textContent = `Signed in as ${myUsername}. Create a private table or join with a room code.`;
       showPanel("lobby");
       const savedRoom = localStorage.getItem("mindi-active-room");
       if (savedRoom && !activeRoom) {
@@ -2546,7 +2590,7 @@
         card.className = `mp-seat-card${player && seat === mySeat ? " is-you" : ""}${seatModes[seat] === "cpu" ? " is-cpu" : ""}`;
         const title = document.createElement("h4"); title.textContent = seatNames[index];
         const meta = document.createElement("div"); meta.className = "mp-seat-meta";
-        meta.textContent = player ? (seat === mySeat ? "Occupied by you" : "Occupied by a player") : (seatModes[seat] === "cpu" ? "Computer-controlled" : "Open for a player");
+        meta.textContent = player ? `${player.username || "Player"}${seat === mySeat ? " · you" : ""}` : (seatModes[seat] === "cpu" ? "Computer-controlled" : "Open for a player");
         const fields = document.createElement("div"); fields.className = "mp-seat-fields";
         const modeLabel = document.createElement("label"); modeLabel.textContent = "Seat type";
         const mode = document.createElement("select"); mode.className = "mp-config-select"; mode.dataset.seatMode = seat;
@@ -2578,8 +2622,8 @@
         li.style.justifyContent = "space-between";
         li.style.gap = "10px";
         const text = document.createElement("span");
-        const role = player ? (seat === mySeat ? "You" : "Human player") : (seatModes[seat] === "cpu" ? "CPU" : "Waiting for player");
-        text.textContent = `${seatNames[seats.indexOf(seat)]} · ${role} · ${teamLabel(seatTeams[seat])}`;
+        const role = player ? (player.username || "Player") : (seatModes[seat] === "cpu" ? "CPU" : "Waiting for player");
+        text.textContent = `${seatNames[seats.indexOf(seat)]} · ${role}${player && seat === mySeat ? " (you)" : ""} · ${teamLabel(seatTeams[seat])}`;
         li.appendChild(text);
         if (isHost && player && seat !== mySeat) {
           const kick = document.createElement("button");
@@ -2763,11 +2807,12 @@
       realtimeChannel = null; lobbyPoll = null; activeRoom = null;
       localStorage.removeItem("mindi-active-room");
       await supabase.auth.signOut();
-      session = null; mySeat = null; gameState = null; myHand = [];
+      session = null; mySeat = null; gameState = null; myHand = []; myUsername = "";
       showPanel("auth");
     }
 
     $("mpSignIn").addEventListener("click", () => authenticate("signin").catch((e) => status("mpAuthStatus", e.message, true)));
+    $("mpSaveUsername").addEventListener("click", () => saveUsername().catch((e) => status("mpProfileStatus", e.message, true)));
     $("mpSignUp").addEventListener("click", () => authenticate("signup").catch((e) => status("mpAuthStatus", e.message, true)));
     $("mpCreateRoom").addEventListener("click", () => createRoom().catch((e) => status("mpLobbyStatus", e.message, true)));
     $("mpFindRoom").addEventListener("click", () => previewRoom().catch((e) => status("mpLobbyStatus", e.message, true)));
