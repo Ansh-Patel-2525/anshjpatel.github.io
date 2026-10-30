@@ -2403,7 +2403,7 @@
     const DEFAULT_TEAMS = { player: "yourTeam", cpu1: "opponentTeam", cpu2: "yourTeam", cpu3: "opponentTeam" };
     let session = null, activeRoom = null, mySeat = null, gameState = null, myHand = [];
     let roomPlayers = [], seatModes = {...DEFAULT_MODES}, seatTeams = {...DEFAULT_TEAMS};
-    let isHost = false, realtimeChannel = null, lobbyPoll = null, busy = false, activeRoomCode = "";
+    let isHost = false, realtimeChannel = null, lobbyPoll = null, busy = false, activeRoomCode = "", configDirty = false;
 
     function status(id, message, isError = false) {
       const el = $(id);
@@ -2506,6 +2506,7 @@
     }
 
     async function openRoom(roomId) {
+      configDirty = false;
       activeRoom = roomId;
       localStorage.setItem("mindi-active-room", roomId);
       $("mpRoomDetails").classList.remove("mp-hidden");
@@ -2615,7 +2616,7 @@
       $("mpLobbyHint").textContent = gameState
         ? "A game is currently in progress."
         : (isHost ? "Set the four seats and teams, then start when the table is ready. Every seat marked Human must be occupied." : "Waiting for the host to start. You can share the room code with another player.");
-      if (isHost && !gameState) renderSeatConfig();
+      if (isHost && !gameState && !configDirty) renderSeatConfig();
       if (gameState) { showPanel("game"); renderGame(); }
       else { showPanel("lobby"); status("mpLobbyStatus", isHost ? "You are the host. Configure the table and start when ready." : "Waiting for the host to start the game."); }
     }
@@ -2637,6 +2638,7 @@
       }
       status("mpLobbyStatus", "Saving table setup…");
       await callGame("configure_room", { room_id: activeRoom, seat_modes: modes, seat_teams: teams });
+      configDirty = false;
       await refreshRoom();
       status("mpLobbyStatus", "Table setup saved.");
     }
@@ -2661,7 +2663,7 @@
       await callGame("leave_room", { room_id: activeRoom });
       if (realtimeChannel) supabase.removeChannel(realtimeChannel);
       if (lobbyPoll) clearInterval(lobbyPoll);
-      realtimeChannel = null; lobbyPoll = null; activeRoom = null; mySeat = null; gameState = null; myHand = [];
+      realtimeChannel = null; lobbyPoll = null; activeRoom = null; mySeat = null; gameState = null; myHand = []; configDirty = false;
       localStorage.removeItem("mindi-active-room");
       $("mpRoomDetails").classList.add("mp-hidden");
       $("mpRoomActions").classList.remove("mp-hidden");
@@ -2772,6 +2774,10 @@
     $("mpJoinRoom").addEventListener("click", () => joinRoom().catch((e) => status("mpLobbyStatus", e.message, true)));
     $("mpStartGame").addEventListener("click", () => startGame().catch((e) => status("mpLobbyStatus", e.message, true)));
     $("mpSaveConfig").addEventListener("click", () => saveConfig().catch((e) => status("mpLobbyStatus", e.message, true)));
+    // Lobby polling must not rebuild the host controls while they are editing them.
+    $("mpSeatConfig").addEventListener("change", (event) => {
+      if (event.target.matches("[data-seat-mode], [data-seat-team]")) configDirty = true;
+    });
     $("mpEndGame").addEventListener("click", () => endGame().catch((e) => status("mpLobbyStatus", e.message, true)));
     $("mpLeaveRoom").addEventListener("click", () => leaveRoom().catch((e) => status("mpLobbyStatus", e.message, true)));
     $("mpCopyCode").addEventListener("click", copyRoomCode);
