@@ -1017,6 +1017,24 @@
     font-size: 0.65rem;
   }
 }
+  
+    /* MULTIPLAYER ACCESS AND LOBBY */
+    .mp-shell { width:min(760px, calc(100% - 32px)); margin:110px auto 36px; }
+    .mp-panel { background:#fffefa; border:1px solid var(--border); border-radius:20px; padding:26px; box-shadow:var(--shadow-lg); }
+    .mp-panel h2 { color:var(--felt-dark); margin-bottom:8px; }
+    .mp-muted { color:var(--muted); margin-bottom:18px; }
+    .mp-form { display:grid; gap:12px; }
+    .mp-form input { width:100%; padding:13px 14px; border:1px solid #d8ddd5; border-radius:10px; font:inherit; }
+    .mp-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; }
+    .mp-actions button, .mp-form button { border:0; border-radius:10px; padding:12px 17px; background:var(--felt); color:white; font-weight:750; cursor:pointer; }
+    .mp-actions button.secondary { background:#e9eee8; color:var(--felt-dark); }
+    .mp-status { min-height:24px; margin-top:14px; color:var(--felt-dark); font-weight:650; overflow-wrap:anywhere; }
+    .mp-room-code { font-size:2rem; font-weight:900; letter-spacing:5px; color:var(--felt-dark); margin:8px 0 16px; }
+    .mp-player-list { list-style:none; padding:0; display:grid; gap:8px; }
+    .mp-player-list li { padding:10px 12px; background:#f4f5ed; border-radius:9px; }
+    .mp-hidden { display:none !important; }
+    @media (max-width:600px) { .mp-panel {padding:20px;} .mp-actions button {flex:1;} }
+
   </style>
 </head>
 
@@ -1032,7 +1050,48 @@
     </div>
   </header>
 
-  <div class="mindi-container">
+  <section class="mp-shell" id="mpAuthPanel">
+    <div class="mp-panel">
+      <h2>Play Mindi Online</h2>
+      <p class="mp-muted">Sign in or create an account to host a private game or join with a room code.</p>
+      <div class="mp-form">
+        <input id="mpEmail" type="email" autocomplete="email" placeholder="Email address">
+        <input id="mpPassword" type="password" autocomplete="current-password" placeholder="Password (at least 6 characters)">
+      </div>
+      <div class="mp-actions">
+        <button id="mpSignIn">Sign in</button>
+        <button id="mpSignUp" class="secondary">Create account</button>
+      </div>
+      <div class="mp-status" id="mpAuthStatus" role="status"></div>
+    </div>
+  </section>
+
+  <section class="mp-shell mp-hidden" id="mpLobbyPanel">
+    <div class="mp-panel">
+      <h2>Mindi Lobby</h2>
+      <p class="mp-muted" id="mpLobbyDescription">Create a private room or join a friend's room.</p>
+      <div class="mp-actions" id="mpRoomActions">
+        <button id="mpCreateRoom">Create room</button>
+      </div>
+      <div class="mp-form" id="mpJoinForm" style="margin-top:14px;">
+        <input id="mpRoomCodeInput" maxlength="6" autocomplete="off" placeholder="Enter 6-character room code">
+        <button id="mpJoinRoom">Join room</button>
+      </div>
+      <div id="mpRoomDetails" class="mp-hidden">
+        <div class="mp-muted" style="margin-top:18px;">Share this code with the other players:</div>
+        <div class="mp-room-code" id="mpRoomCode"></div>
+        <h3>Players</h3>
+        <ul class="mp-player-list" id="mpPlayerList"></ul>
+        <div class="mp-actions">
+          <button id="mpStartGame">Start game</button>
+          <button id="mpSignOut" class="secondary">Sign out</button>
+        </div>
+      </div>
+      <div class="mp-status" id="mpLobbyStatus" role="status"></div>
+    </div>
+  </section>
+
+  <div class="mindi-container mp-hidden" id="mpGameContainer">
     <div class="mindi-card">
 
       <!-- LEFT PANEL: GAME INFORMATION -->
@@ -1134,727 +1193,290 @@
     </div>
   </div>
 
-  <script>
-    // Hide/show header on scroll
-    let lastScrollTop = 0;
-    const header = document.querySelector('.game-header');
-    let scrollTimeout;
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-    window.addEventListener('scroll', function() {
-      clearTimeout(scrollTimeout);
+    // The publishable/anon key is safe for browser use. Never put a service-role key here.
+    const SUPABASE_URL = "https://jckqizjkbrxtkosdlxub.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_l2dP2MMiPnZTLRaxNXlTGQ_3gJau3z2";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
-      scrollTimeout = setTimeout(() => {
-        let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const $ = (id) => document.getElementById(id);
+    const seats = ["player", "cpu1", "cpu2", "cpu3"];
+    let session = null;
+    let activeRoom = null;
+    let mySeat = null;
+    let gameState = null;
+    let myHand = [];
+    let roomPlayers = [];
+    let realtimeChannel = null;
+    let lobbyPoll = null;
+    let busy = false;
 
-        if (scrollTop > lastScrollTop && scrollTop > 100) {
-          header.style.transform = 'translateY(-100%)';
-        } else {
-          header.style.transform = 'translateY(0)';
-        }
-
-        lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
-      }, 50);
-    }, false);
-
-    // Game variables
-    const suits = ['♠', '♥', '♦', '♣'];
-    const values = ['A', 'K', 'Q', 'J', '10', '9', '8', '7', '6', '5', '4', '3', '2'];
-    const valueOrder = {
-      'A': 14, 'K': 13, 'Q': 12, 'J': 11, '10': 10,
-      '9': 9, '8': 8, '7': 7, '6': 6, '5': 5,
-      '4': 4, '3': 3, '2': 2
-    };
-
-    let deck = [];
-
-    let hands = {
-      player: [],
-      cpu1: [],
-      cpu2: [],
-      cpu3: []
-    };
-
-    let currentTrick = {
-      player: null,
-      cpu1: null,
-      cpu2: null,
-      cpu3: null
-    };
-
-    let currentPlayer = 'player';
-    let leadPlayer = 'player';
-    let leadSuit = null;
-    let trumpSuit = null;
-    let gameActive = false;
-
-    let tricksWon = {
-      yourTeam: 0,
-      opponentTeam: 0
-    };
-
-    let tensWon = {
-      yourTeam: 0,
-      opponentTeam: 0
-    };
-
-    function createDeck() {
-      deck = [];
-
-      for (let suit of suits) {
-        for (let value of values) {
-          deck.push({ suit, value });
-        }
-      }
-
-      for (let i = deck.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [deck[i], deck[j]] = [deck[j], deck[i]];
-      }
+    function status(id, message, isError = false) {
+      const el = $(id);
+      el.textContent = message || "";
+      el.style.color = isError ? "#b42318" : "var(--felt-dark)";
     }
 
-    function dealCards() {
-      hands = {
-        player: [],
-        cpu1: [],
-        cpu2: [],
-        cpu3: []
-      };
-
-      const players = ['player', 'cpu1', 'cpu2', 'cpu3'];
-      let playerIndex = 0;
-
-      for (let i = 0; i < 52; i++) {
-        hands[players[playerIndex]].push(deck[i]);
-        playerIndex = (playerIndex + 1) % 4;
-      }
-
-      for (let player of players) {
-        sortHand(hands[player]);
-      }
+    function showPanel(name) {
+      $("mpAuthPanel").classList.toggle("mp-hidden", name !== "auth");
+      $("mpLobbyPanel").classList.toggle("mp-hidden", name !== "lobby");
+      $("mpGameContainer").classList.toggle("mp-hidden", name !== "game");
     }
 
-    function sortHand(hand) {
-      hand.sort((a, b) => {
-        if (a.suit !== b.suit) {
-          return suits.indexOf(a.suit) - suits.indexOf(b.suit);
-        }
-
-        return valueOrder[b.value] - valueOrder[a.value];
+    async function callGame(action, extra = {}) {
+      const { data, error } = await supabase.functions.invoke("mindi-game", {
+        body: { action, ...extra }
       });
+      if (error) {
+        let detail = error.message || "The game server request failed.";
+        try {
+          const context = error.context;
+          if (context && typeof context.json === "function") {
+            const body = await context.json();
+            if (body?.error) detail = body.error;
+          }
+        } catch (_) {}
+        throw new Error(detail);
+      }
+      if (data?.error) throw new Error(data.error);
+      return data;
     }
 
-    function createCardElement(card, faceDown = false, clickable = false) {
-      if (faceDown) {
-        const cardBack = document.createElement('div');
-        cardBack.className = 'card-back';
-        return cardBack;
+    function seatLabel(seat) {
+      const player = roomPlayers.find((p) => p.seat === seat);
+      if (seat === mySeat) return "You";
+      if (player) return `Player ${player.seat + 1}`;
+      return `CPU ${seat.slice(-1)}`;
+    }
+
+    function isMyTeam(seat) {
+      const teamA = ["player", "cpu2"];
+      return teamA.includes(mySeat) === teamA.includes(seat);
+    }
+
+    async function authenticate(mode) {
+      const email = $("mpEmail").value.trim();
+      const password = $("mpPassword").value;
+      if (!email || !password) {
+        status("mpAuthStatus", "Enter your email and password.", true);
+        return;
       }
+      status("mpAuthStatus", mode === "signup" ? "Creating account…" : "Signing in…");
+      const result = mode === "signup"
+        ? await supabase.auth.signUp({ email, password, options: { emailRedirectTo: "https://anshjpatel.com/mindih.html" } })
+        : await supabase.auth.signInWithPassword({ email, password });
+      if (result.error) throw result.error;
+      if (!result.data.session) {
+        status("mpAuthStatus", "Account created. Check your email to confirm it, then sign in.");
+        return;
+      }
+      session = result.data.session;
+      await afterLogin();
+    }
 
-      const cardDiv = document.createElement('div');
-      const color = ['♥', '♦'].includes(card.suit) ? 'red' : 'black';
+    async function afterLogin() {
+      $("mpLobbyDescription").textContent = `Signed in as ${session.user.email}. Create a room or join one using its code.`;
+      showPanel("lobby");
+      const savedRoom = localStorage.getItem("mindi-active-room");
+      if (savedRoom) {
+        try {
+          await openRoom(savedRoom);
+        } catch (_) {
+          localStorage.removeItem("mindi-active-room");
+        }
+      }
+    }
 
-      cardDiv.className = `card ${color} ${clickable ? 'clickable' : ''}`;
+    async function createRoom() {
+      const result = await callGame("create_room");
+      const room = result.room;
+      await openRoom(room.room_id);
+    }
 
-      cardDiv.innerHTML = `
-        <div>${card.value}${card.suit}</div>
-        <div style="text-align: center;">${card.suit}</div>
-        <div style="text-align: right;">${card.value}${card.suit}</div>
-      `;
+    async function joinRoom() {
+      const code = $("mpRoomCodeInput").value.trim().toUpperCase();
+      if (!/^[A-HJ-NP-Z2-9]{6}$/.test(code)) {
+        status("mpLobbyStatus", "Enter a valid six-character room code.", true);
+        return;
+      }
+      const result = await callGame("join_room", { room_code: code });
+      await openRoom(result.room.room_id);
+    }
 
+    async function openRoom(roomId) {
+      activeRoom = roomId;
+      localStorage.setItem("mindi-active-room", roomId);
+      await refreshRoom();
+      $("mpRoomDetails").classList.remove("mp-hidden");
+      $("mpRoomActions").classList.add("mp-hidden");
+      $("mpJoinForm").classList.add("mp-hidden");
+      $("mpRoomCode").textContent = activeRoomCode;
+      subscribeToRoom();
+      if (lobbyPoll) clearInterval(lobbyPoll);
+      lobbyPoll = setInterval(() => refreshRoom().catch((e) => status("mpLobbyStatus", e.message, true)), 3000);
+      showPanel(gameState ? "game" : "lobby");
+    }
+
+    let activeRoomCode = "";
+
+    async function refreshRoom() {
+      if (!activeRoom) return;
+      const result = await callGame("get_state", { room_id: activeRoom });
+      activeRoomCode = result.room.room_code;
+      mySeat = result.seat;
+      roomPlayers = result.players || [];
+      gameState = result.game_state;
+      myHand = result.hand || [];
+      $("mpRoomCode").textContent = activeRoomCode;
+      $("mpPlayerList").innerHTML = "";
+      for (const seat of seats) {
+        const player = roomPlayers.find((p) => p.seat === seat);
+        const li = document.createElement("li");
+        li.textContent = player ? `Seat ${seats.indexOf(seat) + 1} — ${seatLabel(seat)}` : `Seat ${seats.indexOf(seat) + 1} — CPU`;
+        $("mpPlayerList").appendChild(li);
+      }
+      const isHost = result.room.host_id === session.user.id;
+      $("mpStartGame").classList.toggle("mp-hidden", !isHost || !!gameState);
+      if (gameState) {
+        showPanel("game");
+        renderGame();
+      } else {
+        showPanel("lobby");
+        status("mpLobbyStatus", isHost ? "Waiting for players. You need at least two human players to start." : "Waiting for the host to start the game.");
+      }
+    }
+
+    function subscribeToRoom() {
+      if (realtimeChannel) supabase.removeChannel(realtimeChannel);
+      realtimeChannel = supabase.channel(`mindi-room-${activeRoom}`)
+        .on("postgres_changes", {
+          event: "*", schema: "public", table: "mindi_public_state", filter: `room_id=eq.${activeRoom}`
+        }, () => refreshRoom().catch((e) => console.error(e)))
+        .subscribe();
+    }
+
+    async function startGame() {
+      status("mpLobbyStatus", "Starting game…");
+      const result = await callGame("start_game", { room_id: activeRoom });
+      gameState = result.game_state;
+      myHand = result.your_hand || [];
+      await refreshRoom();
+      showPanel("game");
+    }
+
+    function createCardElement(card, clickable = false) {
+      const div = document.createElement("div");
+      const red = ["♥", "♦"].includes(card.suit);
+      div.className = `card ${red ? "red" : "black"}${clickable ? " clickable" : ""}`;
+      div.innerHTML = `<div>${card.value}${card.suit}</div><div style="text-align:center">${card.suit}</div><div style="text-align:right">${card.value}${card.suit}</div>`;
       if (clickable) {
-        cardDiv.addEventListener('click', () => playCard(card));
+        div.addEventListener("click", () => submitCard(card));
       }
-
-      return cardDiv;
+      return div;
     }
 
-    function updateDisplay() {
-      const playerHandDiv = document.getElementById('handPlayer');
-      playerHandDiv.innerHTML = '';
-
-      hands.player.forEach(card => {
-        const canPlay = canPlayCard(card);
-
-        playerHandDiv.appendChild(
-          createCardElement(
-            card,
-            false,
-            canPlay && currentPlayer === 'player' && gameActive
-          )
-        );
-      });
-
-      // Show single card back with count for CPU players
-      ['cpu1', 'cpu2', 'cpu3'].forEach(cpu => {
-        const cpuHandDiv = document.getElementById(`hand${cpu.toUpperCase()}`);
-        cpuHandDiv.innerHTML = '';
-
-        const cardCount = hands[cpu].length;
-
-        if (cardCount > 0) {
-          const cardBack = document.createElement('div');
-          cardBack.className = 'card-back';
-
-          cardBack.innerHTML = `
-            <span class="card-count">${cardCount}</span>
-          `;
-
-          cardBack.style.setProperty('--before-content', '"🂠"');
-          cpuHandDiv.appendChild(cardBack);
-        }
-      });
-
-      document.getElementById('trickTop').innerHTML = '';
-      document.getElementById('trickLeft').innerHTML = '';
-      document.getElementById('trickRight').innerHTML = '';
-      document.getElementById('trickBottom').innerHTML = '';
-
-      if (currentTrick.cpu2) {
-        document.getElementById('trickTop').appendChild(
-          createCardElement(currentTrick.cpu2)
-        );
-      }
-
-      if (currentTrick.cpu1) {
-        document.getElementById('trickLeft').appendChild(
-          createCardElement(currentTrick.cpu1)
-        );
-      }
-
-      if (currentTrick.cpu3) {
-        document.getElementById('trickRight').appendChild(
-          createCardElement(currentTrick.cpu3)
-        );
-      }
-
-      if (currentTrick.player) {
-        document.getElementById('trickBottom').appendChild(
-          createCardElement(currentTrick.player)
-        );
-      }
-
-      ['player', 'cpu1', 'cpu2', 'cpu3'].forEach(p => {
-        const label = document.getElementById(
-          p === 'player' ? 'labelPlayer' : `label${p.toUpperCase()}`
-        );
-
-        if (p === currentPlayer) {
-          label.classList.add('active');
-        } else {
-          label.classList.remove('active');
-        }
-      });
-
-      document.getElementById('trumpDisplay').textContent =
-        trumpSuit ? trumpSuit : 'None yet';
-
-      document.getElementById('yourTricks').textContent = tricksWon.yourTeam;
-      document.getElementById('opponentTricks').textContent = tricksWon.opponentTeam;
-      document.getElementById('yourTens').textContent = tensWon.yourTeam;
-      document.getElementById('opponentTens').textContent = tensWon.opponentTeam;
-    }
-
-    function canPlayCard(card) {
-      if (!leadSuit) return true;
-
-      if (hands.player.some(c => c.suit === leadSuit)) {
-        return card.suit === leadSuit;
-      }
-
-      return true;
-    }
-
-    function playCard(card) {
-      if (currentPlayer !== 'player' || !gameActive) return;
-      if (!canPlayCard(card)) return;
-
-      hands.player = hands.player.filter(c => c !== card);
-
-      if (!trumpSuit && leadSuit && card.suit !== leadSuit) {
-        trumpSuit = card.suit;
-        showMessage(`Trump suit established: ${trumpSuit}`, 'playing');
-      }
-
-      if (!leadSuit) {
-        leadSuit = card.suit;
-      }
-
-      currentTrick.player = card;
-      updateDisplay();
-      nextPlayer();
-    }
-
-    function nextPlayer() {
-      const order = ['player', 'cpu1', 'cpu2', 'cpu3'];
-      const currentIndex = order.indexOf(currentPlayer);
-
-      currentPlayer = order[(currentIndex + 1) % 4];
-
-      if (currentPlayer === leadPlayer) {
-        setTimeout(() => evaluateTrick(), 1000);
-      } else {
-        if (currentPlayer !== 'player') {
-          setTimeout(() => cpuPlay(), 800);
-        } else {
-          updateDisplay();
-        }
-      }
-    }
-
-    // ============================================
-    // ORIGINAL CPU AI — UNCHANGED
-    // ============================================
-
-    function cpuPlay() {
-      const cpuHand = hands[currentPlayer];
-      let cardToPlay;
-
-      // Get valid cards that follow suit rules
-      const validCards = cpuHand.filter(card => {
-        if (!leadSuit) return true;
-
-        if (cpuHand.some(c => c.suit === leadSuit)) {
-          return card.suit === leadSuit;
-        }
-
-        return true;
-      });
-
-      if (validCards.length === 0) {
-        cardToPlay = cpuHand[0];
-      } else if (!leadSuit) {
-        // LEADING STRATEGY: Lead from strength
-        cardToPlay = chooseLeadCard(cpuHand);
-      } else {
-        // FOLLOWING STRATEGY: Smart play based on trick situation
-        cardToPlay = chooseFollowCard(validCards, cpuHand);
-      }
-
-      // Establish trump if playing off-suit
-      if (!trumpSuit && leadSuit && cardToPlay.suit !== leadSuit) {
-        trumpSuit = cardToPlay.suit;
-        showMessage(
-          `${currentPlayer.toUpperCase()} established trump: ${trumpSuit}`,
-          'playing'
-        );
-      }
-
-      if (!leadSuit) {
-        leadSuit = cardToPlay.suit;
-      }
-
-      hands[currentPlayer] = hands[currentPlayer].filter(c => c !== cardToPlay);
-      currentTrick[currentPlayer] = cardToPlay;
-
-      updateDisplay();
-      nextPlayer();
-    }
-
-    function chooseLeadCard(hand) {
-      // When leading, play from your strongest suit
-      // Count cards by suit
-      const suitCounts = {};
-      suits.forEach(s => suitCounts[s] = hand.filter(c => c.suit === s).length);
-
-      // Find suit with most cards
-      let bestSuit = null;
-      let maxCount = 0;
-
-      for (let suit in suitCounts) {
-        if (suitCounts[suit] > maxCount) {
-          maxCount = suitCounts[suit];
-          bestSuit = suit;
-        }
-      }
-
-      // From that suit, lead with a high card
-      // but not the absolute highest unless it's Ace
-      const suitCards = hand.filter(c => c.suit === bestSuit);
-      suitCards.sort((a, b) => valueOrder[b.value] - valueOrder[a.value]);
-
-      // If we have Ace, lead it. Otherwise lead second-highest
-      if (suitCards[0].value === 'A') {
-        return suitCards[0];
-      } else if (suitCards.length > 1) {
-        return suitCards[1];
-      } else {
-        return suitCards[0];
-      }
-    }
-
-    function chooseFollowCard(validCards, hand) {
-      // Check if there are any 10s in the current trick
-      const tensInTrick = Object.values(currentTrick)
-        .filter(c => c && c.value === '10').length;
-
-      // Check if teammate is winning
-      const teammateWinning = isTeammateWinning();
-
-      // Evaluate current winning card
-      const currentWinner = getCurrentWinner();
-
-      const leadSuitCards = validCards.filter(c => c.suit === leadSuit);
-      const trumpCards = validCards.filter(c => trumpSuit && c.suit === trumpSuit);
-
-      // CASE 1: Following suit
-      if (leadSuitCards.length > 0) {
-        leadSuitCards.sort((a, b) => valueOrder[b.value] - valueOrder[a.value]);
-
-        // If teammate is already winning
-        if (teammateWinning) {
-          // Play lowest card to save high ones
-          return leadSuitCards[leadSuitCards.length - 1];
-        }
-
-        // If trick has 10s, try harder to win
-        const shouldTryToWin = tensInTrick > 0;
-
-        // Try to beat the current winner
-        const canWin = leadSuitCards.some(
-          c => valueOrder[c.value] > valueOrder[currentWinner.value]
-        );
-
-        if (canWin && (shouldTryToWin || !teammateWinning)) {
-          // Find the lowest card that can still win
-          const winningCards = leadSuitCards.filter(
-            c => valueOrder[c.value] > valueOrder[currentWinner.value]
-          );
-
-          return winningCards[winningCards.length - 1];
-        } else {
-          // Can't win or don't need to, play lowest
-          return leadSuitCards[leadSuitCards.length - 1];
-        }
-      }
-
-      // CASE 2: Can't follow suit, use trump
-      else if (trumpCards.length > 0) {
-        trumpCards.sort((a, b) => valueOrder[b.value] - valueOrder[a.value]);
-
-        // If teammate is winning, don't trump
-        if (teammateWinning) {
-          // Discard lowest non-trump card instead
-          const nonTrumpCards = validCards.filter(c => c.suit !== trumpSuit);
-
-          if (nonTrumpCards.length > 0) {
-            nonTrumpCards.sort((a, b) => valueOrder[a.value] - valueOrder[b.value]);
-            return nonTrumpCards[0];
-          }
-        }
-
-        // If trick has 10s or opponent winning, use trump
-        if (tensInTrick > 0 || !teammateWinning) {
-          // Check if current winner is trump
-          if (currentWinner.suit === trumpSuit) {
-            // Try to beat their trump with lowest trump that wins
-            const canBeat = trumpCards.filter(
-              c => valueOrder[c.value] > valueOrder[currentWinner.value]
-            );
-
-            if (canBeat.length > 0) {
-              return canBeat[canBeat.length - 1];
-            } else {
-              // Can't beat, play lowest trump
-              return trumpCards[trumpCards.length - 1];
-            }
-          } else {
-            // They didn't trump, use our lowest trump to win
-            return trumpCards[trumpCards.length - 1];
-          }
-        }
-
-        // No good reason to trump, discard low card
-        const nonTrumpCards = validCards.filter(c => c.suit !== trumpSuit);
-
-        if (nonTrumpCards.length > 0) {
-          nonTrumpCards.sort((a, b) => valueOrder[a.value] - valueOrder[b.value]);
-          return nonTrumpCards[0];
-        }
-
-        return trumpCards[trumpCards.length - 1];
-      }
-
-      // CASE 3: Can't follow, can't trump - discard lowest
-      else {
-        validCards.sort((a, b) => valueOrder[a.value] - valueOrder[b.value]);
-        return validCards[0];
-      }
-    }
-
-    function isTeammateWinning() {
-      // Check if this CPU's teammate is currently winning the trick
-      const currentWinner = getCurrentWinnerPlayer();
-
-      if (currentPlayer === 'cpu1') {
-        return currentWinner === 'cpu3';
-      } else if (currentPlayer === 'cpu2') {
-        return currentWinner === 'player';
-      } else if (currentPlayer === 'cpu3') {
-        return currentWinner === 'cpu1';
-      }
-
-      return false;
-    }
-
-    function getCurrentWinnerPlayer() {
-      // Determine who is currently winning the trick
-      const cardsPlayed = [];
-
-      if (currentTrick.player) {
-        cardsPlayed.push({ player: 'player', card: currentTrick.player });
-      }
-
-      if (currentTrick.cpu1) {
-        cardsPlayed.push({ player: 'cpu1', card: currentTrick.cpu1 });
-      }
-
-      if (currentTrick.cpu2) {
-        cardsPlayed.push({ player: 'cpu2', card: currentTrick.cpu2 });
-      }
-
-      if (currentTrick.cpu3) {
-        cardsPlayed.push({ player: 'cpu3', card: currentTrick.cpu3 });
-      }
-
-      if (cardsPlayed.length === 0) return null;
-
-      let winner = cardsPlayed[0];
-
-      for (let i = 1; i < cardsPlayed.length; i++) {
-        const current = cardsPlayed[i];
-
-        // Skip cards that are neither lead suit nor trump
-        if (current.card.suit !== leadSuit && current.card.suit !== trumpSuit) {
-          continue;
-        }
-
-        if (trumpSuit) {
-          if (current.card.suit === trumpSuit && winner.card.suit !== trumpSuit) {
-            winner = current;
-            continue;
-          }
-
-          if (winner.card.suit === trumpSuit && current.card.suit !== trumpSuit) {
-            continue;
-          }
-        }
-
-        if (current.card.suit === winner.card.suit) {
-          if (valueOrder[current.card.value] > valueOrder[winner.card.value]) {
-            winner = current;
-          }
-        }
-      }
-
-      return winner.player;
-    }
-
-    function getCurrentWinner() {
-      // Get the current winning card
-      const cardsPlayed = [];
-
-      if (currentTrick.player) cardsPlayed.push(currentTrick.player);
-      if (currentTrick.cpu1) cardsPlayed.push(currentTrick.cpu1);
-      if (currentTrick.cpu2) cardsPlayed.push(currentTrick.cpu2);
-      if (currentTrick.cpu3) cardsPlayed.push(currentTrick.cpu3);
-
-      if (cardsPlayed.length === 0) return null;
-
-      let winner = cardsPlayed[0];
-
-      for (let i = 1; i < cardsPlayed.length; i++) {
-        const current = cardsPlayed[i];
-
-        // Skip cards that are neither lead suit nor trump
-        if (current.suit !== leadSuit && current.suit !== trumpSuit) {
-          continue;
-        }
-
-        if (trumpSuit) {
-          if (current.suit === trumpSuit && winner.suit !== trumpSuit) {
-            winner = current;
-            continue;
-          }
-
-          if (winner.suit === trumpSuit && current.suit !== trumpSuit) {
-            continue;
-          }
-        }
-
-        if (current.suit === winner.suit) {
-          if (valueOrder[current.value] > valueOrder[winner.value]) {
-            winner = current;
-          }
-        }
-      }
-
-      return winner;
-    }
-
-    // ============================================
-    // END OF ORIGINAL CPU AI
-    // ============================================
-
-    function evaluateTrick() {
-
-      const cardsPlayed = [
-        { player: 'player', card: currentTrick.player },
-        { player: 'cpu1', card: currentTrick.cpu1 },
-        { player: 'cpu2', card: currentTrick.cpu2 },
-        { player: 'cpu3', card: currentTrick.cpu3 }
-      ];
-
-      // Remove any null cards just in case
-      const played = cardsPlayed.filter(cp => cp.card !== null);
-
-      // IMPORTANT: Start winner as the lead player's card
-      let winner = played.find(cp => cp.player === leadPlayer);
-
-      for (let i = 0; i < played.length; i++) {
-
-        const current = played[i];
-
-        if (current.player === winner.player) continue;
-
-        // Ignore cards that are neither lead suit nor trump
-        if (current.card.suit !== leadSuit && current.card.suit !== trumpSuit) {
-          continue;
-        }
-
-        // Trump beats non-trump
-        if (trumpSuit) {
-          if (current.card.suit === trumpSuit && winner.card.suit !== trumpSuit) {
-            winner = current;
-            continue;
-          }
-
-          if (winner.card.suit === trumpSuit && current.card.suit !== trumpSuit) {
-            continue;
-          }
-        }
-
-        // Same suit comparison
-        if (current.card.suit === winner.card.suit) {
-          if (valueOrder[current.card.value] > valueOrder[winner.card.value]) {
-            winner = current;
-          }
-        }
-      }
-
-      // Count 10s
-      let tensInTrick = 0;
-
-      played.forEach(cp => {
-        if (cp.card.value === '10') tensInTrick++;
-      });
-
-      // Assign trick
-      if (winner.player === 'player' || winner.player === 'cpu2') {
-        tricksWon.yourTeam++;
-        tensWon.yourTeam += tensInTrick;
-      } else {
-        tricksWon.opponentTeam++;
-        tensWon.opponentTeam += tensInTrick;
-      }
-
-      showMessage(`${winner.player.toUpperCase()} wins the trick!`, 'playing');
-
-      currentTrick = {
-        player: null,
-        cpu1: null,
-        cpu2: null,
-        cpu3: null
+    function renderGame() {
+      if (!gameState || !mySeat) return;
+      const myIndex = seats.indexOf(mySeat);
+      const positions = {
+        player: mySeat,
+        cpu1: seats[(myIndex + 1) % 4],
+        cpu2: seats[(myIndex + 2) % 4],
+        cpu3: seats[(myIndex + 3) % 4]
       };
+      const ids = { player: "handPlayer", cpu1: "handCPU1", cpu2: "handCPU2", cpu3: "handCPU3" };
+      const labelIds = { player: "labelPlayer", cpu1: "labelCPU1", cpu2: "labelCPU2", cpu3: "labelCPU3" };
+      const trickIds = { player: "trickBottom", cpu1: "trickLeft", cpu2: "trickTop", cpu3: "trickRight" };
 
-      leadSuit = null;
-      leadPlayer = winner.player;
-      currentPlayer = winner.player;
-
-      updateDisplay();
-
-      if (hands.player.length === 0) {
-        setTimeout(() => endGame(), 1500);
-      } else {
-        if (currentPlayer !== 'player') {
-          setTimeout(() => cpuPlay(), 1000);
-        }
-      }
-    }
-
-    function endGame() {
-      gameActive = false;
-
-      if (tensWon.yourTeam > tensWon.opponentTeam) {
-        showMessage(
-          `You win! Your team got ${tensWon.yourTeam} tens vs ${tensWon.opponentTeam}`,
-          'win'
-        );
-      } else if (tensWon.opponentTeam > tensWon.yourTeam) {
-        showMessage(
-          `Opponents win! They got ${tensWon.opponentTeam} tens vs ${tensWon.yourTeam}`,
-          'lose'
-        );
-      } else {
-        if (tricksWon.yourTeam > tricksWon.opponentTeam) {
-          showMessage(
-            `You win on tricks! (${tricksWon.yourTeam} vs ${tricksWon.opponentTeam})`,
-            'win'
-          );
+      for (const pos of Object.keys(positions)) {
+        const seat = positions[pos];
+        const handEl = $(ids[pos]);
+        handEl.innerHTML = "";
+        if (pos === "player") {
+          for (const card of myHand) {
+            const follows = !gameState.leadSuit || !myHand.some((c) => c.suit === gameState.leadSuit) || card.suit === gameState.leadSuit;
+            handEl.appendChild(createCardElement(card, gameState.gameActive && gameState.currentPlayer === mySeat && follows));
+          }
         } else {
-          showMessage(
-            `Opponents win on tricks! (${tricksWon.opponentTeam} vs ${tricksWon.yourTeam})`,
-            'lose'
-          );
+          const count = gameState.handCounts?.[seat] ?? 0;
+          if (count > 0) {
+            const back = document.createElement("div");
+            back.className = "card-back";
+            back.innerHTML = `<span class="card-count">${count}</span>`;
+            handEl.appendChild(back);
+          }
         }
+        const label = $(labelIds[pos]);
+        label.textContent = `${seatLabel(seat)}${isMyTeam(seat) ? " (Team)" : ""}`;
+        label.classList.toggle("active", gameState.currentPlayer === seat && gameState.gameActive);
+        const slot = $(trickIds[pos]);
+        slot.innerHTML = "";
+        const card = gameState.currentTrick?.[seat];
+        if (card) slot.appendChild(createCardElement(card));
+      }
+
+      $("trumpDisplay").textContent = gameState.trumpSuit || "None yet";
+      const ownTeam = isMyTeam(mySeat) ? "yourTeam" : "opponentTeam";
+      const otherTeam = ownTeam === "yourTeam" ? "opponentTeam" : "yourTeam";
+      $("yourTricks").textContent = gameState.tricksWon[ownTeam];
+      $("yourTens").textContent = gameState.tensWon[ownTeam];
+      $("opponentTricks").textContent = gameState.tricksWon[otherTeam];
+      $("opponentTens").textContent = gameState.tensWon[otherTeam];
+      document.querySelector(".tricks-won .tricks-label").textContent = "Your Team";
+      document.querySelectorAll(".tricks-won .tricks-label")[1].textContent = "Opponents";
+      $("btnNewGame").classList.add("mp-hidden");
+
+      if (!gameState.gameActive) {
+        const won = gameState.winner === ownTeam;
+        $("gameMessage").textContent = won ? "Your team wins!" : "Your opponents win!";
+        $("gameMessage").className = `game-message message-${won ? "win" : "lose"}`;
+      } else {
+        $("gameMessage").textContent = gameState.currentPlayer === mySeat ? "Your turn — choose a card." : `${seatLabel(gameState.currentPlayer)} is playing…`;
+        $("gameMessage").className = "game-message message-playing";
       }
     }
 
-    function showMessage(message, type) {
-      const msgDiv = document.getElementById('gameMessage');
-      msgDiv.textContent = message;
-      msgDiv.className = 'game-message message-' + type;
-    }
-
-    function startNewGame() {
-      createDeck();
-      dealCards();
-
-      currentTrick = {
-        player: null,
-        cpu1: null,
-        cpu2: null,
-        cpu3: null
-      };
-
-      leadSuit = null;
-      trumpSuit = null;
-
-      tricksWon = {
-        yourTeam: 0,
-        opponentTeam: 0
-      };
-
-      tensWon = {
-        yourTeam: 0,
-        opponentTeam: 0
-      };
-
-      const players = ['player', 'cpu1', 'cpu2', 'cpu3'];
-
-      leadPlayer = players[Math.floor(Math.random() * 4)];
-      currentPlayer = leadPlayer;
-
-      gameActive = true;
-
-      updateDisplay();
-      showMessage(`${currentPlayer.toUpperCase()} starts the game!`, 'playing');
-
-      if (currentPlayer !== 'player') {
-        setTimeout(() => cpuPlay(), 1000);
+    async function submitCard(card) {
+      if (busy || !gameState || gameState.currentPlayer !== mySeat) return;
+      busy = true;
+      status("mpLobbyStatus", "");
+      try {
+        const result = await callGame("play_card", {
+          room_id: activeRoom,
+          version: gameState.version,
+          card
+        });
+        gameState = result.game_state;
+        myHand = result.your_hand || [];
+        renderGame();
+      } catch (error) {
+        alert(error.message);
+        await refreshRoom();
+      } finally {
+        busy = false;
       }
     }
 
-    updateDisplay();
+
+    $("mpSignIn").addEventListener("click", () => authenticate("signin").catch((e) => status("mpAuthStatus", e.message, true)));
+    $("mpSignUp").addEventListener("click", () => authenticate("signup").catch((e) => status("mpAuthStatus", e.message, true)));
+    $("mpCreateRoom").addEventListener("click", () => createRoom().catch((e) => status("mpLobbyStatus", e.message, true)));
+    $("mpJoinRoom").addEventListener("click", () => joinRoom().catch((e) => status("mpLobbyStatus", e.message, true)));
+    $("mpStartGame").addEventListener("click", () => startGame().catch((e) => status("mpLobbyStatus", e.message, true)));
+    $("mpSignOut").addEventListener("click", async () => { await supabase.auth.signOut(); session = null; activeRoom = null; localStorage.removeItem("mindi-active-room"); showPanel("auth"); });
+    $("mpRoomCodeInput").addEventListener("input", (e) => { e.target.value = e.target.value.toUpperCase().replace(/[^A-HJ-NP-Z2-9]/g, "").slice(0, 6); });
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      session = newSession;
+      if (newSession) setTimeout(() => afterLogin().catch((e) => status("mpLobbyStatus", e.message, true)), 0);
+      else showPanel("auth");
+    });
+    const { data: sessionData } = await supabase.auth.getSession();
+    session = sessionData.session;
+    if (session) await afterLogin();
+    else showPanel("auth");
   </script>
 
 </body>
