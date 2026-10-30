@@ -2088,6 +2088,65 @@
       #mpGameContainer {padding-top:88px;}
     }
 
+
+    /* MINDI ONLINE: refreshed account experience */
+    .mp-auth-shell { width:min(500px, calc(100% - 28px)); margin:clamp(104px,14vh,150px) auto 42px; }
+    .mp-auth-brand { display:flex; align-items:center; justify-content:center; gap:11px; margin:0 auto 22px; color:#173d32; font-size:.88rem; font-weight:950; letter-spacing:2px; }
+    .mp-auth-brand i { color:#b18a43; font-style:normal; font-size:.68rem; letter-spacing:2.5px; margin-left:4px; }
+    .mp-brand-mark { width:38px; height:38px; display:grid; place-items:center; border-radius:12px; color:#f4d58f; background:linear-gradient(145deg,#154e3b,#0a3328); box-shadow:0 8px 18px rgba(10,51,40,.18); font-size:1.3rem; }
+    .mp-auth-card { padding:clamp(25px,6vw,38px); border:1px solid rgba(255,255,255,.75); border-radius:26px; background:rgba(255,255,255,.88); box-shadow:0 24px 70px rgba(17,48,38,.13); backdrop-filter:blur(18px); }
+    .mp-auth-eyebrow { margin-bottom:13px; color:#a17a36; font-size:.68rem; font-weight:900; letter-spacing:1.7px; }
+    .mp-auth-card h2 { margin-bottom:7px; color:#163d31; font-size:clamp(1.9rem,7vw,2.35rem); line-height:1.12; letter-spacing:-1.1px; }
+    .mp-auth-card .mp-muted { margin-bottom:24px; color:#718078; font-size:.93rem; }
+    .mp-auth-card .mp-form { gap:8px; }
+    .mp-field-label { margin-top:5px; color:#34483e; font-size:.78rem; font-weight:850; }
+    .mp-auth-card .mp-form input { min-height:51px; padding:14px 15px; border:1px solid #dfe7e1; border-radius:13px; background:#fbfdfb; font-size:.95rem; transition:border-color .18s,box-shadow .18s,background .18s; }
+    .mp-auth-card .mp-form input:focus { outline:none; border-color:#43836b; background:#fff; box-shadow:0 0 0 4px rgba(67,131,107,.12); }
+    .mp-auth-tools { display:flex; justify-content:flex-end; margin:11px 0 18px; }
+    .mp-text-button { border:0; padding:0; color:#267052; background:none; font:inherit; font-size:.83rem; font-weight:850; cursor:pointer; }
+    .mp-text-button:hover { color:#123e2f; text-decoration:underline; }
+    .mp-auth-primary { width:100%; min-height:52px; display:flex; justify-content:center; align-items:center; gap:12px; border:0; border-radius:14px; color:white; background:linear-gradient(115deg,#14533d,#267a57); box-shadow:0 8px 18px rgba(20,83,61,.19); font:inherit; font-weight:900; cursor:pointer; transition:transform .18s,box-shadow .18s; }
+    .mp-auth-primary:hover { transform:translateY(-2px); box-shadow:0 12px 22px rgba(20,83,61,.23); }
+    .mp-auth-primary span { font-size:1.2rem; }
+    .mp-auth-switch { margin-top:21px; color:#718078; text-align:center; font-size:.84rem; }
+    .mp-auth-switch .mp-text-button { margin-left:4px; }
+    .mp-auth-note { margin-top:20px; padding:12px 13px; border:1px solid #e4ebe3; border-radius:12px; color:#6c7d73; background:#f5f8f4; font-size:.77rem; line-height:1.5; }
+    .mp-auth-footnote { margin-top:18px; color:#829087; text-align:center; font-size:.76rem; }
+    .mp-auth-card .mp-status { font-size:.84rem; }
+    .mp-account-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding-bottom:14px; margin-bottom:14px; border-bottom:1px solid #e8ede8; }
+    .mp-account-identity { display:flex; align-items:center; gap:10px; min-width:0; }
+    .mp-account-avatar { width:38px; height:38px; flex:0 0 38px; display:grid; place-items:center; border-radius:12px; color:#e8cb8d; background:#174b39; }
+    .mp-account-identity small { display:block; margin-bottom:2px; color:#89958d; font-size:.65rem; font-weight:900; letter-spacing:1px; }
+    .mp-account-identity strong { display:block; max-width:100%; overflow-wrap:anywhere; color:#30443a; font-size:.82rem; }
+    .mp-signout { border:1px solid #e1e8e2; border-radius:10px; padding:9px 12px; color:#52665a; background:#fff; font:inherit; font-size:.78rem; font-weight:800; cursor:pointer; }
+    .mp-signout:hover { border-color:#c6d5c9; background:#f7faf7; }
+
+    /* Phone table: reserve a real row for the player's name and full hand. */
+    @media (max-width:600px) {
+      .game-header { position:sticky; }
+      .mp-auth-shell { margin-top:34px; }
+      .mp-shell:not(.mp-auth-shell) { width:calc(100% - 20px); margin:20px auto 28px; }
+      .mp-panel { border-radius:18px; }
+      .mp-account-head { align-items:flex-start; }
+      .mp-account-identity strong { font-size:.75rem; }
+      .mp-profile-row { grid-template-columns:minmax(0,1fr); }
+      .mp-profile-row button { width:100%; }
+      #mpGameContainer { padding-top:76px; }
+      .mindi-container { padding:76px 6px 18px; }
+      .mindi-card { padding:8px; gap:10px; }
+      .game-board { height:490px; min-height:490px; padding:7px 3px 5px; grid-template-rows:66px minmax(0,1fr) 154px; overflow:visible; }
+      .player-bottom { justify-content:flex-start; padding-top:4px; z-index:8; }
+      #labelPlayer { position:relative; z-index:10; display:block; width:max-content; max-width:calc(100% - 8px); height:auto; min-height:24px; margin:0 auto 7px; padding:4px 10px; overflow:visible; white-space:normal; overflow-wrap:anywhere; text-overflow:clip; line-height:1.25; font-size:.69rem; }
+      .player-bottom .cards-hand { position:relative; z-index:7; display:flex; justify-content:center; align-content:flex-start; flex-wrap:wrap; width:100%; gap:3px; }
+      .player-bottom .card { width:clamp(27px,8.7vw,38px); height:clamp(40px,12.6vw,55px); }
+      .player-top .player-label { position:relative; z-index:9; width:max-content; max-width:calc(100% - 8px); height:auto; min-height:22px; overflow:visible; white-space:normal; text-overflow:clip; }
+    }
+    @media (max-width:370px) {
+      .game-board { height:475px; min-height:475px; grid-template-rows:66px minmax(0,1fr) 145px; }
+      .player-bottom .card { width:clamp(25px,8.2vw,31px); height:46px; }
+      #labelPlayer { font-size:.64rem; }
+    }
+
   </style>
 
 </head>
@@ -2118,36 +2177,39 @@
 
 
 
-  <section class="mp-shell" id="mpAuthPanel">
-
-    <div class="mp-panel">
-
-      <h2>Play Mindi Online</h2>
-
-      <p class="mp-muted">Sign in or create an account to host a private game or join with a room code.</p>
-
-      <div class="mp-form">
-
-        <input id="mpSignupUsername" type="text" autocomplete="nickname" maxlength="20" placeholder="Username (required only when creating an account)">
-        <input id="mpEmail" type="email" autocomplete="email" placeholder="Email address">
-
-        <input id="mpPassword" type="password" autocomplete="current-password" placeholder="Password (at least 6 characters)">
-
+  <section class="mp-shell mp-auth-shell" id="mpAuthPanel">
+    <div class="mp-auth-brand"><span class="mp-brand-mark">♠</span><span>MINDI <i>ONLINE</i></span></div>
+    <div class="mp-panel mp-auth-card">
+      <div class="mp-auth-eyebrow">PRIVATE TABLES · PLAY WITH FRIENDS</div>
+      <div id="mpSignInView">
+        <h2>Welcome back.</h2>
+        <p class="mp-muted">Sign in to pick up where your next game begins.</p>
+        <div class="mp-form">
+          <label class="mp-field-label" for="mpSignInEmail">Email address</label>
+          <input id="mpSignInEmail" type="email" autocomplete="username" placeholder="you@example.com">
+          <label class="mp-field-label" for="mpSignInPassword">Password</label>
+          <input id="mpSignInPassword" type="password" autocomplete="current-password" placeholder="Your password">
+        </div>
+        <div class="mp-auth-tools"><button type="button" class="mp-text-button" id="mpForgotPassword">Forgot password?</button></div>
+        <button type="button" class="mp-auth-primary" id="mpSignIn">Sign in <span>→</span></button>
+        <p class="mp-auth-switch">New to Mindi? <button type="button" class="mp-text-button" id="mpShowSignup">Create an account</button></p>
       </div>
-
-      <div class="mp-actions">
-
-        <button id="mpSignIn">Sign in</button>
-
-        <button id="mpSignUp" class="secondary">Create account</button>
-
+      <div id="mpSignUpView" class="mp-hidden">
+        <h2>Join the table.</h2>
+        <p class="mp-muted">Create your account with an email and password. We'll give you a player name automatically.</p>
+        <div class="mp-form">
+          <label class="mp-field-label" for="mpSignUpEmail">Email address</label>
+          <input id="mpSignUpEmail" type="email" autocomplete="email" placeholder="you@example.com">
+          <label class="mp-field-label" for="mpSignUpPassword">Create password</label>
+          <input id="mpSignUpPassword" type="password" autocomplete="new-password" placeholder="At least 6 characters">
+        </div>
+        <button type="button" class="mp-auth-primary" id="mpSignUp">Create account <span>→</span></button>
+        <p class="mp-auth-switch">Already have an account? <button type="button" class="mp-text-button" id="mpShowSignin">Sign in</button></p>
       </div>
-
-      <div class="mp-auth-note">Create an account with your email and password. If email confirmation is enabled, confirm the message we send before signing in.</div>
-      <div class="mp-status" id="mpAuthStatus" role="status"></div>
-
+      <div class="mp-auth-note">If email confirmation is enabled, you'll need to confirm your address before signing in.</div>
+      <div class="mp-status" id="mpAuthStatus" role="status" aria-live="polite"></div>
     </div>
-
+    <p class="mp-auth-footnote">A private table for four. No downloads, just cards.</p>
   </section>
 
 
@@ -2159,13 +2221,17 @@
       <h2>Mindi Multiplayer Lobby</h2>
       <p class="mp-muted" id="mpLobbyDescription">Create a private room or join a friend's room. The host controls seats, teams and the start of each game.</p>
       <div class="mp-profile" id="mpProfilePanel">
+        <div class="mp-account-head">
+          <div class="mp-account-identity"><span class="mp-account-avatar">♠</span><span><small>SIGNED IN AS</small><strong id="mpAccountEmail">—</strong></span></div>
+          <button type="button" id="mpSignOutTop" class="mp-signout">Sign out</button>
+        </div>
         <div class="mp-profile-row">
-          <label for="mpProfileUsername">Your username
+          <label for="mpProfileUsername">Player username
             <input id="mpProfileUsername" type="text" maxlength="20" autocomplete="nickname" placeholder="Your username">
           </label>
           <button type="button" id="mpSaveUsername" class="secondary">Save username</button>
         </div>
-        <small>3–20 characters. Letters, numbers and underscores only. Usernames are visible to other players.</small>
+        <small>3–20 characters. Letters, numbers and underscores only. Other players see this name, never your email.</small>
         <div class="mp-status" id="mpProfileStatus" role="status"></div>
       </div>
       <div class="mp-actions" id="mpRoomActions"><button id="mpCreateRoom">＋ Create a room</button></div>
@@ -2465,6 +2531,7 @@
       if (error) throw new Error(`Could not load your username. Run the Mindi username SQL migration first. (${error.message})`);
       myUsername = data.username;
       $("mpProfileUsername").value = myUsername;
+      $("mpAccountEmail").textContent = session.user.email || "Email unavailable";
       return data;
     }
 
@@ -2478,7 +2545,7 @@
         status("mpProfileStatus", message, true); return;
       }
       myUsername = data.username;
-      $("mpLobbyDescription").textContent = `Signed in as ${myUsername}. Create a private table or join with a room code.`;
+      $("mpLobbyDescription").textContent = `Playing as ${myUsername}. Create a private table or join with a room code.`;
       status("mpProfileStatus", "Username saved.");
       if (activeRoom) await refreshRoom();
     }
@@ -2488,30 +2555,52 @@
       return Boolean(gameState?.teams) && gameState.teams[mySeat] === gameState.teams[seat];
     }
 
+    function showAuthMode(mode) {
+      const signup = mode === "signup";
+      $("mpSignInView").classList.toggle("mp-hidden", signup);
+      $("mpSignUpView").classList.toggle("mp-hidden", !signup);
+      status("mpAuthStatus", "");
+      const email = signup ? $("mpSignInEmail").value : $("mpSignUpEmail").value;
+      if (email) (signup ? $("mpSignUpEmail") : $("mpSignInEmail")).value = email;
+      const target = signup ? $("mpSignUpEmail") : $("mpSignInEmail");
+      target.focus();
+    }
+
     async function authenticate(mode) {
-      const email = $("mpEmail").value.trim();
-      const password = $("mpPassword").value;
-      if (!email || !password) { status("mpAuthStatus", "Enter your email and password.", true); return; }
-      const requestedUsername = $("mpSignupUsername").value.trim();
-      if (mode === "signup" && !validUsername(requestedUsername)) { status("mpAuthStatus", "Choose a username using 3–20 letters, numbers or underscores.", true); return; }
+      const signup = mode === "signup";
+      const email = $(signup ? "mpSignUpEmail" : "mpSignInEmail").value.trim();
+      const password = $(signup ? "mpSignUpPassword" : "mpSignInPassword").value;
+      if (!email || !password) { status("mpAuthStatus", "Enter your email address and password.", true); return; }
       if (password.length < 6) { status("mpAuthStatus", "Use a password with at least 6 characters.", true); return; }
-      status("mpAuthStatus", mode === "signup" ? "Creating account…" : "Signing in…");
-      const result = mode === "signup"
-        ? await supabase.auth.signUp({ email, password, options: { emailRedirectTo: "https://anshjpatel.com/mindih.html", data: { username: requestedUsername } } })
+      status("mpAuthStatus", signup ? "Creating your account…" : "Signing you in…");
+      const result = signup
+        ? await supabase.auth.signUp({ email, password, options: { emailRedirectTo: "https://anshjpatel.com/mindih.html" } })
         : await supabase.auth.signInWithPassword({ email, password });
       if (result.error) throw result.error;
       if (!result.data.session) {
-        status("mpAuthStatus", "Account created. Check your email to confirm it, then return here and sign in.");
+        $("mpSignInEmail").value = email;
+        $("mpSignInPassword").value = "";
+        showAuthMode("signin");
+        status("mpAuthStatus", "Account created. Check your email to confirm it, then sign in here.");
         return;
       }
       session = result.data.session;
       await afterLogin();
     }
 
+    async function sendPasswordReset() {
+      const email = $("mpSignInEmail").value.trim();
+      if (!email) { status("mpAuthStatus", "Enter your email address first.", true); return; }
+      status("mpAuthStatus", "Sending password reset email…");
+      const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: "https://anshjpatel.com/mindih.html" });
+      if (error) throw error;
+      status("mpAuthStatus", "If an account exists for that address, a reset email will arrive shortly.");
+    }
+
     async function afterLogin() {
       if (!session) return;
       await loadMyProfile();
-      $("mpLobbyDescription").textContent = `Signed in as ${myUsername}. Create a private table or join with a room code.`;
+      $("mpLobbyDescription").textContent = `Playing as ${myUsername}. Create a private table or join with a room code.`;
       showPanel("lobby");
       const savedRoom = localStorage.getItem("mindi-active-room");
       if (savedRoom && !activeRoom) {
@@ -2814,6 +2903,10 @@
     $("mpSignIn").addEventListener("click", () => authenticate("signin").catch((e) => status("mpAuthStatus", e.message, true)));
     $("mpSaveUsername").addEventListener("click", () => saveUsername().catch((e) => status("mpProfileStatus", e.message, true)));
     $("mpSignUp").addEventListener("click", () => authenticate("signup").catch((e) => status("mpAuthStatus", e.message, true)));
+    $("mpShowSignup").addEventListener("click", () => showAuthMode("signup"));
+    $("mpShowSignin").addEventListener("click", () => showAuthMode("signin"));
+    $("mpForgotPassword").addEventListener("click", () => sendPasswordReset().catch((e) => status("mpAuthStatus", e.message, true)));
+    $("mpSignOutTop").addEventListener("click", signOut);
     $("mpCreateRoom").addEventListener("click", () => createRoom().catch((e) => status("mpLobbyStatus", e.message, true)));
     $("mpFindRoom").addEventListener("click", () => previewRoom().catch((e) => status("mpLobbyStatus", e.message, true)));
     $("mpJoinRoom").addEventListener("click", () => joinRoom().catch((e) => status("mpLobbyStatus", e.message, true)));
@@ -2836,7 +2929,7 @@
     });
     const { data: sessionData } = await supabase.auth.getSession();
     session = sessionData.session;
-    if (session) await afterLogin(); else showPanel("auth");
+    if (session) await afterLogin(); else { showPanel("auth"); showAuthMode("signin"); }
   </script>
 
 
