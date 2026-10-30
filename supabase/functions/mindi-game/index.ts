@@ -322,9 +322,20 @@ Deno.serve(async (req: Request) => {
 
     return httpError("Unknown action", 400);
   } catch (error) {
-    const status = (error as any)?.status ?? 400;
-    const message = error instanceof Error ? error.message : "Unexpected server error";
-    console.error("mindi-game error:", message);
+    const err = error as any;
+    const status = Number.isInteger(err?.status) ? err.status : 500;
+    const message = err?.message || err?.details || err?.hint ||
+      (typeof error === "string" ? error : "Unexpected server error");
+    // Supabase/PostgREST errors are often plain objects, not Error instances.
+    // Log structured diagnostics and return a safe, useful database message.
+    console.error("mindi-game error:", {
+      message,
+      code: err?.code ?? null,
+      details: err?.details ?? null,
+      hint: err?.hint ?? null,
+      status: err?.status ?? null,
+      stack: err?.stack ?? null,
+    });
     return httpError(message, status);
   }
 });
