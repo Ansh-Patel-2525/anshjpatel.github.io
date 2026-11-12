@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Random Generator - Ansh Patel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Pick random numbers, draw playing cards, choose names from your own list, and more.">
+  <meta name="theme-color" content="#eef3ef">
+
+  <style>
+    :root {
+      --bg: #eef3ef;
+      --paper: #ffffff;
+      --teal: #0f766e;
+      --teal-dark: #0b5a54;
+      --teal-light: #d9efeb;
+      --felt: #0f3d38;
+      --felt-2: #1c6258;
+      --amber: #ffc857;
+      --amber-dark: #e09f1f;
+      --rose: #d6293e;
+      --text: #14261f;
+      --muted: #5f7a72;
+      --border: #dbe6e1;
+      --shadow: 0 18px 50px rgba(15, 61, 56, 0.10);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse at 6% 10%, rgba(255, 200, 87, 0.20), transparent 28%),
+        radial-gradient(ellipse at 96% 80%, rgba(15, 118, 110, 0.12), transparent 32%),
+        var(--bg);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, sans-serif;
+      line-height: 1.6;
+    }
+
+    button, input, select, textarea, a {
+      font: inherit;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button, a { touch-action: manipulation; }
+
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible,
+    a:focus-visible {
+      outline: 3px solid var(--amber-dark);
+      outline-offset: 3px;
+    }
+
+    /* Header and navigation (same pattern as the other widgets) */
+
+    .game-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(15, 118, 110, 0.12);
+      background: rgba(238, 243, 239, 0.9);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .game-header-content {
+      width: min(1120px, calc(100% - 40px));
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 0;
+    }
+
+    .brand-icon {
+      display: grid;
+      place-items: center;
+      flex: 0 0 43px;
+      width: 43px;
+      height: 43px;
+      border-radius: 14px;
+      background: var(--teal-light);
+      font-size: 1.45rem;
+      transform: rotate(-5deg);
+    }
+
+    .brand h1 {
+      font-size: 1.18rem;
+      font-weight: 850;
+      letter-spacing: -0.5px;
+      line-height: 1.25;
+    }
+
+    .brand small {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 550;
+    }
+
+    .header-links {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 41px;
+      padding: 9px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      background: white;
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 700;
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .back-link:hover {
+      transform: translateY(-2px);
+      border-color: #b7d8d2;
+      background: var(--teal-light);
+    }
+
+    /* Layout */
+
+    .game-container {
+      width: min(1040px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 48px 0 65px;
+    }
+
+    .intro {
+      margin-bottom: 28px;
+      text-align: center;
+    }
+
+    .intro h2 {
+      margin-bottom: 9px;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 900;
+      letter-spacing: -2px;
+      line-height: 1.12;
+    }
+
+    .intro p {
+      max-width: 480px;
+      margin: 0 auto;
+      color: var(--muted);
+    }
+
+    .game-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(250px, 0.8fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .game-card {
+      min-width: 0;
+      padding: clamp(20px, 3.5vw, 32px);
+      border: 1px solid rgba(15, 118, 110, 0.12);
+      border-radius: 26px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    /* Tabs */
+
+    .tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 20px;
+      padding: 5px;
+      overflow-x: auto;
+      border-radius: 16px;
+      background: #f0f5f2;
+      scrollbar-width: none;
+    }
+
+    .tabs::-webkit-scrollbar { display: none; }
+
+    .tab {
+      flex: 1 0 auto;
+      min-height: 44px;
+      padding: 9px 16px;
+      border: 0;
+      border-radius: 12px;
+      color: var(--muted);
+      background: transparent;
+      font-size: 0.9rem;
+      font-weight: 800;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .tab:hover { color: var(--text); }
+
+    .tab[aria-selected="true"] {
+      color: var(--teal-dark);
+      background: white;
+      box-shadow: 0 3px 10px rgba(15, 61, 56, 0.10);
+    }
+
+    .panel[hidden] { display: none; }
+
+    /* Result stage: the one dramatic element */
+
+    .stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      min-height: 200px;
+      margin-bottom: 20px;
+      padding: 26px 20px;
+      border-radius: 22px;
+      color: white;
+      text-align: center;
+      background:
+        radial-gradient(ellipse at 50% 0%, var(--felt-2), transparent 70%),
+        var(--felt);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+    }
+
+    .stage-hint {
+      color: rgba(255, 255, 255, 0.62);
+      font-size: 0.92rem;
+      font-weight: 600;
+    }
+
+    .stage-label {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.88rem;
+      font-weight: 650;
+    }
+
+    .big-value {
+      max-width: 100%;
+      color: var(--amber);
+      font-size: clamp(3.6rem, 13vw, 6.4rem);
+      font-weight: 950;
+      line-height: 1;
+      letter-spacing: -3px;
+      font-variant-numeric: tabular-nums;
+      overflow-wrap: anywhere;
+    }
+
+    .big-value.pop { animation: popIn 0.35s ease; }
+
+    .winner-name {
+      max-width: 100%;
+      color: white;
+      font-size: clamp(2rem, 8vw, 3.4rem);
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: -1px;
+      overflow-wrap: anywhere;
+    }
+
+    .winner-name.pop { animation: popIn 0.35s ease; }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      max-height: 260px;
+      overflow-y: auto;
+      width: 100%;
+    }
+
+    .chip {
+      padding: 6px 13px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 11px;
+      background: rgba(255, 255, 255, 0.12);
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      overflow-wrap: anywhere;
+      animation: popIn 0.3s ease both;
+    }
+
+    .chip.amber {
+      border-color: transparent;
+      color: var(--felt);
+      background: var(--amber);
+    }
+
+    .chip small {
+      margin-right: 7px;
+      color: rgba(255, 255, 255, 0.6);
+      font-weight: 700;
+    }
+
+    .teams {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      width: 100%;
+      text-align: left;
+    }
+
+    .team {
+      padding: 12px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.09);
+    }
+
+    .team h4 {
+      margin-bottom: 6px;
+      color: var(--amber);
+      font-size: 0.92rem;
+      font-weight: 850;
+    }
+
+    .team ul {
+      list-style: none;
+      font-size: 0.92rem;
+      font-weight: 650;
+    }
+
+    .team li { overflow-wrap: anywhere; }
+
+    .swatch {
+      width: 120px;
+      height: 120px;
+      border: 4px solid rgba(255, 255, 255, 0.85);
+      border-radius: 26px;
+      animation: popIn 0.35s ease;
+    }
+
+    .stage-hand {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    /* Playing cards */
+
+    .play-card {
+      position: relative;
+      width: 84px;
+      height: 118px;
+      border-radius: 11px;
+      color: #1d2b27;
+      background: white;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+      font-weight: 850;
+      animation: deal 0.4s ease both;
+    }
+
+    .play-card.red { color: var(--rose); }
+
+    .play-card .corner {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 1rem;
+      line-height: 1.05;
+    }
+
+    .play-card .corner.top { top: 7px; left: 8px; }
+
+    .play-card .corner.bottom {
+      right: 8px;
+      bottom: 7px;
+      transform: rotate(180deg);
+    }
+
+    .play-card .pip {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-size: 2.7rem;
+    }
+
+    .play-card.joker { color: var(--teal-dark); }
+
+    .play-card.joker .corner { font-size: 0.7rem; }
+
+    .play-card.back {
+      border: 5px solid white;
+      background:
+        repeating-linear-gradient(45deg, #1c6258 0 6px, #0f4a43 6px 12px);
+      animation: none;
+    }
+
+    /* Controls */
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .field { min-width: 0; }
+
+    .field label,
+    .field-label {
+      display: block;
+      margin-bottom: 5px;
+      color: #3d564d;
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .field input[type="number"],
+    .field select,
+    .field textarea {
+      width: 100%;
+      min-height: 48px;
+      padding: 9px 13px;
+      border: 2px solid var(--border);
+      border-radius: 13px;
+      color: var(--text);
+      background: #fbfdfc;
+      font-size: 1.02rem;
+      font-weight: 700;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .field textarea {
+      min-height: 150px;
+      resize: vertical;
+      font-weight: 600;
+      line-height: 1.55;
+    }
+
+    .field input:hover,
+    .field select:hover,
+    .field textarea:hover { border-color: #b7d8d2; }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      outline: none;
+      border-color: var(--teal);
+      box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.12);
+    }
+
+    .field.full { grid-column: 1 / -1; }
+
+    .checks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      margin-bottom: 14px;
+    }
+
+    .check {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      min-height: 32px;
+      color: #3d564d;
+      font-size: 0.9rem;
+      font-weight: 650;
+      cursor: pointer;
+    }
+
+    .check input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--teal);
+      cursor: pointer;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .widget-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 52px;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 14px;
+      color: white;
+      background: linear-gradient(135deg, #14958a, #0b6b63);
+      box-shadow: 0 8px 18px rgba(15, 118, 110, 0.24);
+      font-size: 0.98rem;
+      font-weight: 850;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    }
+
+    .widget-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 11px 23px rgba(15, 118, 110, 0.3);
+      filter: brightness(1.05);
+    }
+
+    .widget-btn:active { transform: translateY(0); }
+
+    .widget-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .widget-btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 52px;
+      padding: 12px 18px;
+      border: 1.5px solid #bfdcd6;
+      border-radius: 14px;
+      color: var(--teal-dark);
+      background: white;
+      font-size: 0.94rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .widget-btn-secondary:hover {
+      transform: translateY(-1px);
+      border-color: var(--teal);
+      background: var(--teal-light);
+    }
+
+    .note {
+      min-height: 24px;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 650;
+    }
+
+    .note.error { color: var(--rose); }
+
+    /* Deck meter */
+
+    .deck-meter { margin-bottom: 14px; }
+
+    .deck-meter-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 7px;
+      color: #3d564d;
+      font-size: 0.86rem;
+      font-weight: 750;
+    }
+
+    .meter-track {
+      height: 9px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #dcebe6;
+    }
+
+    .meter-fill {
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #14958a, var(--amber));
+      transition: width 0.3s ease;
+    }
+
+    /* Side card */
+
+    .side-card {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .side-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .side-title {
+      font-size: 1.1rem;
+      font-weight: 850;
+      letter-spacing: -0.4px;
+    }
+
+    .clear-history {
+      padding: 5px 10px;
+      border: 0;
+      border-radius: 8px;
+      color: var(--teal-dark);
+      background: var(--teal-light);
+      font-size: 0.78rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .clear-history[hidden] { display: none; }
+
+    .history {
+      list-style: none;
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .history li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      background: #fafcfb;
+      font-size: 0.88rem;
+    }
+
+    .history .h-icon {
+      flex: 0 0 auto;
+      font-size: 1.05rem;
+    }
+
+    .history .h-body { min-width: 0; }
+
+    .history .h-label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 750;
+    }
+
+    .history .h-value {
+      display: block;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .history-empty {
+      margin-top: 10px;
+      padding: 16px;
+      border: 1px dashed #c9ddd7;
+      border-radius: 13px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.86rem;
+    }
+
+    .tip-box {
+      padding: 16px;
+      border: 1px solid #f3dfa4;
+      border-radius: 16px;
+      background: #fff8e4;
+    }
+
+    .tip-heading {
+      margin-bottom: 6px;
+      color: #7d5a10;
+      font-size: 0.9rem;
+      font-weight: 850;
+    }
+
+    .tip-box p {
+      color: #7f6c43;
+      font-size: 0.85rem;
+      line-height: 1.65;
+    }
+
+    .footer-note {
+      margin-top: 28px;
+      color: #8aa098;
+      text-align: center;
+      font-size: 0.82rem;
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.75); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes deal {
+      from { opacity: 0; transform: translateY(-26px) rotate(-8deg); }
+      to { opacity: 1; transform: translateY(0) rotate(0); }
+    }
+
+    /* Responsive */
+
+    @media (max-width: 800px) {
+      .game-header-content { width: calc(100% - 28px); }
+
+      .game-container {
+        width: calc(100% - 28px);
+        padding-top: 34px;
+      }
+
+      .game-layout { grid-template-columns: 1fr; }
+
+      .intro h2 { letter-spacing: -1.3px; }
+    }
+
+    @media (max-width: 480px) {
+      .game-header { padding: 10px 0; }
+
+      .game-header-content {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .brand {
+        justify-content: center;
+        width: 100%;
+      }
+
+      .header-links {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .back-link {
+        flex: 1;
+        max-width: 190px;
+        min-height: 39px;
+        font-size: 0.8rem;
+      }
+
+      .game-container { width: calc(100% - 22px); padding: 28px 0 35px; }
+
+      .game-card { padding: 20px 15px; border-radius: 22px; }
+
+      .stage { min-height: 170px; padding: 22px 12px; }
+
+      .play-card { width: 70px; height: 99px; }
+
+      .play-card .pip { font-size: 2.2rem; }
+
+      .play-card .corner { font-size: 0.88rem; }
+
+      .actions > button { flex: 1 1 100%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="game-header">
+    <div class="game-header-content">
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">🔀</div>
+        <div>
+          <h1>Random Generator</h1>
+          <small>Numbers, cards, names and more</small>
+        </div>
+      </div>
+
+      <nav class="header-links" aria-label="Main navigation">
+        <a href="widgets.html" class="back-link">← Back to Widgets</a>
+        <a href="index.html" class="back-link">🏠 Home</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="game-container">
+    <section class="intro">
+      <h2>Let chance decide.</h2>
+      <p>Pick a number, draw from a deck, or choose a name from your own list. Every result is fair and unpredictable.</p>
+    </section>
+
+    <div class="game-layout">
+      <section class="game-card" aria-label="Random generator">
+        <div class="tabs" role="tablist" aria-label="Generator type">
+          <button class="tab" role="tab" id="tab-number" aria-controls="panel-number" aria-selected="true">🔢 Number</button>
+          <button class="tab" role="tab" id="tab-card" aria-controls="panel-card" aria-selected="false" tabindex="-1">🃏 Card</button>
+          <button class="tab" role="tab" id="tab-name" aria-controls="panel-name" aria-selected="false" tabindex="-1">👥 Names</button>
+          <button class="tab" role="tab" id="tab-quick" aria-controls="panel-quick" aria-selected="false" tabindex="-1">✨ Quick</button>
+        </div>
+
+        <!-- Number -->
+        <div class="panel" role="tabpanel" id="panel-number" aria-labelledby="tab-number">
+          <div class="stage" id="numberStage" aria-live="polite">
+            <span class="stage-hint">Set a range, then generate.</span>
+          </div>
+
+          <div class="controls">
+            <div class="field">
+              <label for="numMin">Minimum</label>
+              <input type="number" id="numMin" value="1" step="1" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label for="numMax">Maximum</label>
+              <input type="number" id="numMax" value="100" step="1" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label for="numCount">How many</label>
+              <input type="number" id="numCount" value="1" min="1" max="100" step="1" inputmode="numeric">
+            </div>
+          </div>
+
+          <div class="checks">
+            <label class="check"><input type="checkbox" id="numUnique"> No repeats</label>
+            <label class="check"><input type="checkbox" id="numSort"> Sort lowest to highest</label>
+          </div>
+
+          <div class="actions">
+            <button type="button" class="widget-btn" id="numGo">Generate <span aria-hidden="true">→</span></button>
+          </div>
+          <p class="note" id="numNote" role="status"></p>
+        </div>
+
+        <!-- Card -->
+        <div class="panel" role="tabpanel" id="panel-card" aria-labelledby="tab-card" hidden>
+          <div class="stage" id="cardStage" aria-live="polite"></div>
+
+          <div class="deck-meter">
+            <div class="deck-meter-top">
+              <span id="deckText">52 cards in the deck</span>
+              <span id="deckSub"></span>
+            </div>
+            <div class="meter-track"><div class="meter-fill" id="deckFill"></div></div>
+          </div>
+
+          <div class="controls">
+            <div class="field">
+              <label for="cardCount">Cards to draw</label>
+              <select id="cardCount">
+                <option>1</option><option>2</option><option>3</option>
+                <option>4</option><option>5</option><option>7</option>
+                <option>10</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="checks">
+            <label class="check"><input type="checkbox" id="cardJokers"> Include 2 jokers</label>
+            <label class="check"><input type="checkbox" id="cardReplace"> Put cards back after drawing</label>
+          </div>
+
+          <div class="actions">
+            <button type="button" class="widget-btn" id="cardGo">Draw <span aria-hidden="true">→</span></button>
+            <button type="button" class="widget-btn-secondary" id="cardShuffle"><span aria-hidden="true">↻</span> Shuffle deck</button>
+          </div>
+          <p class="note" id="cardNote" role="status"></p>
+        </div>
+
+        <!-- Names -->
+        <div class="panel" role="tabpanel" id="panel-name" aria-labelledby="tab-name" hidden>
+          <div class="stage" id="nameStage" aria-live="polite">
+            <span class="stage-hint">Add names below, then pick.</span>
+          </div>
+
+          <div class="controls">
+            <div class="field full">
+              <label for="nameList">Your list <span id="nameCount" style="color: var(--muted); font-weight: 650;">(0 names)</span></label>
+              <textarea id="nameList" placeholder="One name per line, or separate with commas" spellcheck="false"></textarea>
+            </div>
+            <div class="field">
+              <label for="namePick">Names to pick</label>
+              <input type="number" id="namePick" value="1" min="1" step="1" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label for="teamCount">Number of teams</label>
+              <input type="number" id="teamCount" value="2" min="2" step="1" inputmode="numeric">
+            </div>
+          </div>
+
+          <div class="checks">
+            <label class="check"><input type="checkbox" id="nameRemove"> Remove picked names from the list</label>
+          </div>
+
+          <div class="actions">
+            <button type="button" class="widget-btn" id="namePickBtn">Pick <span aria-hidden="true">→</span></button>
+            <button type="button" class="widget-btn-secondary" id="nameShuffle">Shuffle order</button>
+            <button type="button" class="widget-btn-secondary" id="nameTeams">Make teams</button>
+          </div>
+          <div class="actions" style="margin-top: 10px;">
+            <button type="button" class="widget-btn-secondary" id="nameSample">Try sample names</button>
+            <button type="button" class="widget-btn-secondary" id="nameClear">Clear list</button>
+          </div>
+          <p class="note" id="nameNote" role="status"></p>
+        </div>
+
+        <!-- Quick -->
+        <div class="panel" role="tabpanel" id="panel-quick" aria-labelledby="tab-quick" hidden>
+          <div class="stage" id="quickStage" aria-live="polite">
+            <span class="stage-hint">Choose a quick pick below.</span>
+          </div>
+
+          <div class="actions">
+            <button type="button" class="widget-btn" id="quickYes">Yes or no</button>
+            <button type="button" class="widget-btn" id="quickLetter">Letter</button>
+            <button type="button" class="widget-btn" id="quickColour">Colour</button>
+          </div>
+          <p class="note" role="status" id="quickNote"></p>
+        </div>
+      </section>
+
+      <aside class="game-card side-card">
+        <div>
+          <div class="side-head">
+            <h3 class="side-title">🕘 Recent results</h3>
+            <button type="button" class="clear-history" id="clearHistory" hidden>Clear</button>
+          </div>
+          <ul class="history" id="history"></ul>
+          <p class="history-empty" id="historyEmpty">Your results will show up here.</p>
+        </div>
+
+        <div class="tip-box">
+          <div class="tip-heading">💡 How it works</div>
+          <p>Results come from your browser's secure random number generator, so no outcome is favoured. Your name list is saved on this device only.</p>
+        </div>
+      </aside>
+    </div>
+
+    <p class="footer-note">Need dice or a coin? Try the Dice Roller and Coin Flip widgets.</p>
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const $ = (id) => document.getElementById(id);
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      /* ---------- Helpers ---------- */
+
+      function el(tag, className, text) {
+        const node = document.createElement(tag);
+        if (className) node.className = className;
+        if (text !== undefined) node.textContent = text;
+        return node;
+      }
+
+      // Unbiased secure random integer, inclusive of both ends.
+      function randInt(min, max) {
+        const range = max - min + 1;
+        if (range <= 1) return min;
+        const limit = Math.floor(4294967296 / range) * range;
+        const buf = new Uint32Array(1);
+        let x;
+        do {
+          crypto.getRandomValues(buf);
+          x = buf[0];
+        } while (x >= limit);
+        return min + (x % range);
+      }
+
+      function shuffle(list) {
+        const a = list.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+          const j = randInt(0, i);
+          [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+      }
+
+      function setNote(node, message, isError) {
+        node.textContent = message || "";
+        node.classList.toggle("error", Boolean(isError));
+      }
+
+      function stageHint(stage, message) {
+        stage.replaceChildren(el("span", "stage-hint", message));
+      }
+
+      /* ---------- History ---------- */
+
+      const history = [];
+      const historyList = $("history");
+      const historyEmpty = $("historyEmpty");
+      const clearHistoryBtn = $("clearHistory");
+
+      function addHistory(icon, label, value) {
+        history.unshift({ icon, label, value });
+        if (history.length > 10) history.pop();
+        renderHistory();
+      }
+
+      function renderHistory() {
+        historyList.replaceChildren();
+        history.forEach((item) => {
+          const li = el("li");
+          li.append(el("span", "h-icon", item.icon));
+          const body = el("span", "h-body");
+          body.append(el("span", "h-label", item.label), el("span", "h-value", item.value));
+          li.append(body);
+          historyList.append(li);
+        });
+        historyEmpty.hidden = history.length > 0;
+        clearHistoryBtn.hidden = history.length === 0;
+      }
+
+      clearHistoryBtn.addEventListener("click", () => {
+        history.length = 0;
+        renderHistory();
+      });
+
+      /* ---------- Tabs ---------- */
+
+      const tabs = [...document.querySelectorAll(".tab")];
+
+      function activateTab(tab, focus) {
+        tabs.forEach((t) => {
+          const selected = t === tab;
+          t.setAttribute("aria-selected", String(selected));
+          t.tabIndex = selected ? 0 : -1;
+          $(t.getAttribute("aria-controls")).hidden = !selected;
+        });
+        if (focus) tab.focus();
+      }
+
+      tabs.forEach((tab, index) => {
+        tab.addEventListener("click", () => activateTab(tab, false));
+        tab.addEventListener("keydown", (event) => {
+          let next = null;
+          if (event.key === "ArrowRight") next = tabs[(index + 1) % tabs.length];
+          if (event.key === "ArrowLeft") next = tabs[(index - 1 + tabs.length) % tabs.length];
+          if (event.key === "Home") next = tabs[0];
+          if (event.key === "End") next = tabs[tabs.length - 1];
+          if (next) {
+            event.preventDefault();
+            activateTab(next, true);
+          }
+        });
+      });
+
+      /* ---------- Number ---------- */
+
+      const numStage = $("numberStage");
+      const numNote = $("numNote");
+      let numTimer = null;
+
+      function generateNumbers() {
+        clearInterval(numTimer);
+
+        const min = parseInt($("numMin").value, 10);
+        const max = parseInt($("numMax").value, 10);
+        const count = parseInt($("numCount").value, 10);
+        const unique = $("numUnique").checked;
+        const sorted = $("numSort").checked;
+
+        if ([min, max, count].some(Number.isNaN)) {
+          return setNote(numNote, "Enter whole numbers for the range and the amount.", true);
+        }
+        if (Math.abs(min) > 1e9 || Math.abs(max) > 1e9) {
+          return setNote(numNote, "Keep the range between -1,000,000,000 and 1,000,000,000.", true);
+        }
+        if (min > max) {
+          return setNote(numNote, "The minimum can't be higher than the maximum.", true);
+        }
+        if (count < 1 || count > 100) {
+          return setNote(numNote, "Choose between 1 and 100 numbers.", true);
+        }
+
+        const rangeSize = max - min + 1;
+        if (unique && count > rangeSize) {
+          return setNote(
+            numNote,
+            `That range only has ${rangeSize} different ${rangeSize === 1 ? "number" : "numbers"}. Lower "How many" or widen the range.`,
+            true
+          );
+        }
+
+        setNote(numNote, "");
+
+        let results = [];
+        if (unique) {
+          const seen = new Set();
+          while (seen.size < count) seen.add(randInt(min, max));
+          results = [...seen];
+        } else {
+          for (let i = 0; i < count; i++) results.push(randInt(min, max));
+        }
+        if (sorted) results.sort((a, b) => a - b);
+
+        const summary = results.join(", ");
+
+        if (count === 1) {
+          const big = el("div", "big-value pop", String(results[0]));
+          numStage.replaceChildren(el("span", "stage-label", `Between ${min} and ${max}`), big);
+
+          if (!reduceMotion) {
+            let ticks = 0;
+            numTimer = setInterval(() => {
+              ticks++;
+              big.textContent = ticks >= 9 ? String(results[0]) : String(randInt(min, max));
+              if (ticks >= 9) clearInterval(numTimer);
+            }, 50);
+          }
+        } else {
+          const chips = el("div", "chips");
+          results.forEach((n, i) => {
+            const chip = el("span", "chip amber", String(n));
+            chip.style.animationDelay = `${Math.min(i, 20) * 20}ms`;
+            chips.append(chip);
+          });
+          numStage.replaceChildren(
+            el("span", "stage-label", `${count} ${unique ? "unique " : ""}numbers from ${min} to ${max}`),
+            chips
+          );
+        }
+
+        addHistory("🔢", `Number, ${min} to ${max}`, summary);
+      }
+
+      $("numGo").addEventListener("click", generateNumbers);
+      ["numMin", "numMax", "numCount"].forEach((id) => {
+        $(id).addEventListener("keydown", (event) => {
+          if (event.key === "Enter") generateNumbers();
+        });
+      });
+
+      /* ---------- Cards ---------- */
+
+      const RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+      const RANK_NAMES = { A: "Ace", J: "Jack", Q: "Queen", K: "King" };
+      const SUITS = [
+        { symbol: "♠", name: "spades", red: false },
+        { symbol: "♥", name: "hearts", red: true },
+        { symbol: "♦", name: "diamonds", red: true },
+        { symbol: "♣", name: "clubs", red: false }
+      ];
+
+      const cardStage = $("cardStage");
+      const cardNote = $("cardNote");
+      const jokersBox = $("cardJokers");
+      const replaceBox = $("cardReplace");
+      let deck = [];
+
+      function buildDeck() {
+        const cards = [];
+        SUITS.forEach((suit) => {
+          RANKS.forEach((rank) => cards.push({ rank, suit }));
+        });
+        if (jokersBox.checked) {
+          cards.push({ rank: "Joker", suit: null });
+          cards.push({ rank: "Joker", suit: null });
+        }
+        return cards;
+      }
+
+      function cardLabel(card) {
+        if (!card.suit) return "Joker";
+        return `${RANK_NAMES[card.rank] || card.rank} of ${card.suit.name}`;
+      }
+
+      function cardShort(card) {
+        return card.suit ? `${card.rank}${card.suit.symbol}` : "Joker";
+      }
+
+      function cardElement(card, index) {
+        const node = el("div", "play-card");
+        node.setAttribute("role", "img");
+        node.setAttribute("aria-label", cardLabel(card));
+        node.style.animationDelay = `${index * 90}ms`;
+
+        if (!card.suit) {
+          node.classList.add("joker");
+          const top = el("span", "corner top", "★");
+          top.append(el("span", "", "JK"));
+          const bottom = el("span", "corner bottom", "★");
+          bottom.append(el("span", "", "JK"));
+          node.append(top, el("span", "pip", "🃏"), bottom);
+          return node;
+        }
+
+        if (card.suit.red) node.classList.add("red");
+        const makeCorner = (position) => {
+          const corner = el("span", `corner ${position}`);
+          corner.append(el("span", "", card.rank), el("span", "", card.suit.symbol));
+          return corner;
+        };
+        node.append(makeCorner("top"), el("span", "pip", card.suit.symbol), makeCorner("bottom"));
+        return node;
+      }
+
+      function showDeckBack(message) {
+        const back = el("div", "play-card back");
+        back.setAttribute("aria-hidden", "true");
+        const hand = el("div", "stage-hand");
+        hand.append(back);
+        cardStage.replaceChildren(hand, el("span", "stage-hint", message));
+      }
+
+      function updateDeckMeter() {
+        const total = buildDeck().length;
+        const fill = $("deckFill");
+
+        if (replaceBox.checked) {
+          $("deckText").textContent = `${total} cards, always a full deck`;
+          $("deckSub").textContent = "Cards go back";
+          fill.style.width = "100%";
+          return;
+        }
+
+        $("deckText").textContent = `${deck.length} of ${total} cards left`;
+        $("deckSub").textContent = deck.length === 0 ? "Empty" : "";
+        fill.style.width = `${(deck.length / total) * 100}%`;
+      }
+
+      function shuffleDeck(announce) {
+        deck = shuffle(buildDeck());
+        updateDeckMeter();
+        showDeckBack(announce ? "Deck shuffled. Ready to draw." : "Draw a card to begin.");
+        setNote(cardNote, "");
+      }
+
+      function drawCards() {
+        const wanted = parseInt($("cardCount").value, 10);
+        let drawn;
+        let message = "";
+
+        if (replaceBox.checked) {
+          drawn = shuffle(buildDeck()).slice(0, wanted);
+        } else {
+          if (deck.length === 0) {
+            return setNote(cardNote, "The deck is empty. Shuffle it to start again.", true);
+          }
+          const take = Math.min(wanted, deck.length);
+          drawn = deck.splice(deck.length - take, take);
+          if (take < wanted) message = `Only ${take} ${take === 1 ? "card was" : "cards were"} left in the deck.`;
+        }
+
+        const hand = el("div", "stage-hand");
+        drawn.forEach((card, i) => hand.append(cardElement(card, i)));
+
+        cardStage.replaceChildren(
+          el("span", "stage-label", drawn.map(cardLabel).join(", ")),
+          hand
+        );
+
+        updateDeckMeter();
+        setNote(cardNote, message || (!replaceBox.checked && deck.length === 0 ? "That was the last card. Shuffle to start again." : ""));
+        addHistory("🃏", `Drew ${drawn.length} ${drawn.length === 1 ? "card" : "cards"}`, drawn.map(cardShort).join(", "));
+      }
+
+      $("cardGo").addEventListener("click", drawCards);
+      $("cardShuffle").addEventListener("click", () => shuffleDeck(true));
+      jokersBox.addEventListener("change", () => shuffleDeck(true));
+      replaceBox.addEventListener("change", () => {
+        updateDeckMeter();
+        setNote(cardNote, "");
+      });
+
+      /* ---------- Names ---------- */
+
+      const nameStage = $("nameStage");
+      const nameNote = $("nameNote");
+      const nameInput = $("nameList");
+      const STORAGE_KEY = "ansh-random-names";
+      let nameTimer = null;
+
+      function getNames() {
+        return nameInput.value
+          .split(/[\n,]+/)
+          .map((s) => s.trim())
+          .filter(Boolean);
+      }
+
+      function saveNames() {
+        try {
+          localStorage.setItem(STORAGE_KEY, nameInput.value);
+        } catch (error) {
+          /* Storage can be unavailable; the tool still works. */
+        }
+      }
+
+      function refreshNameCount() {
+        const n = getNames().length;
+        $("nameCount").textContent = `(${n} ${n === 1 ? "name" : "names"})`;
+      }
+
+      function setNames(list) {
+        nameInput.value = list.join("\n");
+        refreshNameCount();
+        saveNames();
+      }
+
+      function pickNames() {
+        clearInterval(nameTimer);
+        const names = getNames();
+        const count = parseInt($("namePick").value, 10);
+
+        if (names.length === 0) return setNote(nameNote, "Add at least one name to the list first.", true);
+        if (Number.isNaN(count) || count < 1) return setNote(nameNote, "Choose how many names to pick.", true);
+        if (count > names.length) {
+          return setNote(nameNote, `You asked for ${count} names but the list has ${names.length}.`, true);
+        }
+
+        setNote(nameNote, "");
+
+        const order = shuffle(names.map((_, i) => i)).slice(0, count);
+        const picked = order.map((i) => names[i]);
+
+        if (count === 1) {
+          const winner = el("div", "winner-name pop", picked[0]);
+          nameStage.replaceChildren(el("span", "stage-label", "The pick is"), winner);
+
+          if (!reduceMotion && names.length > 1) {
+            let ticks = 0;
+            nameTimer = setInterval(() => {
+              ticks++;
+              winner.textContent = ticks >= 10 ? picked[0] : names[randInt(0, names.length - 1)];
+              if (ticks >= 10) clearInterval(nameTimer);
+            }, 60);
+          }
+        } else {
+          const chips = el("div", "chips");
+          picked.forEach((name, i) => {
+            const chip = el("span", "chip amber", name);
+            chip.style.animationDelay = `${Math.min(i, 20) * 30}ms`;
+            chips.append(chip);
+          });
+          nameStage.replaceChildren(el("span", "stage-label", `${count} picked from ${names.length}`), chips);
+        }
+
+        if ($("nameRemove").checked) {
+          const remaining = names.slice();
+          picked.forEach((name) => {
+            const at = remaining.indexOf(name);
+            if (at !== -1) remaining.splice(at, 1);
+          });
+          setNames(remaining);
+          setNote(nameNote, `${remaining.length} ${remaining.length === 1 ? "name" : "names"} left in the list.`);
+        }
+
+        addHistory("👥", `Picked from ${names.length}`, picked.join(", "));
+      }
+
+      function shuffleNames() {
+        const names = getNames();
+        if (names.length < 2) return setNote(nameNote, "Add at least two names to shuffle.", true);
+        setNote(nameNote, "");
+
+        const mixed = shuffle(names);
+        setNames(mixed);
+
+        const chips = el("div", "chips");
+        mixed.forEach((name, i) => {
+          const chip = el("span", "chip");
+          chip.append(el("small", "", String(i + 1)), document.createTextNode(name));
+          chip.style.animationDelay = `${Math.min(i, 20) * 20}ms`;
+          chips.append(chip);
+        });
+        nameStage.replaceChildren(el("span", "stage-label", "New order"), chips);
+        addHistory("👥", "Shuffled order", mixed.join(", "));
+      }
+
+      function makeTeams() {
+        const names = getNames();
+        const teamTotal = parseInt($("teamCount").value, 10);
+
+        if (Number.isNaN(teamTotal) || teamTotal < 2) return setNote(nameNote, "Choose at least 2 teams.", true);
+        if (names.length < teamTotal) {
+          return setNote(nameNote, `You need at least ${teamTotal} names for ${teamTotal} teams.`, true);
+        }
+
+        setNote(nameNote, "");
+
+        const groups = Array.from({ length: teamTotal }, () => []);
+        shuffle(names).forEach((name, i) => groups[i % teamTotal].push(name));
+
+        const grid = el("div", "teams");
+        groups.forEach((members, i) => {
+          const box = el("div", "team");
+          box.append(el("h4", "", `Team ${i + 1}`));
+          const ul = el("ul");
+          members.forEach((m) => ul.append(el("li", "", m)));
+          box.append(ul);
+          grid.append(box);
+        });
+
+        nameStage.replaceChildren(el("span", "stage-label", `${names.length} names in ${teamTotal} teams`), grid);
+        addHistory("👥", `${teamTotal} teams`, groups.map((g, i) => `T${i + 1}: ${g.join(", ")}`).join(" | "));
+      }
+
+      $("namePickBtn").addEventListener("click", pickNames);
+      $("nameShuffle").addEventListener("click", shuffleNames);
+      $("nameTeams").addEventListener("click", makeTeams);
+
+      $("nameSample").addEventListener("click", () => {
+        setNames(["Aarav", "Maya", "Liam", "Sofia", "Noah", "Zara", "Ethan", "Priya"]);
+        setNote(nameNote, "Sample names added. Edit them any time.");
+      });
+
+      $("nameClear").addEventListener("click", () => {
+        setNames([]);
+        stageHint(nameStage, "Add names below, then pick.");
+        setNote(nameNote, "");
+        nameInput.focus();
+      });
+
+      nameInput.addEventListener("input", () => {
+        refreshNameCount();
+        saveNames();
+      });
+
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) nameInput.value = saved;
+      } catch (error) {
+        /* Ignore unavailable storage. */
+      }
+      refreshNameCount();
+
+      /* ---------- Quick picks ---------- */
+
+      const quickStage = $("quickStage");
+
+      $("quickYes").addEventListener("click", () => {
+        const answer = randInt(0, 1) === 1 ? "Yes" : "No";
+        quickStage.replaceChildren(el("span", "stage-label", "The answer is"), el("div", "big-value pop", answer));
+        addHistory("✨", "Yes or no", answer);
+      });
+
+      $("quickLetter").addEventListener("click", () => {
+        const letter = String.fromCharCode(65 + randInt(0, 25));
+        quickStage.replaceChildren(el("span", "stage-label", "Your letter is"), el("div", "big-value pop", letter));
+        addHistory("✨", "Letter", letter);
+      });
+
+      $("quickColour").addEventListener("click", () => {
+        const hex = "#" + [0, 0, 0]
+          .map(() => randInt(0, 255).toString(16).padStart(2, "0"))
+          .join("")
+          .toUpperCase();
+        const swatch = el("div", "swatch");
+        swatch.style.background = hex;
+        swatch.setAttribute("role", "img");
+        swatch.setAttribute("aria-label", `Colour ${hex}`);
+        quickStage.replaceChildren(swatch, el("div", "winner-name pop", hex));
+        addHistory("✨", "Colour", hex);
+      });
+
+      /* ---------- Start ---------- */
+
+      shuffleDeck(false);
+      renderHistory();
+    })();
+  </script>
+</body>
+</html>
