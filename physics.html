@@ -236,8 +236,18 @@ hr{border:0;border-top:1px solid var(--line);margin:14px 0}
     sim(s, dt) { s.vy -= P.g * dt; s.vx -= P.drag * s.vx * dt; s.vy -= P.drag * s.vy * dt; s.x += s.vx * dt; s.y += s.vy * dt; },
     step(dt) {
       for (const s of this.shots) if (s.live) {
-        for (let i = 0; i < 4; i++) this.sim(s, dt / 4);
-        s.t.push([s.x, s.y]); if (s.y <= 0) { s.y = 0; s.live = false; }
+        for (let i = 0; i < 4; i++) {
+          if (!s.live) break;
+          const before = { x: s.x, y: s.y };
+          this.sim(s, dt / 4);
+          if (s.y <= 0 && before.y > 0) {
+            const f = before.y / (before.y - s.y);
+            s.x = before.x + (s.x - before.x) * f;
+            s.y = 0;
+            s.live = false;
+          }
+        }
+        s.t.push([s.x, s.y]);
       }
     },
     draw() {
@@ -246,11 +256,29 @@ hr{border:0;border-top:1px solid var(--line);margin:14px 0}
       ctx.fillStyle = "#8f9ab0"; ctx.font = "11px system-ui"; ctx.textAlign = "center";
       for (let m = 0; X(m) < W; m += z < 5 ? 20 : 10) { ctx.fillRect(X(m), gy, 1, 6); ctx.fillText(m + " m", X(m), gy + 20); }
       const a = P.ang * Math.PI / 180, p = { x: 0, y: 0, vx: P.v0 * Math.cos(a), vy: P.v0 * Math.sin(a) };
-      let top = 0, T = 0;
+      // Predict the complete flight, not a fixed 30-second window. Use the same
+      // equations as the live projectile and stop at the first ground crossing.
+      let top = 0, T = 0, range = 0, previousY = 0, previousX = 0;
+      const previewStep = 0.005, maxPreviewSteps = 200000;
       ctx.fillStyle = "rgba(255,255,255,.5)";
-      for (let i = 0; i < 1500 && (p.y >= 0 || i < 2); i++) {
-        this.sim(p, 0.02); T += 0.02; top = Math.max(top, p.y);
-        if (i % 4 === 0 && p.y >= 0) ctx.fillRect(X(p.x) - 1, Y(p.y) - 1, 3, 3);
+      for (let i = 0; i < maxPreviewSteps; i++) {
+        previousX = p.x; previousY = p.y;
+        this.sim(p, previewStep);
+        T += previewStep;
+        top = Math.max(top, p.y);
+        if (i % 4 === 0 && p.y >= 0 && X(p.x) >= 0 && X(p.x) <= W) {
+          ctx.fillRect(X(p.x) - 1, Y(p.y) - 1, 3, 3);
+        }
+        if (p.y <= 0 && T > previewStep) {
+          // Interpolate the final fraction of the step to the ground for a
+          // more accurate landing time and horizontal range.
+          const fraction = previousY > 0 ? previousY / (previousY - p.y) : 0;
+          range = previousX + (p.x - previousX) * fraction;
+          T -= previewStep * (1 - fraction);
+          top = Math.max(top, 0);
+          break;
+        }
+        range = p.x;
       }
       ctx.strokeStyle = "#ff785a"; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(X(0), Y(0)); ctx.lineTo(X(0) + Math.cos(a) * 36, Y(0) - Math.sin(a) * 36); ctx.stroke();
       for (const s of this.shots) {
@@ -259,7 +287,7 @@ hr{border:0;border-top:1px solid var(--line);margin:14px 0}
         ctx.fillStyle = "#ffd24a"; ctx.beginPath(); ctx.arc(X(s.x), Y(s.y), 6, 0, 7); ctx.fill();
       }
       ctx.textAlign = "left";
-      hud(`Range ${p.x.toFixed(1)} m · Max height ${top.toFixed(1)} m · Flight ${T.toFixed(1)} s`);
+      hud(`Range ${range.toFixed(1)} m · Max height ${top.toFixed(1)} m · Flight ${T.toFixed(1)} s`);
     },
     up() {}
   };
