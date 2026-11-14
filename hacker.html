@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#020805">
+<meta name="description" content="A fake hacker terminal. Go fullscreen and look like you're breaking into the mainframe.">
+<title>Hacker Terminal | Ansh Patel</title>
+<style>
+:root{--c:#27ff7a;--c2:rgba(39,255,122,.18);--bg:#020805;--dim:#1b8a47}
+*{box-sizing:border-box;margin:0;padding:0}
+html{color-scheme:dark}
+body{min-height:100vh;background:var(--bg);color:var(--c);font:13px/1.45 "JetBrains Mono","Fira Code",ui-monospace,Menlo,Consolas,monospace;overflow-x:hidden}
+body.alert{--c:#ff3b3b;--c2:rgba(255,59,59,.2);--dim:#9a2424;animation:flash .5s steps(2) infinite}
+@keyframes flash{50%{background:#1a0303}}
+button,input,a{font:inherit;color:inherit}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--c);outline-offset:2px}
+#rain{position:fixed;inset:0;width:100%;height:100%;opacity:.3;pointer-events:none}
+.top{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 16px;background:rgba(2,8,5,.9);border-bottom:1px solid var(--c2);flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;text-decoration:none;white-space:nowrap}
+.ico{width:34px;height:34px;display:grid;place-items:center;border:1px solid var(--c);border-radius:8px;font-size:15px;box-shadow:0 0 12px var(--c2)}
+nav{display:flex;gap:8px;flex-wrap:wrap}
+.nl,.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:34px;padding:6px 12px;border:1px solid var(--c2);border-radius:6px;background:rgba(39,255,122,.04);text-decoration:none;cursor:pointer;font-size:12px;font-weight:700;transition:.15s}
+body.alert .nl,body.alert .btn{background:rgba(255,59,59,.05)}
+.nl:hover,.btn:hover{background:var(--c);color:#021006;border-color:var(--c);box-shadow:0 0 14px var(--c2)}
+:fullscreen .top{display:none}
+.wrap{position:relative;z-index:1;display:grid;grid-template-columns:230px minmax(0,1fr) 270px;gap:12px;padding:12px;min-height:calc(100vh - 53px)}
+:fullscreen .wrap{min-height:100vh}
+.box{border:1px solid var(--c2);background:rgba(2,10,6,.82);border-radius:6px;padding:10px;min-width:0;box-shadow:inset 0 0 24px rgba(39,255,122,.03)}
+.box h2{font-size:11px;font-weight:700;color:var(--dim);margin-bottom:8px;letter-spacing:1px}
+.col{display:flex;flex-direction:column;gap:12px;min-width:0}
+.ops{display:grid;gap:6px}
+.ops .btn{justify-content:flex-start;text-align:left}
+.term{display:flex;flex-direction:column;height:calc(100vh - 77px);min-height:420px}
+:fullscreen .term{height:calc(100vh - 24px)}
+#prog{height:3px;background:var(--c2);margin-bottom:8px;border-radius:2px;overflow:hidden}
+#prog i{display:block;height:100%;width:0;background:var(--c);box-shadow:0 0 8px var(--c);transition:width .15s}
+#log{flex:1;overflow-y:auto;overflow-wrap:anywhere;scrollbar-width:thin;scrollbar-color:var(--dim) transparent}
+#log div{white-space:pre-wrap}
+.ok{color:#9dffc0}.warn{color:#ffd24a}.bad{color:#ff5b5b}.dim{color:var(--dim)}.inf{color:#5fd8ff}
+.prompt{display:flex;gap:8px;align-items:center;border-top:1px solid var(--c2);margin-top:8px;padding-top:8px}
+.prompt input{flex:1;min-width:0;background:transparent;border:0;outline:0;caret-color:var(--c);text-shadow:0 0 6px var(--c2)}
+.row{display:flex;justify-content:space-between;gap:8px;font-size:12px;margin-bottom:3px}
+.bar{height:6px;background:var(--c2);border-radius:3px;overflow:hidden;margin-bottom:8px}
+.bar i{display:block;height:100%;background:var(--c);transition:width .6s}
+#hex{font-size:11px;line-height:1.5;color:var(--dim);overflow:hidden;white-space:pre;height:150px}
+.node{display:flex;justify-content:space-between;gap:6px;font-size:12px;padding:2px 0;border-bottom:1px dashed var(--c2)}
+.node b{font-weight:400}
+.big{font-size:22px;font-weight:800;text-shadow:0 0 12px var(--c);letter-spacing:2px}
+#banner{display:none;position:fixed;inset:0;z-index:50;place-items:center;pointer-events:none;text-align:center}
+body.alert #banner{display:grid}
+#banner div{padding:20px 40px;border:3px solid var(--c);background:rgba(20,0,0,.85);font-size:clamp(22px,5vw,48px);font-weight:900;letter-spacing:4px}
+@media(max-width:1000px){.wrap{grid-template-columns:1fr}.term{height:60vh}.ops{grid-template-columns:repeat(2,1fr)}}
+@media(prefers-reduced-motion:reduce){body.alert{animation:none}}
+</style>
+</head>
+<body>
+<canvas id="rain" aria-hidden="true"></canvas>
+<div id="banner" aria-hidden="true"><div>⚠ INTRUSION DETECTED<br>侵入検知 · 入侵警报</div></div>
+<header class="top">
+  <a class="brand" href="index.html" aria-label="Ansh Patel home"><span class="ico" aria-hidden="true">&gt;_</span><span>Hacker Terminal</span></a>
+  <nav aria-label="Main navigation">
+    <a class="nl" href="widgets.html">← Back to Widgets</a>
+    <a class="nl" href="index.html">⌂ Home</a>
+  </nav>
+</header>
+
+<main class="wrap">
+  <aside class="col" aria-label="Operations">
+    <section class="box">
+      <h2>OPERATIONS · 操作</h2>
+      <div class="ops">
+        <button class="btn" data-run="scan">▸ Scan network</button>
+        <button class="btn" data-run="brute">▸ Brute force login</button>
+        <button class="btn" data-run="firewall">▸ Bypass firewall</button>
+        <button class="btn" data-run="decrypt">▸ Decrypt hash</button>
+        <button class="btn" data-run="inject">▸ Inject payload</button>
+        <button class="btn" data-run="trace">▸ Trace route</button>
+        <button class="btn" data-run="satellite">▸ Hijack satellite</button>
+        <button class="btn" data-run="alert">⚠ Trigger alarm</button>
+        <button class="btn" data-run="color">◐ Change colour</button>
+        <button class="btn" data-run="clear">✕ Clear screen</button>
+        <button class="btn" id="fs">⛶ Fullscreen</button>
+      </div>
+    </section>
+    <section class="box">
+      <h2>ACCESS LEVEL · 権限</h2>
+      <div class="big" id="level">GUEST</div>
+      <div class="row dim" style="margin-top:6px"><span>Uptime</span><span id="uptime">00:00:00</span></div>
+      <div class="row dim"><span>Clock</span><span id="clock"></span></div>
+    </section>
+  </aside>
+
+  <section class="box term" aria-label="Terminal">
+    <div id="prog"><i></i></div>
+    <div id="log" role="log" aria-live="off"></div>
+    <label class="prompt"><span id="ps">root@mainframe:~#</span>
+      <input id="cmd" type="text" autocomplete="off" spellcheck="false" placeholder="type help" aria-label="Terminal command">
+    </label>
+  </section>
+
+  <aside class="col" aria-label="System monitors">
+    <section class="box">
+      <h2>SYSTEM · システム</h2>
+      <div class="row"><span>CPU</span><span id="cpuV">0%</span></div><div class="bar"><i id="cpu"></i></div>
+      <div class="row"><span>MEM</span><span id="memV">0%</span></div><div class="bar"><i id="mem"></i></div>
+      <div class="row"><span>NET ↑↓</span><span id="netV">0 MB/s</span></div><div class="bar"><i id="net"></i></div>
+      <div class="row"><span>CRACK 破解</span><span id="crkV">0%</span></div><div class="bar"><i id="crk"></i></div>
+    </section>
+    <section class="box"><h2>MEMORY DUMP · 메모리</h2><div id="hex" aria-hidden="true"></div></section>
+    <section class="box"><h2>NODES · 节点</h2><div id="nodes"></div></section>
+  </aside>
+</main>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const log = $("log"), cmd = $("cmd"), prog = $("prog").firstElementChild;
+  const rnd = n => Math.floor(Math.random() * n);
+  const pick = a => a[rnd(a.length)];
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const hex = n => Array.from({ length: n }, () => rnd(16).toString(16)).join("");
+  const ip = () => `${1 + rnd(222)}.${rnd(256)}.${rnd(256)}.${1 + rnd(254)}`;
+  const GLYPHS = "ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄ日月火水木金土電脳暗号侵入突破漢字数据한국어해킹접속Привет взлом ΣΩΔλ0123456789";
+  const glyphs = n => Array.from({ length: n }, () => GLYPHS[rnd(GLYPHS.length)]).join("");
+  const CITIES = ["Tokyo 東京", "Beijing 北京", "Seoul 서울", "Moscow Москва", "Cairo القاهرة", "Mumbai मुंबई", "Berlin Berlín", "Osaka 大阪", "Shanghai 上海", "Taipei 台北", "Athens Αθήνα", "Bangkok กรุงเทพฯ"];
+  const SERVICES = ["ssh", "http", "https", "ftp", "smtp", "mysql", "rdp", "telnet", "smb", "redis"];
+  const colors = ["#27ff7a", "#38d9ff", "#ffb627", "#d66bff"];
+  let colorIdx = 0, busy = false, crack = 0;
+
+  function line(text, cls) {
+    const d = document.createElement("div");
+    if (cls) d.className = cls;
+    d.textContent = text;
+    log.appendChild(d);
+    while (log.childElementCount > 400) log.firstChild.remove();
+    log.scrollTop = log.scrollHeight;
+  }
+  function setProg(p) { prog.style.width = p + "%"; }
+  function setCrack(p) { crack = p; $("crk").style.width = p + "%"; $("crkV").textContent = Math.round(p) + "%"; }
+
+  async function steps(list, delay = [90, 260]) {
+    for (let i = 0; i < list.length; i++) {
+      const [t, c] = list[i];
+      line(t, c);
+      setProg(((i + 1) / list.length) * 100);
+      await sleep(delay[0] + rnd(delay[1] - delay[0]));
+    }
+    await sleep(300); setProg(0);
+  }
+
+  const ACTIONS = {
+    scan: () => {
+      const l = [["[*] Starting port scanner v4.2 · スキャン開始", "inf"]];
+      for (let i = 0; i < 10; i++) l.push([`[+] ${ip()}:${pick([22, 80, 443, 21, 3306, 3389, 8080])}  OPEN  ${pick(SERVICES)}  ${glyphs(5)}`, "ok"]);
+      l.push([`[✓] Scan complete · ${5 + rnd(40)} hosts alive · 完了`, "ok"]);
+      return l;
+    },
+    brute: () => {
+      const pw = ["admin123", "P@ssw0rd", "letmein", "qwerty", "密码123", "비밀번호", "hunter2", "пароль1", "toor", "dragon", "sakura桜"];
+      const l = [["[*] Loading wordlist rockyou.txt (14,344,391 entries)", "inf"]];
+      for (let i = 0; i < 14; i++) l.push([`[~] ssh root@${ip()}  trying '${pick(pw)}${rnd(99)}' ... FAILED`, "dim"]);
+      l.push([`[✓] ACCESS GRANTED  user=root  key=${hex(24)}`, "ok"]);
+      l.push(["[!] Privilege escalation: GUEST → ROOT", "warn"]);
+      return l;
+    },
+    firewall: () => {
+      const l = [["[*] Fingerprinting firewall: Cisco ASA · 防火墙", "inf"]];
+      ["Layer 3 packet filter", "Deep packet inspection", "Intrusion prevention", "Geo-IP block 地域封锁", "Rate limiter"].forEach(n => {
+        l.push([`[~] Bypassing ${n} ...`, "dim"]); l.push([`[✓] ${n} neutralised  ${hex(8)}`, "ok"]);
+      });
+      l.push(["[✓] Firewall rules overwritten · ファイアウォール突破", "ok"]);
+      return l;
+    },
+    decrypt: () => {
+      const l = [["[*] Target hash: " + hex(32) + "  (SHA-256)", "inf"]];
+      for (let i = 1; i <= 12; i++) l.push([`[~] block ${String(i).padStart(2, "0")}/12  ${hex(32)}  ${glyphs(3)}`, "dim"]);
+      l.push([`[✓] PLAINTEXT: ${pick(["correct horse battery staple", "ひみつのパスワード", "我的秘密2026", "비밀입니다!", "Секрет42"])}`, "ok"]);
+      return l;
+    },
+    inject: () => {
+      const l = [["[*] Building payload (x86_64/linux) · ペイロード作成", "inf"]];
+      for (let i = 0; i < 8; i++) l.push([`[~] writing 0x${hex(8)}  ${hex(48)}`, "dim"]);
+      l.push(["[!] Buffer overflow triggered at 0x" + hex(8), "warn"]);
+      l.push(["[✓] Shell spawned · reverse connection from " + ip(), "ok"]);
+      return l;
+    },
+    trace: () => {
+      const l = [["[*] traceroute to mainframe.corp (" + ip() + "), 30 hops max", "inf"]];
+      for (let i = 1; i <= 10; i++) l.push([` ${String(i).padStart(2)}  ${ip().padEnd(16)} ${(5 + rnd(180)) + "." + rnd(9)} ms   ${pick(CITIES)}`, "dim"]);
+      l.push(["[✓] Target located · 目标已定位", "ok"]);
+      return l;
+    },
+    satellite: () => {
+      const l = [["[*] Acquiring uplink · 衛星接続中", "inf"]];
+      ["Aligning dish", "Handshake with SAT-" + (1000 + rnd(9000)), "Cracking telemetry key", "Overriding orbit controller"].forEach(t => l.push(["[~] " + t + " ...", "dim"]));
+      l.push([`[✓] Control acquired · LAT ${(rnd(1800) / 10 - 90).toFixed(3)}  LON ${(rnd(3600) / 10 - 180).toFixed(3)}`, "ok"]);
+      return l;
+    }
+  };
+
+  async function run(name) {
+    if (name === "clear") { log.textContent = ""; return; }
+    if (name === "color") { colorIdx = (colorIdx + 1) % colors.length; document.body.classList.remove("alert"); const c = colors[colorIdx]; document.documentElement.style.setProperty("--c", c); document.documentElement.style.setProperty("--c2", c + "30"); line("[*] Colour scheme updated", "inf"); return; }
+    if (name === "alert") { document.body.classList.add("alert"); line("[!!!] INTRUSION DETECTED · 侵入検知", "bad"); setTimeout(() => { document.body.classList.remove("alert"); line("[✓] Alarm silenced", "ok"); }, 3500); return; }
+    if (!ACTIONS[name]) { line(`bash: ${name}: command not found`, "bad"); return; }
+    if (busy) { line("[!] Another operation is running...", "warn"); return; }
+    busy = true;
+    const from = crack, to = Math.min(100, crack + 12 + rnd(20));
+    const anim = setInterval(() => setCrack(Math.min(to, crack + 1)), 120);
+    await steps(ACTIONS[name]());
+    clearInterval(anim); busy = false;
+    if (crack >= 100) { $("level").textContent = "ROOT"; line("[★] SYSTEM FULLY COMPROMISED · 完全掌握", "warn"); setTimeout(() => setCrack(0), 2500); $("level").textContent = "ROOT"; }
+    else if (crack > 60) $("level").textContent = "ADMIN";
+    else if (crack > 25) $("level").textContent = "USER";
+    void from;
+  }
+
+  document.querySelectorAll("[data-run]").forEach(b => b.addEventListener("click", () => { line("root@mainframe:~# " + b.dataset.run, ""); run(b.dataset.run); }));
+
+  const HELP = "Commands: scan  brute  firewall  decrypt  inject  trace  satellite  alert  color  clear  whoami  date  help";
+  const hist = []; let hi = 0;
+  cmd.addEventListener("keydown", e => {
+    if (e.key === "ArrowUp" && hist.length) { hi = Math.max(0, hi - 1); cmd.value = hist[hi]; e.preventDefault(); }
+    if (e.key === "ArrowDown") { hi = Math.min(hist.length, hi + 1); cmd.value = hist[hi] || ""; e.preventDefault(); }
+    if (e.key !== "Enter") return;
+    const v = cmd.value.trim().toLowerCase(); cmd.value = "";
+    if (!v) return;
+    hist.push(v); hi = hist.length;
+    line("root@mainframe:~# " + v, "");
+    if (v === "help") line(HELP, "inf");
+    else if (v === "whoami") line("root  (uid=0)  権限: すべて", "ok");
+    else if (v === "date") line(new Date().toString(), "dim");
+    else if (v === "ls") line("secrets.db  passwords.txt  机密文件.zip  nuclear_codes.enc  비밀.log", "dim");
+    else run(v);
+  });
+
+  $("fs").addEventListener("click", () => {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => line("[!] Fullscreen blocked by browser", "warn"));
+    else line("[!] Fullscreen not supported here", "warn");
+  });
+  document.addEventListener("click", e => { if (!e.target.closest("button,a,input")) cmd.focus(); });
+
+  // Matrix rain
+  const cv = $("rain"), cx = cv.getContext("2d"); let cols = [], fs = 16;
+  function sizeRain() { cv.width = innerWidth; cv.height = innerHeight; cols = Array.from({ length: Math.ceil(cv.width / fs) }, () => rnd(cv.height / fs)); }
+  addEventListener("resize", sizeRain); sizeRain();
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  setInterval(() => {
+    if (reduce) return;
+    cx.fillStyle = "rgba(2,8,5,.12)"; cx.fillRect(0, 0, cv.width, cv.height);
+    cx.fillStyle = getComputedStyle(document.body).getPropertyValue("--c") || "#27ff7a"; cx.font = fs + "px monospace";
+    cols.forEach((y, i) => {
+      cx.fillText(GLYPHS[rnd(GLYPHS.length)], i * fs, y * fs);
+      cols[i] = y * fs > cv.height && Math.random() > .975 ? 0 : y + 1;
+    });
+  }, 55);
+
+  // Live panels
+  const bars = [["cpu", "cpuV", "%"], ["mem", "memV", "%"]];
+  const nodeNames = ["Tokyo-01 東京", "Seoul-07 서울", "Beijing-3 北京", "Moscow-9 Москва", "Dubai-2 دبي", "Berlin-4"];
+  const nodesEl = $("nodes");
+  nodeNames.forEach(n => { const d = document.createElement("div"); d.className = "node"; d.innerHTML = "<span>" + n + "</span><b></b>"; nodesEl.appendChild(d); });
+  function tick() {
+    bars.forEach(([b, v]) => { const p = 15 + rnd(80); $(b).style.width = p + "%"; $(v).textContent = p + "%"; });
+    const n = rnd(900) / 10; $("net").style.width = Math.min(100, n) + "%"; $("netV").textContent = n.toFixed(1) + " MB/s";
+    nodesEl.querySelectorAll(".node b").forEach(b => { const s = pick(["ONLINE", "ONLINE", "SYNC", "ONLINE", "PWNED", "IDLE"]); b.textContent = s; b.style.color = s === "PWNED" ? "#ff5b5b" : ""; });
+  }
+  setInterval(tick, 1200); tick();
+  setInterval(() => {
+    let h = ""; for (let i = 0; i < 9; i++) h += hex(8) + "  " + hex(4) + " " + hex(4) + " " + hex(4) + " " + hex(4) + "  " + glyphs(6) + "\n";
+    $("hex").textContent = h;
+  }, 350);
+  const t0 = Date.now(), p2 = n => String(n).padStart(2, "0");
+  setInterval(() => {
+    const s = Math.floor((Date.now() - t0) / 1000);
+    $("uptime").textContent = p2(Math.floor(s / 3600)) + ":" + p2(Math.floor(s / 60) % 60) + ":" + p2(s % 60);
+    $("clock").textContent = new Date().toLocaleTimeString("en-GB");
+  }, 1000);
+
+  (async () => {
+    await steps([
+      ["MAINFRAME OS v9.4.1  ·  システム起動中", "ok"], ["[ OK ] Loading kernel modules ... " + glyphs(4), "dim"],
+      ["[ OK ] Establishing encrypted tunnel (TOR → VPN → 代理)", "dim"], ["[ OK ] Spoofing MAC address " + hex(2) + ":" + hex(2) + ":" + hex(2) + ":" + hex(2), "dim"],
+      ["Type 'help' or press a button on the left.", "inf"]
+    ], [150, 350]);
+    cmd.focus();
+  })();
+})();
+</script>
+</body>
+</html>

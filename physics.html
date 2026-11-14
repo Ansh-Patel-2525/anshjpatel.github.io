@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0e1320">
+<meta name="description" content="Interactive physics sandbox: bouncing balls, double pendulum, gravity orbits and projectile motion.">
+<title>Physics Lab | Ansh Patel</title>
+<style>
+:root{--bg:#0e1320;--panel:#171e30;--text:#eef2fa;--muted:#8f9ab0;--accent:#4de0c2;--line:rgba(255,255,255,.09)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;background:var(--bg);color:var(--text);font:14px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color-scheme:dark}
+button,a,input{font:inherit}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px clamp(12px,3vw,32px);background:rgba(14,19,32,.93);border-bottom:1px solid var(--line);backdrop-filter:blur(16px);flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:850;font-size:17px;text-decoration:none;color:inherit;white-space:nowrap}
+.ico{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:var(--accent);color:#06211b;font-size:20px}
+nav,.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.nl,.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:38px;padding:8px 13px;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.04);color:#e5e9f2;text-decoration:none;font-size:13px;font-weight:700;cursor:pointer;transition:.2s}
+.nl:hover,.btn:hover{background:rgba(255,255,255,.1);transform:translateY(-1px)}
+.nl.home{border-color:rgba(77,224,194,.4);color:var(--accent)}
+.btn.on{background:var(--accent);border-color:var(--accent);color:#06211b}
+.page{width:min(1240px,100%);margin:0 auto;padding:22px clamp(12px,3vw,28px) 36px}
+h1{font-size:clamp(28px,4.5vw,42px);letter-spacing:-1.5px;line-height:1.1;margin-bottom:6px}
+.sub{color:var(--muted);margin-bottom:18px;max-width:640px}
+.tabs{margin-bottom:14px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:16px;align-items:start}
+.stage{position:relative;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#0a0f1b}
+canvas{display:block;width:100%;height:min(68vh,620px);min-height:340px;touch-action:none;cursor:crosshair}
+.hint{position:absolute;left:12px;bottom:10px;color:var(--muted);font-size:12px;pointer-events:none}
+.panel{padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--panel)}
+.panel h2{font-size:15px;margin-bottom:12px}
+.ctl{margin-bottom:12px}
+.ctl label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:4px}
+.ctl output{color:var(--text);font-variant-numeric:tabular-nums;font-weight:700}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.acts .btn{min-height:36px;padding:6px 8px;font-size:12px}
+hr{border:0;border-top:1px solid var(--line);margin:14px 0}
+@media(max-width:860px){.layout{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="index.html" aria-label="Ansh Patel home"><span class="ico" aria-hidden="true">⚛</span><span>Physics Lab</span></a>
+  <nav aria-label="Main navigation">
+    <a class="nl" href="widgets.html">← Back to Widgets</a>
+    <a class="nl home" href="index.html">⌂ Home</a>
+  </nav>
+</header>
+<main class="page">
+  <h1>Change the laws. Watch what happens.</h1>
+  <p class="sub">Four simulations with live controls. Crank gravity, flip it upside down, or break the orbit.</p>
+  <div class="row tabs" role="tablist" aria-label="Simulations" id="tabs"></div>
+  <div class="layout">
+    <div class="stage">
+      <canvas id="cv" aria-label="Simulation canvas"></canvas>
+      <div class="hint" id="hint"></div>
+    </div>
+    <aside class="panel" aria-label="Controls">
+      <h2 id="simName"></h2>
+      <div id="params"></div>
+      <hr>
+      <div class="ctl"><label for="speed">Time speed <output id="speedO">1×</output></label><input id="speed" type="range" min="0.1" max="2" step="0.1" value="1"></div>
+      <div class="acts" id="acts"></div>
+      <div class="acts"><button class="btn" id="pause" type="button">⏸ Pause</button><button class="btn" id="reset" type="button">↺ Reset</button></div>
+    </aside>
+  </div>
+</main>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const cv = $("cv"), ctx = cv.getContext("2d");
+  let W = 0, H = 0, paused = false, speed = 1, P = {}, cur = null, pointer = null;
+  const S = 50; // px per metre for the sandbox
+  const rand = (a, b) => a + Math.random() * (b - a);
+
+  function resize() {
+    const r = cv.getBoundingClientRect(), d = window.devicePixelRatio || 1;
+    W = r.width; H = r.height; cv.width = W * d; cv.height = H * d; ctx.setTransform(d, 0, 0, d, 0, 0);
+    if (cur && cur.onResize) cur.onResize();
+  }
+  new ResizeObserver(resize).observe(cv);
+
+  const pos = e => { const r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+
+  /* ---------- 1. Sandbox ---------- */
+  const sandbox = {
+    name: "Bouncing balls", hint: "Click to drop a ball · drag and release to throw one",
+    params: [
+      { k: "g", l: "Gravity (m/s²)", min: -20, max: 40, v: 9.8, s: 0.1 },
+      { k: "e", l: "Bounciness", min: 0, max: 1, v: 0.8, s: 0.01 },
+      { k: "drag", l: "Air drag", min: 0, max: 1, v: 0.05, s: 0.01 },
+      { k: "r", l: "Ball size", min: 6, max: 40, v: 16, s: 1 }
+    ],
+    actions: [["+10 balls", () => { for (let i = 0; i < 10; i++) sandbox.add(rand(40, W - 40), rand(30, H / 2), rand(-150, 150), rand(-100, 100)); }],
+      ["Shake!", () => sandbox.balls.forEach(b => { b.vx += rand(-400, 400); b.vy -= rand(100, 500); })]],
+    init() { this.balls = []; for (let i = 0; i < 12; i++) this.add(rand(40, W - 40), rand(20, H / 2), rand(-100, 100), 0); },
+    add(x, y, vx, vy) {
+      if (this.balls.length > 160) this.balls.shift();
+      const r = P.r * rand(.6, 1.4); this.balls.push({ x, y, vx, vy, r, m: r * r, c: `hsl(${rand(0, 360)|0},80%,62%)` });
+    },
+    step(dt) {
+      const n = 4, h = dt / n, B = this.balls;
+      for (let s = 0; s < n; s++) {
+        for (const b of B) {
+          b.vy += P.g * S * h; const k = Math.exp(-P.drag * h); b.vx *= k; b.vy *= k;
+          b.x += b.vx * h; b.y += b.vy * h;
+          if (b.x < b.r) { b.x = b.r; b.vx = -b.vx * P.e; } else if (b.x > W - b.r) { b.x = W - b.r; b.vx = -b.vx * P.e; }
+          if (b.y > H - b.r) { b.y = H - b.r; b.vy = -b.vy * P.e; b.vx *= 0.995; } else if (b.y < b.r) { b.y = b.r; b.vy = -b.vy * P.e; }
+        }
+        for (let i = 0; i < B.length; i++) for (let j = i + 1; j < B.length; j++) {
+          const a = B[i], c = B[j], dx = c.x - a.x, dy = c.y - a.y, d = Math.hypot(dx, dy), md = a.r + c.r;
+          if (d >= md || d === 0) continue;
+          const nx = dx / d, ny = dy / d, ov = md - d, t = a.m + c.m;
+          a.x -= nx * ov * c.m / t; a.y -= ny * ov * c.m / t; c.x += nx * ov * a.m / t; c.y += ny * ov * a.m / t;
+          const vn = (c.vx - a.vx) * nx + (c.vy - a.vy) * ny;
+          if (vn < 0) { const j2 = -(1 + P.e) * vn / (1 / a.m + 1 / c.m); a.vx -= j2 * nx / a.m; a.vy -= j2 * ny / a.m; c.vx += j2 * nx / c.m; c.vy += j2 * ny / c.m; }
+        }
+      }
+    },
+    draw() {
+      for (const b of this.balls) { ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, 7); ctx.fillStyle = b.c; ctx.fill(); }
+      if (pointer) { ctx.strokeStyle = "#4de0c2"; ctx.lineWidth = 2; ctx.setLineDash([5, 5]); ctx.beginPath(); ctx.moveTo(pointer.sx, pointer.sy); ctx.lineTo(pointer.x, pointer.y); ctx.stroke(); ctx.setLineDash([]); }
+      hud(`${this.balls.length} balls`);
+    },
+    up(s, e) { this.add(s.x, s.y, (s.x - e.x) * 4, (s.y - e.y) * 4); }
+  };
+
+  /* ---------- 2. Double pendulum ---------- */
+  const pendulum = {
+    name: "Double pendulum", hint: "Tiny changes, wildly different outcomes — that's chaos",
+    params: [
+      { k: "g", l: "Gravity (m/s²)", min: 1, max: 40, v: 9.8, s: 0.1 },
+      { k: "L1", l: "Rod 1 length (m)", min: 0.3, max: 2, v: 1, s: 0.05 },
+      { k: "L2", l: "Rod 2 length (m)", min: 0.3, max: 2, v: 1, s: 0.05 },
+      { k: "m1", l: "Mass 1 (kg)", min: 0.2, max: 5, v: 1, s: 0.1 },
+      { k: "m2", l: "Mass 2 (kg)", min: 0.2, max: 5, v: 1, s: 0.1 },
+      { k: "damp", l: "Damping", min: 0, max: 1, v: 0, s: 0.01 }
+    ],
+    actions: [["Random start", () => pendulum.init()], ["Clear trail", () => { pendulum.trail = []; }]],
+    init() { this.s = [rand(1.5, 3), rand(1, 3), 0, 0]; this.trail = []; },
+    f([a1, a2, w1, w2]) {
+      const { g, L1, L2, m1, m2, damp } = P, d = a1 - a2, den = 2 * m1 + m2 - m2 * Math.cos(2 * d);
+      const al1 = (-g * (2 * m1 + m2) * Math.sin(a1) - m2 * g * Math.sin(a1 - 2 * a2) - 2 * Math.sin(d) * m2 * (w2 * w2 * L2 + w1 * w1 * L1 * Math.cos(d))) / (L1 * den);
+      const al2 = (2 * Math.sin(d) * (w1 * w1 * L1 * (m1 + m2) + g * (m1 + m2) * Math.cos(a1) + w2 * w2 * L2 * m2 * Math.cos(d))) / (L2 * den);
+      return [w1, w2, al1 - damp * w1, al2 - damp * w2];
+    },
+    step(dt) {
+      const n = 8, h = dt / n, add = (s, k, f) => s.map((v, i) => v + k[i] * f);
+      for (let i = 0; i < n; i++) {
+        const s = this.s, k1 = this.f(s), k2 = this.f(add(s, k1, h / 2)), k3 = this.f(add(s, k2, h / 2)), k4 = this.f(add(s, k3, h));
+        this.s = s.map((v, j) => v + h / 6 * (k1[j] + 2 * k2[j] + 2 * k3[j] + k4[j]));
+      }
+      const q = this.geo(); this.trail.push([q.x2, q.y2]); if (this.trail.length > 500) this.trail.shift();
+    },
+    geo() {
+      const sc = Math.min(W, H) * 0.42 / (P.L1 + P.L2), ox = W / 2, oy = H * 0.45;
+      const x1 = ox + Math.sin(this.s[0]) * P.L1 * sc, y1 = oy + Math.cos(this.s[0]) * P.L1 * sc;
+      return { ox, oy, x1, y1, x2: x1 + Math.sin(this.s[1]) * P.L2 * sc, y2: y1 + Math.cos(this.s[1]) * P.L2 * sc };
+    },
+    draw() {
+      const q = this.geo();
+      ctx.lineWidth = 2;
+      for (let i = 1; i < this.trail.length; i++) {
+        ctx.strokeStyle = `rgba(77,224,194,${i / this.trail.length})`;
+        ctx.beginPath(); ctx.moveTo(...this.trail[i - 1]); ctx.lineTo(...this.trail[i]); ctx.stroke();
+      }
+      ctx.strokeStyle = "#cfd8ea"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(q.ox, q.oy); ctx.lineTo(q.x1, q.y1); ctx.lineTo(q.x2, q.y2); ctx.stroke();
+      ctx.fillStyle = "#ff785a"; ctx.beginPath(); ctx.arc(q.x1, q.y1, 8 + P.m1 * 3, 0, 7); ctx.fill();
+      ctx.fillStyle = "#4de0c2"; ctx.beginPath(); ctx.arc(q.x2, q.y2, 8 + P.m2 * 3, 0, 7); ctx.fill();
+      ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(q.ox, q.oy, 4, 0, 7); ctx.fill();
+      const E = 0.5 * P.m1 * (this.s[2] * P.L1) ** 2; hud(`ω₁ ${this.s[2].toFixed(2)} rad/s · ω₂ ${this.s[3].toFixed(2)} rad/s`); void E;
+    },
+    up() {}
+  };
+
+  /* ---------- 3. Gravity orbits ---------- */
+  const orbit = {
+    name: "Gravity & orbits", hint: "Click to launch a planet · lower the sun's mass and watch orbits fly apart",
+    params: [
+      { k: "G", l: "Gravitational constant", min: 0.2, max: 3, v: 1, s: 0.05 },
+      { k: "M", l: "Sun mass", min: 500, max: 8000, v: 2000, s: 100 },
+      { k: "trail", l: "Trail length", min: 0, max: 400, v: 150, s: 10 }
+    ],
+    actions: [["Add planet", () => orbit.launch(W / 2 + rand(80, 220) * (Math.random() < .5 ? -1 : 1), H / 2 + rand(-60, 60))], ["Remove planets", () => { orbit.b = []; }]],
+    init() { this.b = []; for (const d of [90, 150, 230]) this.launch(W / 2 + d, H / 2); },
+    launch(x, y) {
+      const dx = x - W / 2, dy = y - H / 2, d = Math.hypot(dx, dy) || 1, v = Math.sqrt(P.G * P.M * 1000 / d) * rand(.85, 1.05);
+      this.b.push({ x, y, vx: -dy / d * v, vy: dx / d * v, m: rand(.5, 4), c: `hsl(${rand(0, 360)|0},75%,62%)`, t: [] });
+    },
+    step(dt) {
+      const n = 10, h = dt / n, cx = W / 2, cy = H / 2, k = P.G * 1000;
+      for (let s = 0; s < n; s++) {
+        for (const a of this.b) {
+          let ax = 0, ay = 0, dx = cx - a.x, dy = cy - a.y, d2 = dx * dx + dy * dy + 25, d = Math.sqrt(d2);
+          ax += k * P.M * dx / (d2 * d); ay += k * P.M * dy / (d2 * d);
+          for (const o of this.b) if (o !== a) { dx = o.x - a.x; dy = o.y - a.y; d2 = dx * dx + dy * dy + 100; d = Math.sqrt(d2); ax += k * o.m * dx / (d2 * d); ay += k * o.m * dy / (d2 * d); }
+          a.vx += ax * h; a.vy += ay * h;
+        }
+        for (const a of this.b) { a.x += a.vx * h; a.y += a.vy * h; }
+      }
+      const R = this.sunR();
+      this.b = this.b.filter(a => Math.hypot(a.x - cx, a.y - cy) > R && Math.hypot(a.x - cx, a.y - cy) < Math.max(W, H) * 3);
+      for (const a of this.b) { a.t.push([a.x, a.y]); while (a.t.length > P.trail) a.t.shift(); }
+    },
+    sunR() { return 10 + Math.sqrt(P.M) * 0.28; },
+    draw() {
+      const cx = W / 2, cy = H / 2, R = this.sunR();
+      for (const a of this.b) {
+        ctx.strokeStyle = a.c; ctx.globalAlpha = .45; ctx.lineWidth = 2; ctx.beginPath();
+        a.t.forEach((p, i) => i ? ctx.lineTo(...p) : ctx.moveTo(...p)); ctx.stroke(); ctx.globalAlpha = 1;
+        ctx.fillStyle = a.c; ctx.beginPath(); ctx.arc(a.x, a.y, 4 + a.m * 1.5, 0, 7); ctx.fill();
+      }
+      const g = ctx.createRadialGradient(cx, cy, R * .3, cx, cy, R * 2.2); g.addColorStop(0, "#fff3b0"); g.addColorStop(.4, "#ffb627"); g.addColorStop(1, "rgba(255,150,0,0)");
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, R * 2.2, 0, 7); ctx.fill();
+      hud(`${this.b.length} planets`);
+    },
+    up(s) { this.launch(s.x, s.y); }
+  };
+
+  /* ---------- 4. Projectile ---------- */
+  const proj = {
+    name: "Projectile motion", hint: "Set speed and angle, then fire. Dotted line is the predicted path.",
+    params: [
+      { k: "g", l: "Gravity (m/s²)", min: 0.5, max: 30, v: 9.8, s: 0.1 },
+      { k: "v0", l: "Launch speed (m/s)", min: 5, max: 60, v: 28, s: 1 },
+      { k: "ang", l: "Angle (°)", min: 5, max: 85, v: 45, s: 1 },
+      { k: "drag", l: "Air drag", min: 0, max: 1, v: 0, s: 0.01 },
+      { k: "zoom", l: "View scale (px/m)", min: 2, max: 20, v: 9, s: 0.5 }
+    ],
+    actions: [["🚀 Fire!", () => proj.fire()], ["Clear shots", () => { proj.shots = []; }]],
+    init() { this.shots = []; },
+    ground() { return H - 44; },
+    fire() { const a = P.ang * Math.PI / 180; this.shots.push({ x: 0, y: 0, vx: P.v0 * Math.cos(a), vy: P.v0 * Math.sin(a), t: [[0, 0]], live: true }); if (this.shots.length > 12) this.shots.shift(); },
+    sim(s, dt) { s.vy -= P.g * dt; s.vx -= P.drag * s.vx * dt; s.vy -= P.drag * s.vy * dt; s.x += s.vx * dt; s.y += s.vy * dt; },
+    step(dt) {
+      for (const s of this.shots) if (s.live) {
+        for (let i = 0; i < 4; i++) this.sim(s, dt / 4);
+        s.t.push([s.x, s.y]); if (s.y <= 0) { s.y = 0; s.live = false; }
+      }
+    },
+    draw() {
+      const z = P.zoom, gy = this.ground(), ox = 40, X = m => ox + m * z, Y = m => gy - m * z;
+      ctx.fillStyle = "#16301f"; ctx.fillRect(0, gy, W, H - gy);
+      ctx.fillStyle = "#8f9ab0"; ctx.font = "11px system-ui"; ctx.textAlign = "center";
+      for (let m = 0; X(m) < W; m += z < 5 ? 20 : 10) { ctx.fillRect(X(m), gy, 1, 6); ctx.fillText(m + " m", X(m), gy + 20); }
+      const a = P.ang * Math.PI / 180, p = { x: 0, y: 0, vx: P.v0 * Math.cos(a), vy: P.v0 * Math.sin(a) };
+      let top = 0, T = 0;
+      ctx.fillStyle = "rgba(255,255,255,.5)";
+      for (let i = 0; i < 1500 && (p.y >= 0 || i < 2); i++) {
+        this.sim(p, 0.02); T += 0.02; top = Math.max(top, p.y);
+        if (i % 4 === 0 && p.y >= 0) ctx.fillRect(X(p.x) - 1, Y(p.y) - 1, 3, 3);
+      }
+      ctx.strokeStyle = "#ff785a"; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(X(0), Y(0)); ctx.lineTo(X(0) + Math.cos(a) * 36, Y(0) - Math.sin(a) * 36); ctx.stroke();
+      for (const s of this.shots) {
+        ctx.strokeStyle = "#4de0c2"; ctx.globalAlpha = s.live ? 1 : .4; ctx.lineWidth = 2; ctx.beginPath();
+        s.t.forEach((q, i) => i ? ctx.lineTo(X(q[0]), Y(q[1])) : ctx.moveTo(X(q[0]), Y(q[1]))); ctx.stroke(); ctx.globalAlpha = 1;
+        ctx.fillStyle = "#ffd24a"; ctx.beginPath(); ctx.arc(X(s.x), Y(s.y), 6, 0, 7); ctx.fill();
+      }
+      ctx.textAlign = "left";
+      hud(`Range ${p.x.toFixed(1)} m · Max height ${top.toFixed(1)} m · Flight ${T.toFixed(1)} s`);
+    },
+    up() {}
+  };
+
+  function hud(text) { ctx.fillStyle = "#8f9ab0"; ctx.font = "12px system-ui"; ctx.textAlign = "right"; ctx.fillText(text, W - 12, 20); ctx.textAlign = "left"; }
+
+  /* ---------- UI plumbing ---------- */
+  const SIMS = { sandbox, pendulum, orbit, proj }, tabsEl = $("tabs");
+  Object.entries(SIMS).forEach(([key, sim]) => {
+    const b = document.createElement("button"); b.className = "btn"; b.type = "button"; b.textContent = sim.name; b.dataset.key = key; b.setAttribute("role", "tab");
+    b.addEventListener("click", () => select(key)); tabsEl.appendChild(b);
+  });
+
+  function select(key) {
+    cur = SIMS[key];
+    tabsEl.querySelectorAll(".btn").forEach(b => { const on = b.dataset.key === key; b.classList.toggle("on", on); b.setAttribute("aria-selected", on); });
+    $("simName").textContent = cur.name; $("hint").textContent = cur.hint;
+    P = {}; const box = $("params"); box.textContent = "";
+    cur.params.forEach(p => {
+      P[p.k] = p.v;
+      const w = document.createElement("div"); w.className = "ctl";
+      w.innerHTML = `<label for="p_${p.k}">${p.l} <output>${p.v}</output></label><input id="p_${p.k}" type="range" min="${p.min}" max="${p.max}" step="${p.s}" value="${p.v}">`;
+      const inp = w.querySelector("input"), o = w.querySelector("output");
+      inp.addEventListener("input", () => { P[p.k] = +inp.value; o.textContent = inp.value; });
+      box.appendChild(w);
+    });
+    const acts = $("acts"); acts.textContent = "";
+    cur.actions.forEach(([label, fn]) => { const b = document.createElement("button"); b.className = "btn"; b.type = "button"; b.textContent = label; b.addEventListener("click", fn); acts.appendChild(b); });
+    cur.init();
+  }
+
+  $("speed").addEventListener("input", e => { speed = +e.target.value; $("speedO").textContent = speed.toFixed(1) + "×"; });
+  $("pause").addEventListener("click", e => { paused = !paused; e.target.textContent = paused ? "▶ Resume" : "⏸ Pause"; });
+  $("reset").addEventListener("click", () => cur.init());
+
+  cv.addEventListener("pointerdown", e => { const p = pos(e); pointer = { sx: p.x, sy: p.y, x: p.x, y: p.y }; cv.setPointerCapture(e.pointerId); });
+  cv.addEventListener("pointermove", e => { if (pointer) { const p = pos(e); pointer.x = p.x; pointer.y = p.y; } });
+  cv.addEventListener("pointerup", e => { if (!pointer) return; const s = { x: pointer.sx, y: pointer.sy }, p = pos(e); pointer = null; cur.up(s, p); });
+  cv.addEventListener("pointercancel", () => { pointer = null; });
+
+  let last = performance.now();
+  function frame(t) {
+    const dt = Math.min(0.033, (t - last) / 1000); last = t;
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = "rgba(255,255,255,.04)";
+    if (cur) {
+      if (!paused) cur.step(dt * speed);
+      cur.draw();
+    }
+    requestAnimationFrame(frame);
+  }
+  resize(); select("sandbox"); requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

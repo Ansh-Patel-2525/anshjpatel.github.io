@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f1420">
+<meta name="description" content="Write LaTeX on the left, see it rendered on the right, and export to PDF, HTML or .tex.">
+<title>LaTeX Studio | Ansh Patel</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<style>
+:root{--bg:#0f1420;--panel:#171e2e;--text:#eef2fa;--muted:#8f9ab0;--accent:#7aa2ff;--line:rgba(255,255,255,.09)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font:14px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;flex-direction:column;color-scheme:dark}
+button,a{font:inherit}
+button:focus-visible,a:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px clamp(12px,3vw,28px);background:rgba(15,20,32,.95);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:850;font-size:17px;text-decoration:none;color:inherit;white-space:nowrap}
+.ico{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:var(--accent);color:#08101f;font-size:21px;font-family:Georgia,serif}
+nav,.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.nl,.btn{display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:8px 13px;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.04);color:#e5e9f2;text-decoration:none;font-size:13px;font-weight:700;cursor:pointer;transition:.2s}
+.nl:hover,.btn:hover{background:rgba(255,255,255,.1);transform:translateY(-1px)}
+.nl.home{border-color:rgba(122,162,255,.4);color:var(--accent)}
+.btn.main{background:var(--accent);border-color:var(--accent);color:#08101f}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:10px clamp(12px,3vw,28px);border-bottom:1px solid var(--line)}
+.status{color:var(--muted);font-size:12px}
+select.btn{padding-right:8px}
+.split{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr}
+.pane{min-width:0;min-height:0;display:flex;flex-direction:column}
+.pane+.pane{border-left:1px solid var(--line)}
+.label{padding:7px 16px;color:var(--muted);font-size:12px;font-weight:700;border-bottom:1px solid var(--line);background:var(--panel)}
+textarea{flex:1;width:100%;resize:none;border:0;padding:16px;background:#0b101a;color:#d9e2f5;font:13.5px/1.65 "JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;tab-size:2;white-space:pre;overflow:auto}
+.preview{flex:1;overflow:auto;background:#5b6475;padding:22px}
+.paper{max-width:760px;margin:0 auto;background:#fff;color:#111;padding:48px 56px;min-height:100%;box-shadow:0 10px 40px rgba(0,0,0,.35);font-family:"Latin Modern Roman","Computer Modern",Georgia,"Times New Roman",serif;font-size:17px;line-height:1.6}
+.paper h2,.paper h3,.paper h4{margin:1.3em 0 .5em;line-height:1.25}
+.paper h2{font-size:1.45em}.paper h3{font-size:1.2em}.paper h4{font-size:1.05em}
+.paper p{margin:0 0 .9em;text-align:justify}
+.paper ul,.paper ol{margin:0 0 .9em 1.6em}
+.paper .ttl{text-align:center;margin-bottom:1.6em}.paper .ttl h1{font-size:1.9em;margin-bottom:.3em}
+.paper .abs{margin:0 2.5em 1.2em;font-size:.92em}.paper .abs b{display:block;text-align:center}
+.paper .ctr{text-align:center}.paper blockquote{margin:0 0 .9em 2em;font-style:italic}
+.paper .dm{margin:.8em 0;overflow-x:auto;text-align:center}.paper .err{color:#c00;font-family:monospace}
+@media(max-width:820px){.split{grid-template-columns:1fr;grid-template-rows:1fr 1fr}.pane+.pane{border-left:0;border-top:1px solid var(--line)}.paper{padding:26px 20px}}
+@media print{body{display:block}.top,.bar,.label,.pane:first-child{display:none}.preview{padding:0;background:#fff;overflow:visible}.paper{box-shadow:none}}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="index.html" aria-label="Ansh Patel home"><span class="ico" aria-hidden="true">∑</span><span>LaTeX Studio</span></a>
+  <nav aria-label="Main navigation">
+    <a class="nl" href="widgets.html">← Back to Widgets</a>
+    <a class="nl home" href="index.html">⌂ Home</a>
+  </nav>
+</header>
+<div class="bar">
+  <div class="tools">
+    <select class="btn" id="sample" aria-label="Load a sample">
+      <option value="paper">Sample: Paper</option><option value="math">Sample: Math cheatsheet</option><option value="blank">Blank</option>
+    </select>
+    <span class="status" id="status">Live preview</span>
+  </div>
+  <div class="tools">
+    <button class="btn" id="dlTex" type="button">⬇ .tex</button>
+    <button class="btn" id="dlHtml" type="button">⬇ HTML</button>
+    <button class="btn main" id="dlPdf" type="button">⬇ PDF</button>
+  </div>
+</div>
+<main class="split">
+  <section class="pane" aria-label="LaTeX source">
+    <div class="label">LaTeX source</div>
+    <textarea id="src" spellcheck="false" aria-label="LaTeX source code"></textarea>
+  </section>
+  <section class="pane" aria-label="Preview">
+    <div class="label">Preview</div>
+    <div class="preview"><article class="paper" id="out"></article></div>
+  </section>
+</main>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const src = $("src"), out = $("out"), status = $("status");
+
+  const SAMPLES = {
+paper: String.raw`\documentclass{article}
+\title{On the Beauty of Euler's Identity}
+\author{Ansh Patel}
+\date{\today}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We take a short, friendly tour through a few famous formulas and show that LaTeX makes them look as good as they feel.
+\end{abstract}
+
+\section{Introduction}
+Euler's identity links five fundamental constants: $e^{i\pi} + 1 = 0$. It is often called \textbf{the most beautiful equation} in mathematics, and it follows from \emph{Euler's formula}:
+$$e^{ix} = \cos x + i\sin x$$
+
+\section{Some results}
+\subsection{Calculus}
+The Gaussian integral is
+\[ \int_{-\infty}^{\infty} e^{-x^2}\,dx = \sqrt{\pi} \]
+and the basel problem gives $\sum_{n=1}^{\infty} \frac{1}{n^2} = \frac{\pi^2}{6}$.
+
+\subsection{Algebra}
+The quadratic formula solves $ax^2+bx+c=0$:
+\begin{equation}
+x = \frac{-b \pm \sqrt{b^2-4ac}}{2a}
+\end{equation}
+
+\section{Things to remember}
+\begin{itemize}
+  \item Math goes between dollar signs.
+  \item Use \textbf{bold}, \textit{italic}, \underline{underline} and \texttt{code}.
+  \begin{enumerate}
+    \item Lists can be nested
+    \item and numbered
+  \end{enumerate}
+\end{itemize}
+
+\end{document}`,
+math: String.raw`\section{Math cheatsheet}
+Inline: $a^2 + b^2 = c^2$, fractions $\frac{a}{b}$, roots $\sqrt[3]{x}$, Greek $\alpha,\beta,\gamma,\Omega$.
+
+\subsection{Matrices}
+$$A = \begin{pmatrix} 1 & 2 \\ 3 & 4 \end{pmatrix},\quad \det A = -2$$
+
+\subsection{Aligned equations}
+\begin{align}
+(x+y)^2 &= x^2 + 2xy + y^2 \\
+\nabla \cdot \mathbf{E} &= \frac{\rho}{\varepsilon_0}
+\end{align}
+
+\subsection{Limits and sums}
+$$\lim_{n\to\infty}\left(1+\frac1n\right)^n = e \qquad \prod_{k=1}^{n} k = n!$$`,
+blank: ""
+  };
+
+  const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+  function convert(input) {
+    input = input.replace(/(^|[^\\])%.*$/gm, "$1");
+    const doc = input.match(/\\begin\{document\}([\s\S]*?)\\end\{document\}/);
+    const pre = doc ? input.slice(0, doc.index) : "";
+    let body = doc ? doc[1] : input;
+    const grab = re => { const m = pre.match(re); return m ? m[1] : null; };
+    const title = grab(/\\title\{([^}]*)\}/) || "";
+    const author = grab(/\\author\{([^}]*)\}/) || "";
+    const dateRaw = grab(/\\date\{([^}]*)\}/);
+    const today = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+    const date = dateRaw === null ? today : dateRaw.replace(/\\today/g, today);
+
+    const maths = [];
+    const stash = (tex, display) => {
+      let html;
+      try { html = katex.renderToString(tex.trim(), { displayMode: display, throwOnError: false }); }
+      catch (e) { html = '<span class="err">' + esc(tex) + "</span>"; }
+      maths.push(display ? '<div class="dm">' + html + "</div>" : html);
+      return "\u0000" + (maths.length - 1) + "\u0000";
+    };
+    body = body
+      .replace(/\\begin\{(equation|align|gather|displaymath)\*?\}([\s\S]*?)\\end\{\1\*?\}/g,
+        (a, env, t) => stash(env === "align" ? "\\begin{aligned}" + t + "\\end{aligned}" : t, true))
+      .replace(/\$\$([\s\S]*?)\$\$/g, (a, t) => stash(t, true))
+      .replace(/\\\[([\s\S]*?)\\\]/g, (a, t) => stash(t, true))
+      .replace(/\\\(([\s\S]*?)\\\)/g, (a, t) => stash(t, false))
+      .replace(/\$([^$\n]+?)\$/g, (a, t) => stash(t, false));
+
+    body = esc(body);
+
+    const count = [0, 0, 0];
+    body = body.replace(/\\(section|subsection|subsubsection)(\*?)\{([^}]*)\}/g, (a, kind, star, text) => {
+      const lvl = kind === "section" ? 0 : kind === "subsection" ? 1 : 2;
+      let num = "";
+      if (!star) {
+        count[lvl]++; for (let i = lvl + 1; i < 3; i++) count[i] = 0;
+        num = count.slice(0, lvl + 1).join(".") + "&nbsp;&nbsp;";
+      }
+      return "\n\n<h" + (lvl + 2) + ">" + num + text + "</h" + (lvl + 2) + ">\n\n";
+    });
+
+    const tags = { textbf: "b", textit: "i", emph: "i", underline: "u", texttt: "code" };
+    for (let i = 0; i < 4; i++)
+      body = body.replace(/\\(textbf|textit|emph|underline|texttt)\{([^{}]*)\}/g, (a, c, t) => "<" + tags[c] + ">" + t + "</" + tags[c] + ">");
+
+    const envs = [
+      [/\\begin\{abstract\}([\s\S]*?)\\end\{abstract\}/g, '\n\n<div class="abs"><b>Abstract</b>$1</div>\n\n'],
+      [/\\begin\{center\}([\s\S]*?)\\end\{center\}/g, '\n\n<div class="ctr">$1</div>\n\n'],
+      [/\\begin\{quote\}([\s\S]*?)\\end\{quote\}/g, "\n\n<blockquote>$1</blockquote>\n\n"]
+    ];
+    envs.forEach(([re, rep]) => { body = body.replace(re, rep); });
+
+    const listRe = /\\begin\{(itemize|enumerate)\}((?:(?!\\begin\{(?:itemize|enumerate)\})[\s\S])*?)\\end\{\1\}/;
+    let m;
+    while ((m = body.match(listRe))) {
+      const tag = m[1] === "itemize" ? "ul" : "ol";
+      const items = m[2].split(/\\item\s*/).slice(1).map(t => "<li>" + t.trim() + "</li>").join("");
+      body = body.replace(m[0], "\n\n<" + tag + ">" + items + "</" + tag + ">\n\n");
+    }
+
+    const titleBlock = '<div class="ttl"><h1>' + esc(title) + "</h1>" +
+      (author ? "<div>" + esc(author) + "</div>" : "") + (date ? "<div>" + esc(date) + "</div>" : "") + "</div>";
+
+    body = body
+      .replace(/\\maketitle/g, "\n\n" + titleBlock + "\n\n")
+      .replace(/\\(?:hrule|noindent|centering|newpage|clearpage|tableofcontents|bigskip|medskip|smallskip)\b/g, "")
+      .replace(/\\LaTeX\b/g, "L<sup style='font-size:.7em'>A</sup>T<sub style='font-size:.9em'>E</sub>X")
+      .replace(/\\(?:ldots|dots)\b/g, "…")
+      .replace(/\\today/g, today)
+      .replace(/\\\\|\\newline/g, "<br>")
+      .replace(/---/g, "—").replace(/--/g, "–")
+      .replace(/``/g, "“").replace(/''/g, "”")
+      .replace(/\\(&amp;|[%$#_{}])/g, "$1")
+      .replace(/\\([a-zA-Z]+)(\{[^{}]*\})?/g, (a, c, arg) => arg ? arg.slice(1, -1) : "");
+
+    const html = body.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean).map(p =>
+      /^(<(h\d|ul|ol|div|blockquote)|\u0000\d+\u0000$)/.test(p) ? p : "<p>" + p + "</p>").join("\n");
+
+    return html.replace(/\u0000(\d+)\u0000/g, (a, i) => maths[i]);
+  }
+
+  const PAPER_CSS = out ? "" : "";
+  function pageStyles() {
+    return [...document.styleSheets].reduce((acc, sheet) => {
+      try { [...sheet.cssRules].forEach(r => { if (/\.paper|^@media print|\.katex|\.dm/.test(r.cssText) || r.cssText.startsWith("@font-face")) acc += r.cssText + "\n"; }); } catch (e) {}
+      return acc;
+    }, "");
+  }
+  function fullHtml() {
+    const t = (src.value.match(/\\title\{([^}]*)\}/) || [])[1] || "Document";
+    return '<!DOCTYPE html>\n<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>' + esc(t) +
+      '</title>\n<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">\n<style>body{margin:0;background:#fff}.paper{box-shadow:none!important;margin:0 auto}@page{margin:18mm}' +
+      [...document.styleSheets].map(s => { try { return [...s.cssRules].filter(r => /^\.paper/.test(r.cssText)).map(r => r.cssText).join("\n"); } catch (e) { return ""; } }).join("\n") +
+      '</style></head>\n<body><article class="paper">\n' + out.innerHTML + "\n</article></body></html>";
+  }
+  function download(name, text, type) {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([text], { type }));
+    a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+
+  let timer;
+  function update() {
+    try { out.innerHTML = convert(src.value); status.textContent = "Live preview · " + src.value.split("\n").length + " lines"; }
+    catch (e) { status.textContent = "Could not render: " + e.message; }
+  }
+  src.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(update, 120); });
+  src.addEventListener("keydown", e => {
+    if (e.key === "Tab") { e.preventDefault(); document.execCommand("insertText", false, "  "); }
+  });
+  $("sample").addEventListener("change", e => { src.value = SAMPLES[e.target.value]; update(); });
+  $("dlTex").addEventListener("click", () => download("document.tex", src.value, "text/x-tex"));
+  $("dlHtml").addEventListener("click", () => download("document.html", fullHtml(), "text/html"));
+  $("dlPdf").addEventListener("click", () => {
+    const w = window.open("", "_blank");
+    if (!w) { status.textContent = "Allow pop-ups, then choose “Save as PDF” in the print dialog."; return; }
+    w.document.write(fullHtml() + "<script>addEventListener('load',()=>setTimeout(()=>print(),600))<\/script>");
+    w.document.close();
+    status.textContent = "In the print dialog, choose “Save as PDF”.";
+  });
+
+  src.value = SAMPLES.paper;
+  update();
+})();
+</script>
+</body>
+</html>
