@@ -325,6 +325,9 @@ a.backlink{color:#fff;border-bottom-color:var(--neon-cyan)}
   *,*:before,*:after{scroll-behavior:auto!important;transition:none!important}
 }
 
+#tFs,#tRot{top:max(8px,env(safe-area-inset-top));width:44px;height:44px;font-size:11px}
+#tFs{left:50%;margin-left:30px}#tRot{left:50%;margin-left:-74px}
+.fsB,.rotB{display:none}
 </style>
 </head>
 <body>
@@ -352,7 +355,7 @@ a.backlink{color:#fff;border-bottom-color:var(--neon-cyan)}
   <button class="tb" id="tAct">ENTER</button>
   <button class="tb" id="tWeap">PISTOL</button>
   <button class="tb" id="tHb">DRIFT</button>
-  <button class="tb" id="tPause">II</button>
+  <button class="tb" id="tPause">II</button><button class="tb" id="tFs">FULL</button><button class="tb" id="tRot">ROT</button>
 </div>
 <div id="stickBase"><div id="stickKnob"></div></div>
 <div id="rot">Rotate your phone sideways for the best view</div>
@@ -365,7 +368,7 @@ a.backlink{color:#fff;border-bottom-color:var(--neon-cyan)}
     <p class="tag">Steal a car. Grab a weapon. Don&rsquo;t get caught.</p>
     <div class="btnrow">
       <button class="go" id="startBtn">Hit the streets</button>
-      <button class="mini" id="fsBtn" style="display:none">Fullscreen</button>
+      <button class="mini fsB">Fullscreen</button><button class="mini rotB">Rotate</button>
     </div>
     <div class="tabs"><button class="tabbtn active" data-tab="char">Character</button><button class="tabbtn" data-tab="armory">Armory</button></div>
     <div id="titleHost">
@@ -379,7 +382,7 @@ a.backlink{color:#fff;border-bottom-color:var(--neon-cyan)}
       <div><span>Look</span><kbd>Mouse / arrows</kbd></div>
       <div><span>Enter / exit car</span><kbd>E</kbd></div>
       <div><span>Fire / attack</span><kbd>Click / Space</kbd></div>
-      <div><span>Weapons</span><kbd>1-6 / wheel</kbd></div>
+      <div><span>Weapons</span><kbd>1-9 / wheel</kbd></div>
       <div><span>Reload</span><kbd>R</kbd></div>
       <div><span>Sprint</span><kbd>Shift</kbd></div>
       <div><span>Handbrake</span><kbd>Space</kbd></div>
@@ -393,7 +396,7 @@ a.backlink{color:#fff;border-bottom-color:var(--neon-cyan)}
   <div class="card">
     <h1 style="font-size:clamp(40px,7vw,80px)">PAUSED</h1>
     <p class="tag">The city will wait.</p>
-    <div class="btnrow"><button class="go" id="resumeBtn">Back to it</button></div>
+    <div class="btnrow"><button class="go" id="resumeBtn">Back to it</button><button class="mini fsB">Fullscreen</button><button class="mini rotB">Rotate</button></div>
     <div class="tabs"><button class="tabbtn" data-tab="char">Character</button><button class="tabbtn" data-tab="armory">Armory</button></div>
     <div id="pauseHost"></div>
     <div class="menu-actions"><a class="menu-btn" href="widgets.html">&larr; Back to Widgets Hub</a></div>
@@ -520,6 +523,10 @@ const groundG=new THREE.PlaneGeometry(CELL,CELL);groundG.rotateX(-Math.PI/2);
 const groundM=new THREE.MeshBasicMaterial({map:roadTex,color:0xd6c4dc});
 const grassG=new THREE.PlaneGeometry(58,58);grassG.rotateX(-Math.PI/2);
 const grassM=new THREE.MeshLambertMaterial({color:0x2f5d45});
+const pondG=new THREE.CircleGeometry(1,28);pondG.rotateX(-Math.PI/2);
+const pondM=new THREE.MeshBasicMaterial({color:0x2f8fd0,transparent:true,opacity:0.82});
+const SHOPT=[{n:'AMMO SHOP',c:0x5a5a68,price:100},{n:'BURGERS',c:0xd8503a,price:30},{n:'CLOTHES',c:0x7a50c0,price:50},{n:'GARAGE',c:0x3a7a9a,price:150}];
+function inWater(x,z){const ch=chunks.get(Math.round(x/CELL)+','+Math.round(z/CELL));if(ch)for(const q of ch.ponds)if(Math.hypot(x-q.x,z-q.z)<q.r)return true;return false;}
 const trunkG=new THREE.CylinderGeometry(0.35,0.5,3.2,6);trunkG.translate(0,1.6,0);
 const crownG=new THREE.ConeGeometry(2.6,6.5,7);crownG.translate(0,6,0);
 const trunkM=lam(0x4a3322),crownM=lam(0x24573a);
@@ -529,7 +536,7 @@ const cashM=new THREE.MeshBasicMaterial({color:0x3dff86});
 
 /* ---------- world chunks ---------- */
 const chunks=new Map(),RC=isTouch?2:3;
-const vehicles=[],peds=[],cashes=[],collectedCash=new Set();
+const vehicles=[],peds=[],cashes=[],shops=[],collectedCash=new Set();
 const RING=31,PERIM=248;
 function ringPos(t,S){
   const side=Math.floor(t/62)%4,u=(t%62)-31;
@@ -539,16 +546,19 @@ function ringPos(t,S){
 function buildChunk(ci,cj){
   const key=ci+','+cj,rnd=mulberry(hashInt(ci,cj)),cx=ci*CELL,cz=cj*CELL;
   const group=new THREE.Group();
-  const ch={key,ci,cj,group,boxes:[],geos:[]};
+  const ch={key,ci,cj,group,boxes:[],geos:[],ponds:[]};
   const gr=new THREE.Mesh(groundG,groundM);gr.position.set(cx,0,cz);group.add(gr);
 
   const isPark=(ci===0&&cj===0)||rnd()<0.13;
   if(isPark){
     const gp=new THREE.Mesh(grassG,grassM);gp.position.set(cx,0.06,cz);group.add(gp);
+    {const z0=(ci===0&&cj===0),pr=z0?9:11+rnd()*5,px=z0?cx-17:cx+(rnd()-0.5)*10,pz=z0?cz-15:cz+(rnd()-0.5)*10;
+    const wm=new THREE.Mesh(pondG,pondM);wm.position.set(px,0.12,pz);wm.scale.set(pr,1,pr);group.add(wm);ch.ponds.push({x:px,z:pz,r:pr});}
     const nt=7+Math.floor(rnd()*5);
     for(let n=0;n<nt;n++){
       const x=cx+(rnd()-0.5)*52,z=cz+(rnd()-0.5)*52;
       if(ci===0&&cj===0&&Math.hypot(x-cx,z-cz)<12)continue;
+      if(ch.ponds.some(q=>Math.hypot(x-q.x,z-q.z)<q.r+2))continue;
       const s=0.8+rnd()*0.7;
       const tr=new THREE.Mesh(trunkG,trunkM);tr.position.set(x,0,z);tr.scale.setScalar(s);group.add(tr);
       const cr=new THREE.Mesh(crownG,crownM);cr.position.set(x,0,z);cr.scale.setScalar(s);group.add(cr);
@@ -593,6 +603,11 @@ function buildChunk(ci,cj){
       addCash(cx+p[0],cz+p[1],20+Math.floor(rnd()*6)*10,id,key,group);
     }
   }
+  if(!isPark&&rnd()<0.22){
+    const k=Math.floor(rnd()*4),T=SHOPT[k],q=ringPos(rnd()*PERIM,RING+1.5),sx=cx+q[0],sz=cz+q[1];
+    box(3.2,3,3.2,lam(T.c),sx,1.5,sz,group);box(3.6,0.5,3.6,neonMats[k%3],sx,3.2,sz,group);
+    shops.push({x:sx,z:sz,type:k,cell:key});
+  }
   // peds
   const np=1+Math.floor(rnd()*3);
   for(let n=0;n<np;n++)spawnPed(ch,rnd);
@@ -617,6 +632,7 @@ function removeChunk(key){
   for(let i=vehicles.length-1;i>=0;i--)if(vehicles[i].cell===key&&vehicles[i].owner==='parked')removeVehicle(vehicles[i]);
   for(let i=peds.length-1;i>=0;i--)if(peds[i].cell===key){scene.remove(peds[i].mesh);peds.splice(i,1);}
   for(let i=cashes.length-1;i>=0;i--)if(cashes[i].cell===key)cashes.splice(i,1);
+  for(let i=shops.length-1;i>=0;i--)if(shops[i].cell===key)shops.splice(i,1);
 }
 function updateChunks(px,pz,maxNew){
   const pi=Math.round(px/CELL),pj=Math.round(pz/CELL);
@@ -893,9 +909,12 @@ const WEAPONS=[
   {id:'fists',name:'Fists',type:'melee',dmg:1,rate:0.42,range:2.6,price:0,desc:'Classic. Knocks pedestrians flat.'},
   {id:'sword',name:'Neon Blade',type:'melee',dmg:2,rate:0.48,range:3.8,price:0,desc:'Wide swing. Dents cars too.'},
   {id:'pistol',name:'Pistol',type:'gun',dmg:8,rate:0.26,mag:12,reload:1.1,spread:0.02,pellets:1,range:70,price:0,desc:'12 rounds. Tap to fire.'},
-  {id:'smg',name:'SMG',type:'gun',auto:true,dmg:5,rate:0.075,mag:30,reload:1.6,spread:0.05,pellets:1,range:60,price:900,desc:'Full auto spray. 30 rounds.'},
-  {id:'shotgun',name:'Shotgun',type:'gun',dmg:9,rate:0.8,mag:6,reload:2.0,spread:0.13,pellets:7,range:34,price:1500,desc:'Seven pellets. Close range.'},
-  {id:'rocket',name:'Rocket Launcher',type:'rocket',dmg:150,rate:1.2,mag:1,reload:2.4,range:80,price:3000,desc:'Big boom. Mind the blast.'}
+  {id:'smg',name:'SMG',type:'gun',auto:true,dmg:5,rate:0.075,mag:30,reload:1.6,spread:0.05,pellets:1,range:60,price:10,desc:'Full auto spray. 30 rounds.'},
+  {id:'shotgun',name:'Shotgun',type:'gun',dmg:9,rate:0.8,mag:6,reload:2.0,spread:0.13,pellets:7,range:34,price:15,desc:'Seven pellets. Close range.'},
+  {id:'rocket',name:'Rocket Launcher',type:'rocket',dmg:150,rate:1.2,mag:1,reload:2.4,range:80,price:30,desc:'Big boom. Mind the blast.'},
+  {id:'bazooka',name:'Bazooka',type:'rocket',dmg:300,rad:17,spd:55,rate:1.8,mag:1,reload:3.2,range:90,price:50,desc:'Huge blast radius. Slow reload.'},
+  {id:'grenade',name:'Grenade',type:'grenade',dmg:200,rate:0.9,mag:3,reload:1.6,range:40,price:12,desc:'Lobbed, bounces, then boom.'},
+  {id:'rail',name:'Rail Gun',type:'rail',dmg:60,rate:1.1,mag:4,reload:2.2,range:160,price:40,desc:'Pierces cars and people. Walls stop it.'}
 ];
 let cash=500,owned=['fists','sword','pistol'],wIdx=2;
 const ammo={};WEAPONS.forEach(w=>{ammo[w.id]=w.mag||0;});
@@ -947,6 +966,9 @@ function makeWeaponModel(id){
   else if(id==='smg'){box(0.08,0.12,0.45,dk,0,0.02,0.2,g);box(0.06,0.22,0.08,dk,0,-0.12,0.1,g);box(0.05,0.05,0.2,mt,0,0.02,0.5,g);}
   else if(id==='shotgun'){box(0.08,0.1,0.8,mt,0,0.02,0.35,g);box(0.1,0.12,0.25,lam(0x6a4020),0,0,0.05,g);}
   else if(id==='rocket'){box(0.16,0.16,0.9,lam(0x3a5a3a),0,0.05,0.3,g);box(0.2,0.2,0.12,lam(0xff8a2a),0,0.05,0.8,g);}
+  else if(id==='bazooka'){box(0.2,0.2,1.2,lam(0x5a6a3a),0,0.05,0.35,g);box(0.26,0.26,0.14,lam(0xff4d3d),0,0.05,0.95,g);}
+  else if(id==='grenade'){box(0.14,0.14,0.14,lam(0x3a5a2a),0,0,0.1,g);}
+  else if(id==='rail'){box(0.1,0.14,1.0,mt,0,0.03,0.4,g);box(0.04,0.04,0.9,acc,0.07,0.1,0.45,g);box(0.04,0.04,0.9,acc,-0.07,0.1,0.45,g);}
   g.visible=false;return g;
 }
 function curW(){return WEAPONS[wIdx];}
@@ -1166,7 +1188,7 @@ function sfx(kind){
 function setMuted(m){A.muted=m;if(A.master)A.master.gain.value=m?0:0.6;toast(m?'Sound off':'Sound on');}
 
 /* ---------- missions ---------- */
-const mission={stage:0,x:0,z:0,timer:0,reward:0};
+const mission={type:'deliver',stage:0,x:0,z:0,timer:0,reward:0,hold:0,ped:null};
 const ringM=new THREE.Mesh(new THREE.TorusGeometry(5,0.3,8,40),new THREE.MeshBasicMaterial({color:0xffd24a,fog:false}));ringM.rotation.x=Math.PI/2;scene.add(ringM);
 const beamM=new THREE.Mesh(new THREE.CylinderGeometry(3.2,3.2,300,16,1,true),new THREE.MeshBasicMaterial({color:0xffc83a,transparent:true,opacity:0.28,blending:THREE.AdditiveBlending,depthWrite:false,fog:false,side:THREE.DoubleSide}));
 beamM.position.y=150;scene.add(beamM);
@@ -1179,21 +1201,53 @@ function pickNode(minD,maxD){
   return[f.x+260,f.z+40];
 }
 function newMission(){
-  const n=pickNode(220,420);mission.stage=0;mission.x=n[0];mission.z=n[1];mission.timer=0;
+  if(mission.ped&&mission.ped.state==='walk')mission.ped.dead=true;
+  const r=Math.random(),ty=r<0.35?'deliver':r<0.6?'hitman':r<0.82?'robbery':'heist',n=pickNode(220,420);
+  Object.assign(mission,{type:ty,stage:0,x:n[0],z:n[1],timer:0,hold:0,ped:null,reward:0});
+  if(ty==='hitman'){
+    const pd=makePerson(0xff2020,0x111111,skins[1]);pd.scale.setScalar(1.1);scene.add(pd);
+    const p={mesh:pd,cell:null,cx:n[0]-40,cz:n[1]-40,t:Math.random()*PERIM,dirS:1,speed:1.4,off:0,state:'walk',x:0,z:0,vx:0,vz:0,fallT:0,ph:0,h:0,target:true};
+    peds.push(p);updatePed(p,0);mission.ped=p;mission.timer=170;mission.reward=700+Math.floor(Math.random()*8)*50;mission.x=p.x;mission.z=p.z;
+  }else if(ty==='robbery')mission.reward=400+Math.floor(Math.random()*6)*50;
+  else if(ty==='heist')mission.reward=2000+Math.floor(Math.random()*6)*100;
+}
+function missionText(dd){
+  const M=mission,t=Math.max(0,Math.ceil(M.timer)),tm=M.timer>0?' &bull; '+Math.floor(t/60)+':'+String(t%60).padStart(2,'0'):'';
+  if(M.type==='deliver')return M.stage===0?'<em>JOB</em>Drive to the yellow marker<br>'+dd+' m':'<em>DELIVERY $'+M.reward+'</em>Get it to the drop-off<br>'+dd+' m'+tm;
+  if(M.type==='hitman')return '<em>HIT $'+M.reward+'</em>Eliminate the man in red<br>'+dd+' m'+tm;
+  const hb=M.type==='heist';
+  if(M.stage===0)return '<em>'+(hb?'BANK HEIST $':'ROBBERY $')+M.reward+'</em>'+(M.hold>0?'Grabbing loot... '+Math.round(M.hold/(hb?5:3)*100)+'%':'Go to the orange marker and hold')+'<br>'+dd+' m';
+  return hb?'<em>HEIST</em>Get to the safehouse by car<br>'+dd+' m'+tm:'<em>ROBBERY</em>Lose the cops!';
 }
 function updateMission(dt){
-  ringM.position.set(mission.x,0.4,mission.z);beamM.position.x=mission.x;beamM.position.z=mission.z;
-  ringM.rotation.z+=dt;
-  const col=mission.stage===0?0xffd24a:0x58f0a0;ringM.material.color.setHex(col);beamM.material.color.setHex(col);
-  if(mission.stage===1){mission.timer-=dt;if(mission.timer<=0){toast('Job failed');newMission();return;}}
-  if(player.state==='car'&&player.veh&&Math.hypot(player.veh.x-mission.x,player.veh.z-mission.z)<7){
-    if(mission.stage===0){
-      const n=pickNode(300,520),dd=Math.hypot(n[0]-mission.x,n[1]-mission.z);
-      mission.stage=1;mission.x=n[0];mission.z=n[1];mission.reward=Math.round((dd*0.8+150)/10)*10;mission.timer=dd/15+28;
-      toast('Package loaded');sfx('door');
-    }else{
-      cash+=mission.reward;toast('Delivered +$'+mission.reward);sfx('cash');newMission();
+  const M=mission,ty=M.type,f=getFocus(),hb=ty==='heist';
+  if(ty==='hitman'&&M.ped){M.x=M.ped.x;M.z=M.ped.z;}
+  ringM.position.set(M.x,0.4,M.z);beamM.position.x=M.x;beamM.position.z=M.z;ringM.rotation.z+=dt;
+  const col=ty==='hitman'?0xff3030:ty==='deliver'?(M.stage===0?0xffd24a:0x58f0a0):(M.stage===0?0xff8a2a:(hb?0x58f0a0:0x7ad0ff));
+  ringM.material.color.setHex(col);beamM.material.color.setHex(col);
+  const d=Math.hypot(f.x-M.x,f.z-M.z);
+  if(M.timer>0){M.timer-=dt;if(M.timer<=0){toast('Job failed');newMission();return;}}
+  if(ty==='deliver'){
+    if(player.state==='car'&&player.veh&&d<7){
+      if(M.stage===0){
+        const n=pickNode(300,520),dd=Math.hypot(n[0]-M.x,n[1]-M.z);
+        M.stage=1;M.x=n[0];M.z=n[1];M.reward=Math.round((dd*0.8+150)/10)*10;M.timer=dd/15+28;toast('Package loaded');sfx('door');
+      }else{cash+=M.reward;toast('Delivered +$'+M.reward);sfx('cash');newMission();}
     }
+  }else if(ty==='hitman'){
+    if(M.ped.state!=='walk'){cash+=M.reward;toast('Target down +$'+M.reward);sfx('cash');newMission();}
+  }else{
+    if(M.stage===0){
+      if(d<6){
+        M.hold+=dt;
+        if(M.hold>=(hb?5:3)){
+          crime(hb?3.2:2.2);sfx('cash');M.stage=1;
+          if(hb){const n=pickNode(300,520);M.x=n[0];M.z=n[1];M.timer=Math.hypot(n[0]-f.x,n[1]-f.z)/12+35;toast('Loot secured! Reach the safehouse');}
+          else{cash+=M.reward;toast('Cash grabbed +$'+M.reward+'. Lose the cops!');}
+        }
+      }else M.hold=Math.max(0,M.hold-dt*2);
+    }else if(!hb&&stars()===0){cash+=200;toast('Clean getaway +$200');sfx('cash');newMission();}
+    else if(hb&&player.state==='car'&&d<7){cash+=M.reward;toast('Heist complete +$'+M.reward);sfx('cash');newMission();}
   }
 }
 
@@ -1311,10 +1365,25 @@ document.addEventListener('click',e=>{
 });
 renderChar();renderArmory();showTab('char');
 $('hint').textContent=isTouch?'Left thumb moves or drives. Drag the right side to look. Buttons do the rest.':'Keyboard and mouse. Click the game to capture the mouse.';
-if(isTouch&&(document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen)){
-  $('fsBtn').style.display='inline-block';
-  $('fsBtn').addEventListener('click',()=>{const el=document.documentElement;try{(el.requestFullscreen||el.webkitRequestFullscreen).call(el);}catch(e){}});
+function toggleFS(){
+  const d=document,el=d.documentElement,on=d.fullscreenElement||d.webkitFullscreenElement;
+  if(!(el.requestFullscreen||el.webkitRequestFullscreen)){toast('Share > Add to Home Screen for fullscreen');return;}
+  try{if(on)(d.exitFullscreen||d.webkitExitFullscreen).call(d);else{const p=(el.requestFullscreen||el.webkitRequestFullscreen).call(el);if(p&&p.catch)p.catch(()=>{});}}catch(e){}
 }
+function rotateScreen(){
+  const o=screen.orientation,msg=()=>toast('Turn off rotation lock, then turn your phone');
+  if(o&&o.lock){
+    const ty=(o.type||'').indexOf('landscape')===0?'portrait':'landscape',go=()=>o.lock(ty).catch(msg),el=document.documentElement;
+    if(!(document.fullscreenElement||document.webkitFullscreenElement)&&el.requestFullscreen)el.requestFullscreen().then(go).catch(go);else go();
+  }else msg();
+}
+function autoLand(){
+  const el=document.documentElement;
+  try{const p=(el.requestFullscreen||el.webkitRequestFullscreen||function(){}).call(el),lk=()=>{if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(()=>{});};if(p&&p.then)p.then(lk).catch(()=>{});else lk();}catch(e){}
+}
+document.querySelectorAll('.fsB').forEach(b=>{if(isTouch)b.style.display='inline-block';b.addEventListener('click',toggleFS);});
+document.querySelectorAll('.rotB').forEach(b=>{if(isTouch)b.style.display='inline-block';b.addEventListener('click',rotateScreen);});
+$('tFs').addEventListener('click',toggleFS);$('tRot').addEventListener('click',rotateScreen);
 
 function setPaused(p){
   if(!started)return;paused=p;$('pause').classList.toggle('hide',!p);
@@ -1331,7 +1400,7 @@ function startGame(){
   initAudio();if(A.ctx&&A.ctx.state==='suspended')A.ctx.resume();
   started=true;paused=false;$('title').classList.add('hide');document.body.classList.add('playing');
   camera.fov=62;camera.updateProjectionMatrix();
-  lockPointer();clock.getDelta();saveGame();
+  lockPointer();if(isTouch)autoLand();clock.getDelta();saveGame();
 }
 $('startBtn').addEventListener('click',startGame);
 $('resumeBtn').addEventListener('click',()=>{setPaused(false);lockPointer();});
@@ -1452,7 +1521,20 @@ function shoot(w){
   if(tg)yaw=Math.atan2(tg.x-src.x,tg.z-src.z);
   const off=inCar?2.5:0.9,ox=src.x+Math.sin(yaw)*off,oz=src.z+Math.cos(yaw)*off;
   if(!inCar)player.h=yaw;
-  if(w.type==='rocket'){launchRocket(ox,oz,yaw);sfx('rocket');shake=Math.max(shake,0.3);crimeShot(0.3);return;}
+  if(w.type==='grenade'){launchGrenade(ox,oz,yaw);sfx('swing');crimeShot(0.3);return;}
+  if(w.type==='rail'){
+    let sx=ox,sz=oz,rg=w.range;const dx=Math.sin(yaw),dz=Math.cos(yaw);sfx('boom');
+    for(let k=0;k<10&&rg>0;k++){
+      const h=rayCast(sx,sz,dx,dz,rg,player.veh),d=h?h.t:rg;
+      addTracer(sx,1.3,sz,sx+dx*d,sz+dz*d,0x58f0ff);
+      if(!h||h.type==='wall')break;
+      const ex=sx+dx*d,ez=sz+dz*d;
+      if(h.type==='ped'){knockPed(h.obj,dx*14,dz*14);crime(0.7);}else{damageVehicle(h.obj,w.dmg);h.obj.hitByPlayer=time;crimeShot(0.4);}
+      burst(ex,1.2,ez,8,0.3,0.9,1,5);sx=ex+dx*2.6;sz=ez+dz*2.6;rg-=d+2.6;
+    }
+    shake=Math.max(shake,0.4);crimeShot(0.3);return;
+  }
+  if(w.type==='rocket'){launchRocket(ox,oz,yaw,w);sfx('rocket');shake=Math.max(shake,0.3);crimeShot(0.3);return;}
   sfx(w.id==='shotgun'?'shotgun':'shot');
   burst(ox,1.3,oz,3,1,0.8,0.3,3);
   for(let i=0;i<w.pellets;i++){
@@ -1467,9 +1549,9 @@ function shoot(w){
 }
 const rockets=[];
 const rocketGeo=new THREE.BoxGeometry(0.25,0.25,0.9),rocketMat=new THREE.MeshBasicMaterial({color:0xff8a2a});
-function launchRocket(x,z,yaw){
+function launchRocket(x,z,yaw,w){
   const m=new THREE.Mesh(rocketGeo,rocketMat);m.position.set(x,1.3,z);m.rotation.y=yaw;scene.add(m);
-  rockets.push({m,x,z,dx:Math.sin(yaw),dz:Math.cos(yaw),t:0});
+  rockets.push({m,x,z,dx:Math.sin(yaw),dz:Math.cos(yaw),t:0,rad:w.rad||10,dmg:w.dmg,spd:w.spd||70});
 }
 function blast(x,z,R,dmg){
   burst(x,1,z,50,1,0.55,0.15,16);burst(x,1.5,z,25,1,0.9,0.5,10);shake=Math.max(shake,0.7);sfx('boom');
@@ -1483,15 +1565,26 @@ function blast(x,z,R,dmg){
 }
 function updateRockets(dt){
   for(let i=rockets.length-1;i>=0;i--){
-    const r=rockets[i],step=70*dt;
+    const r=rockets[i],step=r.spd*dt;
     const h=rayCast(r.x,r.z,r.dx,r.dz,step+0.6,player.veh);
     r.t+=dt;
     if(h||r.t>2.6){
       const d=h?Math.min(h.t,step):step;r.x+=r.dx*d;r.z+=r.dz*d;
-      blast(r.x,r.z,10,150);scene.remove(r.m);rockets.splice(i,1);continue;
+      blast(r.x,r.z,r.rad,r.dmg);scene.remove(r.m);rockets.splice(i,1);continue;
     }
     r.x+=r.dx*step;r.z+=r.dz*step;r.m.position.set(r.x,1.3,r.z);
     emit(r.x,1.3,r.z,(Math.random()-0.5),(Math.random()-0.5),(Math.random()-0.5),0.5,1,0.6,0.2);
+  }
+}
+const grens=[],grenG=new THREE.SphereGeometry(0.22,8,6),grenM=lam(0x3a5a2a);
+function launchGrenade(x,z,yaw){const m=new THREE.Mesh(grenG,grenM);scene.add(m);grens.push({m,x,y:1.4,z,vx:Math.sin(yaw)*17,vy:5,vz:Math.cos(yaw)*17,t:0});}
+function updateGrenades(dt){
+  for(let i=grens.length-1;i>=0;i--){
+    const g=grens[i];g.t+=dt;g.vy-=22*dt;g.x+=g.vx*dt;g.z+=g.vz*dt;g.y+=g.vy*dt;
+    if(g.y<0.25){g.y=0.25;g.vy=Math.abs(g.vy)*0.4;g.vx*=0.7;g.vz*=0.7;}
+    for(const b of boxesNear(g.x,g.z)){if(g.y<b.h&&circleBox(g,0.25,b)){const vn=g.vx*_nx+g.vz*_nz;if(vn<0){g.vx-=1.6*vn*_nx;g.vz-=1.6*vn*_nz;}}}
+    g.m.position.set(g.x,g.y,g.z);
+    if(g.t>2.2){blast(g.x,g.z,12,200);scene.remove(g.m);grens.splice(i,1);}
   }
 }
 function updateWeapons(dt){
@@ -1524,7 +1617,18 @@ function updateCopFire(dt){
 }
 
 /* ---------- player update ---------- */
-function enterNearest(){
+function nearShop(){for(const s of shops)if(Math.hypot(s.x-player.x,s.z-player.z)<4)return s;return null;}
+function useShop(){
+  const s=nearShop();if(!s)return false;const T=SHOPT[s.type];
+  if(cash<T.price){toast('Need $'+T.price);return true;}
+  cash-=T.price;sfx('cash');
+  if(s.type===0){WEAPONS.forEach(w=>{if(w.mag)ammo[w.id]=w.mag;});reloadT=0;toast('Ammo restocked');}
+  else if(s.type===1){player.hp=100;toast('Fed and healed');}
+  else if(s.type===2){CHAR_ROWS.forEach(r=>{av[r.k]=Math.floor(Math.random()*(r.colors?r.colors.length:r.names.length));});rebuildAvatar();saveGame();renderChar();toast('New look!');}
+  else{let n=0;for(const v of vehicles)if(v.owner==='abandoned'&&Math.hypot(v.x-player.x,v.z-player.z)<30){v.hp=v.P.hp;n++;}toast(n?'Car repaired':'No car nearby');if(!n)cash+=T.price;}
+  return true;
+}
+function enterNearest(){if(useShop())return;
   let best=null,bd=5.2;
   for(const v of vehicles){if(v.dead||v.owner==='wreck')continue;const d=Math.hypot(v.x-player.x,v.z-player.z);if(d<bd){bd=d;best=v;}}
   if(!best)return;
@@ -1554,7 +1658,7 @@ function updatePlayer(dt){
     let mx=sy*ctl.f+cy*ctl.l,mz=cy*ctl.f-sy*ctl.l;const m=Math.hypot(mx,mz);
     if(m>0){mx/=m;mz/=m;}
     const w=curW(),aiming=(ctl.fire||firedRecently>0||meleeT>0);
-    const spd=(ctl.sprint&&!aiming?9.5:5.2)*(ctl.mag>0?clamp(ctl.mag*1.15,0.35,1):0);
+    const sw_=player.swim=inWater(player.x,player.z),spd=(sw_?2.8:(ctl.sprint&&!aiming?9.5:5.2))*(ctl.mag>0?clamp(ctl.mag*1.15,0.35,1):0);
     const k=Math.min(1,dt*10);
     player.vx+=(mx*spd-player.vx)*k;player.vz+=(mz*spd-player.vz)*k;
     player.x+=player.vx*dt;player.z+=player.vz*dt;
@@ -1575,7 +1679,8 @@ function updatePlayer(dt){
       if(meleeT>0){const q=1-meleeT/0.32;u.armR.rotation.x=-2.6+q*2.3;u.armR.rotation.z=-0.5+q*1.0;}
       else u.armR.rotation.x=-0.9;
     }else u.armR.rotation.x=meleeT>0?-1.6:sw;
-    player.mesh.position.set(player.x,0,player.z);player.mesh.rotation.y=player.h;
+    player.mesh.position.set(player.x,player.swim?-0.55+Math.sin(time*4)*0.05:0,player.z);player.mesh.rotation.x=player.swim?1.15:0;player.mesh.rotation.y=player.h;
+    if(player.swim&&sp>1&&Math.random()<0.4)emit(player.x,0.3,player.z,(Math.random()-0.5)*2,2,(Math.random()-0.5)*2,0.5,0.4,0.7,1);
     player.hp=Math.min(100,player.hp+dt*1.5);
   }else if(player.veh){
     player.x=player.veh.x;player.z=player.veh.z;player.h=player.veh.h;
@@ -1596,7 +1701,7 @@ function simulate(dt){
   }
   oneShot=[];
   updatePlayer(dt);
-  updateWeapons(dt);updateRockets(dt);updateTracers(dt);updateCopFire(dt);
+  updateWeapons(dt);updateRockets(dt);updateGrenades(dt);updateTracers(dt);updateCopFire(dt);
 
   for(const v of vehicles){
     let inp;
@@ -1605,6 +1710,7 @@ function simulate(dt){
     }else if((v.owner==='ai'||v.owner==='cop')&&v.ai)inp=aiControl(v,dt);
     else inp={thr:0,brk:0,steer:0,hb:false};
     vehiclePhysics(v,inp,dt);
+    if(inWater(v.x,v.z)){const k=Math.exp(-2*dt);v.vx*=k;v.vz*=k;if(v.owner!=='wreck')damageVehicle(v,12*dt);if(Math.random()<0.3)emit(v.x,0.4,v.z,(Math.random()-0.5)*3,3,(Math.random()-0.5)*3,0.5,0.4,0.7,1);}
   }
 
   // building collisions (two circles per car) + vehicle-vs-vehicle
@@ -1748,7 +1854,7 @@ const camPos=new THREE.Vector3(),camLook=new THREE.Vector3();
 let orbitA=0,saveT=0;
 function avatarShot(px,pz,t){
   const m=player.mesh,u=m.userData;
-  m.visible=true;m.position.set(px,0,pz);m.rotation.y=t*0.7+0.5;
+  m.visible=true;m.rotation.x=0;m.position.set(px,0,pz);m.rotation.y=t*0.7+0.5;
   u.legL.rotation.x=u.legR.rotation.x=u.armL.rotation.x=0;u.armR.rotation.z=0;
   u.armR.rotation.x=curW().type==='melee'?-0.9:-1.15;
   if(camera.fov!==36){camera.fov=36;camera.updateProjectionMatrix();}
@@ -1813,6 +1919,8 @@ function drawMap(){
   for(let k=j0;k<=j1;k++){const rc=k*80+40,a=map(f.x-range*1.5,rc),b=map(f.x+range*1.5,rc);mctx.beginPath();mctx.moveTo(a[0],a[1]);mctx.lineTo(b[0],b[1]);mctx.stroke();}
   mctx.fillStyle='#58f0a0';
   for(const cs of cashes){const m=map(cs.x,cs.z);if((m[0]-c)*(m[0]-c)+(m[1]-c)*(m[1]-c)<R*R)mctx.fillRect(m[0]-3,m[1]-3,6,6);}
+  mctx.fillStyle='#2f8fd0';for(const [k,ch] of chunks)for(const q of ch.ponds){const m=map(q.x,q.z);mctx.beginPath();mctx.arc(m[0],m[1],q.r*s,0,TAU);mctx.fill();}
+  mctx.fillStyle='#ff4dd0';for(const sh of shops){const m=map(sh.x,sh.z);mctx.fillRect(m[0]-4,m[1]-4,8,8);}
   const flash=Math.floor(time*5)%2===0;
   for(const v of vehicles){
     if(v.owner!=='cop')continue;const m=map(v.x,v.z);
@@ -1840,15 +1948,15 @@ function updateHUD(){
   if(inCar)$('cp').style.width=clamp(player.veh.hp/player.veh.P.hp*100,0,100)+'%';
   $('spd').firstChild.nodeValue=String(Math.round((inCar?player.veh.speed:Math.hypot(player.vx,player.vz))*3.6));
   const dd=Math.round(Math.hypot(mission.x-f.x,mission.z-f.z));
-  let mh;
-  if(mission.stage===0)mh='<em>JOB</em>Drive to the yellow marker<br>'+dd+' m';
-  else{const t=Math.max(0,Math.ceil(mission.timer));mh='<em>DELIVERY $'+mission.reward+'</em>Get it to the drop-off<br>'+dd+' m &bull; '+Math.floor(t/60)+':'+String(t%60).padStart(2,'0');}
+  const mh=missionText(dd);
   if(hc.mh!==mh){hc.mh=mh;$('mission').innerHTML=mh;}
   const pr=$('prompt'),w=curW();
   const takeT=isTouch?'Tap <b>ENTER</b> to take car':'Press <b>E</b> to take car',outT=isTouch?'Tap <b>EXIT</b> to get out':'Press <b>E</b> to get out';
   if(player.state==='foot'){
     let near=false;for(const v of vehicles){if(!v.dead&&v.owner!=='wreck'&&Math.hypot(v.x-player.x,v.z-player.z)<5.2){near=true;break;}}
-    if(near){pr.innerHTML=takeT;pr.style.opacity=1;}else pr.style.opacity=0;
+    const sh=nearShop();
+    if(sh){pr.innerHTML=(isTouch?'Tap <b>ENTER</b>: ':'Press <b>E</b>: ')+SHOPT[sh.type].n+' $'+SHOPT[sh.type].price;pr.style.opacity=1;}
+    else if(near){pr.innerHTML=takeT;pr.style.opacity=1;}else pr.style.opacity=0;
   }else{pr.innerHTML=outT;pr.style.opacity=(player.veh&&player.veh.speed<4)?1:0;}
   setT('wname',w.name.toUpperCase());
   setT('wammo',w.type==='melee'?'':(reloadT>0?'RELOADING':ammo[w.id]+' / '+w.mag));

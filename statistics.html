@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f6f7fb">
+<meta name="description" content="Interactive probability distributions reference: discrete and continuous distributions, formulae, properties and graphs.">
+<title>Statistics Lab | Ansh Patel</title>
+<style>
+:root{--bg:#f6f7fb;--panel:#fff;--soft:#f0f3fa;--text:#172033;--muted:#5b667d;--accent:#2b50d6;--accent-soft:#e6ebfd;--mean:#d9480f;--line:#dfe4ee;--err:#b42318;--serif:Charter,"Iowan Old Style","Palatino Linotype",Georgia,serif;--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;background:var(--bg);color:var(--text);font:15px/1.6 var(--sans);color-scheme:light}
+button,input{font:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px clamp(14px,3vw,32px);background:rgba(255,255,255,.92);border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:center;gap:10px;font:700 17px var(--serif);color:var(--text);text-decoration:none}
+.ico{width:36px;height:36px;display:grid;place-items:center;border-radius:10px;background:var(--accent);color:#fff;font-size:19px}
+nav,.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.nl,.btn{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:7px 14px;border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--text);text-decoration:none;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s,border-color .15s}
+.nl:hover,.btn:hover{border-color:var(--accent);background:var(--accent-soft)}
+.nl.home{color:var(--accent);border-color:#b9c6f5}
+.btn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.page{width:min(1280px,100%);margin:0 auto;padding:30px clamp(14px,3vw,28px) 56px}
+h1{font:700 clamp(30px,4.6vw,46px)/1.1 var(--serif);letter-spacing:-.02em;margin-bottom:10px;max-width:16em}
+.sub{color:var(--muted);max-width:44em;margin-bottom:22px}
+.tabs{margin-bottom:12px}
+.tabs.main .btn{font-size:15px;padding:8px 18px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;align-items:start;margin-top:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;min-width:0}
+.stagehead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.stagehead h2{font:700 24px var(--serif)}
+.pill{color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:3px 11px;font-size:12px;font-weight:700}
+canvas{display:block;width:100%;height:340px}
+.legend{display:flex;gap:18px;flex-wrap:wrap;color:var(--muted);font-size:13px;margin-top:8px}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--accent);margin-right:6px;vertical-align:-1px}
+.sw.m{background:none;border-top:2px dashed var(--mean);height:0;border-radius:0;vertical-align:3px}
+.content{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+h3{font:700 18px var(--serif);margin-bottom:8px}
+.k{color:var(--muted);font-size:13px;font-weight:600;margin-bottom:4px}
+p{color:#2c3750}
+.small{font-size:13px;color:var(--muted)}
+.formula{padding:14px;border-radius:10px;background:var(--soft);border:1px solid var(--line);font:italic 17px/1.9 var(--serif);overflow-x:auto}
+.formula sup,.formula sub{font-size:.7em}
+.example{margin-top:12px;padding:10px 12px;border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 8px 8px 0;font-size:14px}
+.ctl{margin-bottom:16px}
+.ctl label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:6px}
+.ctlrow{display:grid;grid-template-columns:1fr 84px;gap:10px;align-items:center}
+input[type=number]{width:100%;min-height:38px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--text);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--accent)}
+hr{border:0;border-top:1px solid var(--line);margin:16px 0}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat{background:var(--soft);border-radius:10px;padding:9px 11px}
+.stat span{display:block;color:var(--muted);font-size:12px}
+.stat b{font-size:16px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.note{margin-top:14px;padding:10px 12px;border-radius:10px;background:#fff4ec;border:1px solid #f6d3bd;color:#7a3410;font-size:13px}
+.note.err{background:#fef0ee;border-color:#f5c2bc;color:var(--err)}
+.guide{margin-top:34px}
+.guide h2{font:700 24px var(--serif);margin-bottom:12px}
+.guidegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.guidecard{padding:14px;background:var(--panel);border:1px solid var(--line);border-radius:12px}
+.guidecard b{display:block;margin-bottom:3px}
+@media(max-width:900px){.layout,.content{grid-template-columns:1fr}.guidegrid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.guidegrid{grid-template-columns:1fr}canvas{height:280px}.page{padding-top:20px}}
+</style>
+</head>
+<body>
+<header class="top">
+<a class="brand" href="index.html"><span class="ico">∑</span><span>Statistics Lab</span></a>
+<nav aria-label="Main navigation"><a class="nl" href="widgets.html">← Back to Widgets</a><a class="nl home" href="index.html">⌂ Home</a></nav>
+</header>
+<main class="page">
+<h1>Probability distributions</h1>
+<p class="sub">Pick a distribution, change its parameters, and watch the graph and summary statistics update. Each distribution comes with its definition, formula and a worked example.</p>
+<div class="row tabs main" role="group" aria-label="Distribution type">
+<button class="btn on" id="discTab" type="button">Discrete</button>
+<button class="btn" id="contTab" type="button">Continuous</button>
+</div>
+<div class="row tabs" id="distTabs" role="group" aria-label="Choose a distribution"></div>
+<div class="layout">
+<section>
+<div class="card">
+<div class="stagehead"><h2 id="graphTitle">Binomial</h2><span class="pill" id="graphKind">Probability mass function</span></div>
+<canvas id="plot" role="img" aria-label="Probability distribution graph"></canvas>
+<div class="legend"><span><i class="sw"></i><span id="legendText"></span></span><span><i class="sw m"></i>Mean</span></div>
+</div>
+<div class="content">
+<div class="card"><div class="k">Definition</div><h3>What it models</h3><p id="definition"></p><p class="small" id="support" style="margin-top:8px"></p><div class="example" id="example"></div></div>
+<div class="card"><div class="k" id="formulaKind">Formula</div><h3>The formula</h3><div class="formula" id="formula"></div><p class="small" id="formulaNote" style="margin-top:10px"></p></div>
+</div>
+<div class="card" style="margin-top:18px"><h3>What the parameters mean</h3><p id="parameterGuide"></p></div>
+</section>
+<aside class="card">
+<h3>Parameters</h3>
+<div id="controls"></div>
+<div class="note err" id="error" hidden></div>
+<hr>
+<h3>Key properties</h3>
+<div class="stats" id="stats"></div>
+<div class="note" id="caution"></div>
+</aside>
+</div>
+<section class="guide">
+<h2>How to choose a distribution</h2>
+<div class="guidegrid">
+<div class="guidecard"><b>Bernoulli / Binomial</b><p class="small">One yes/no trial, or the number of successes in a fixed number of independent trials.</p></div>
+<div class="guidecard"><b>Geometric / Negative binomial</b><p class="small">The number of failures before the first success, or before a fixed number of successes.</p></div>
+<div class="guidecard"><b>Poisson</b><p class="small">A count of events in a fixed interval when events occur independently at a constant average rate.</p></div>
+<div class="guidecard"><b>Normal family</b><p class="small">A continuous, symmetric bell curve. The standard normal has mean 0 and variance 1.</p></div>
+<div class="guidecard"><b>Exponential / Gamma / Chi-squared</b><p class="small">Positive waiting times and sums of them. Chi-squared is a special case of the gamma.</p></div>
+<div class="guidecard"><b>Uniform / Beta</b><p class="small">Equal density over an interval, or a flexible density for a proportion between 0 and 1.</p></div>
+<div class="guidecard"><b>Lognormal</b><p class="small">A positive quantity whose natural logarithm follows a normal distribution.</p></div>
+</div>
+</section>
+</main>
+<script>
+(() => {
+const $=id=>document.getElementById(id),canvas=$("plot"),ctx=canvas.getContext("2d");
+let category="discrete",current="binomial",values={};
+/* params: [key,label,default,min,max,step] */
+const D={
+bernoulli:{name:"Bernoulli",kind:"discrete",desc:"A single trial with two outcomes: success (1) with probability p, or failure (0) with probability 1 − p.",support:"Support: x ∈ {0, 1}.",formula:"P(X = x) = p<sup>x</sup>(1 − p)<sup>1−x</sup>, x ∈ {0, 1}",note:"Equivalently, P(X = 1) = p and P(X = 0) = 1 − p.",params:[["p","Success probability p",.35,.01,.99,.01]],mean:v=>v.p,variance:v=>v.p*(1-v.p),mode:v=>v.p>.5?"1":v.p<.5?"0":"0 and 1",skew:v=>(1-2*v.p)/Math.sqrt(v.p*(1-v.p)),example:"Example: a component is defective with probability 0.02. Let X = 1 if it is defective and 0 otherwise.",guide:"p is the probability of success on this single trial."},
+binomial:{name:"Binomial",kind:"discrete",desc:"Counts the number of successes in n independent trials, each with the same success probability p.",support:"Support: x = 0, 1, …, n.",formula:"P(X = x) = C(n, x) p<sup>x</sup>(1 − p)<sup>n−x</sup>",note:"Assumes a fixed n, independent trials, two outcomes per trial and a constant p.",params:[["n","Number of trials n",12,1,60,1],["p","Success probability p",.35,.01,.99,.01]],mean:v=>v.n*v.p,variance:v=>v.n*v.p*(1-v.p),mode:v=>{const m=(v.n+1)*v.p;return Number.isInteger(+m.toFixed(9))&&m<=v.n&&m>=1?`${m-1} and ${m}`:String(Math.floor(m))},skew:v=>(1-2*v.p)/Math.sqrt(v.n*v.p*(1-v.p)),example:"Example: X is the number of heads in 12 independent tosses of a coin with P(head) = 0.35.",guide:"n is the fixed number of trials. p is the success probability on each trial."},
+poisson:{name:"Poisson",kind:"discrete",desc:"Models the number of events in a fixed interval when events occur independently at a constant average rate.",support:"Support: x = 0, 1, 2, …",formula:"P(X = x) = e<sup>−λ</sup> λ<sup>x</sup> / x!",note:"λ is the expected number of events in the interval. The variance also equals λ.",params:[["lambda","Mean count λ",4,.1,20,.1]],mean:v=>v.lambda,variance:v=>v.lambda,mode:v=>Number.isInteger(+v.lambda.toFixed(9))?`${v.lambda-1} and ${v.lambda}`:String(Math.floor(v.lambda)),skew:v=>1/Math.sqrt(v.lambda),example:"Example: if calls arrive at an average of 4 per hour, the number of calls in one hour can be modelled as Poisson(4).",guide:"λ is the average number of events per interval. Doubling the length of the interval doubles λ."},
+negbin:{name:"Negative binomial",kind:"discrete",desc:"Counts the failures that occur before the r-th success in independent trials with success probability p.",support:"Support: x = 0, 1, 2, … failures.",formula:"P(X = x) = C(x + r − 1, x) p<sup>r</sup>(1 − p)<sup>x</sup>",note:"Uses the failures-before-r-th-success convention. Some books count total trials instead, which adds r to X.",params:[["r","Target successes r",4,1,25,1],["p","Success probability p",.4,.05,.99,.01]],mean:v=>v.r*(1-v.p)/v.p,variance:v=>v.r*(1-v.p)/(v.p*v.p),mode:v=>{if(v.r<=1)return"0";const m=(v.r-1)*(1-v.p)/v.p;return Number.isInteger(+m.toFixed(9))&&m>0?`${m-1} and ${m}`:String(Math.floor(m))},skew:v=>(2-v.p)/Math.sqrt(v.r*(1-v.p)),example:"Example: each trial succeeds with probability 0.4. X is the number of failures before the 4th success.",guide:"r is the number of successes you are waiting for. p is the success probability on each trial."},
+geometric:{name:"Geometric",kind:"discrete",desc:"A negative binomial with r = 1: the number of failures before the first success.",support:"Support: x = 0, 1, 2, … failures.",formula:"P(X = x) = (1 − p)<sup>x</sup> p",note:"Uses the failures-before-first-success convention. If you count the trial on which the first success occurs, use X + 1.",params:[["p","Success probability p",.3,.02,.99,.01]],mean:v=>(1-v.p)/v.p,variance:v=>(1-v.p)/(v.p*v.p),mode:()=>"0",skew:v=>(2-v.p)/Math.sqrt(1-v.p),example:"Example: roll a die until the first 6. X is the number of non-sixes before it, with p = 1/6.",guide:"p is the success probability on each independent trial."},
+normal:{name:"Normal",kind:"continuous",desc:"A symmetric, bell-shaped distribution set by its mean μ and standard deviation σ. “Gaussian” is another name for it.",support:"Support: −∞ < x < ∞.",formula:"f(x) = 1/(σ√(2π)) · exp(−(x − μ)<sup>2</sup> / (2σ<sup>2</sup>))",note:"σ > 0 is the standard deviation, so the variance is σ².",params:[["mu","Mean μ",0,-5,5,.1],["sigma","Standard deviation σ",1,.1,4,.1]],mean:v=>v.mu,variance:v=>v.sigma**2,mode:v=>v.mu,skew:()=>0,example:"Example: a measurement error is often modelled as N(μ, σ²), where μ is its average and σ describes its spread.",guide:"μ shifts the centre. σ controls the spread. The variance is σ², not σ."},
+standard:{name:"Standard normal",kind:"continuous",desc:"The normal distribution with mean 0 and variance 1, written Z ~ N(0, 1).",support:"Support: −∞ < z < ∞.",formula:"φ(z) = 1/√(2π) · exp(−z<sup>2</sup> / 2)",note:"Standardising: Z = (X − μ)/σ turns X ~ N(μ, σ²) into N(0, 1).",params:[],mean:()=>0,variance:()=>1,mode:()=>0,skew:()=>0,example:"Example: if X ~ N(100, 15²), then P(X ≤ 115) = P(Z ≤ 1).",guide:"There are no free parameters: μ = 0 and σ = 1."},
+exponential:{name:"Exponential",kind:"continuous",desc:"Models the non-negative waiting time between events in a Poisson process. It has the memoryless property.",support:"Support: x ≥ 0.",formula:"f(x) = λe<sup>−λx</sup>, x ≥ 0",note:"λ > 0 is the rate. Mean = 1/λ and variance = 1/λ². Some texts use the scale θ = 1/λ instead.",params:[["lambda","Rate λ",1,.1,5,.1]],mean:v=>1/v.lambda,variance:v=>1/(v.lambda**2),mode:()=>"0",skew:()=>2,example:"Example: if events occur at a rate of 2 per hour, the wait for the next event has mean 0.5 hours.",guide:"λ is the rate per unit time. A larger λ means a shorter average wait."},
+gamma:{name:"Gamma",kind:"continuous",desc:"A flexible positive distribution, often used for waiting times. The sum of α independent exponential(λ) waits (α a whole number) is gamma.",support:"Support: x > 0.",formula:"f(x) = λ<sup>α</sup> x<sup>α−1</sup> e<sup>−λx</sup> / Γ(α), x > 0",note:"Rate form with shape α > 0 and rate λ > 0. Scale θ = 1/λ. Mean = α/λ and variance = α/λ².",params:[["alpha","Shape α",3,.2,12,.1],["lambda","Rate λ",2,.2,5,.1]],mean:v=>v.alpha/v.lambda,variance:v=>v.alpha/(v.lambda**2),mode:v=>v.alpha>=1?(v.alpha-1)/v.lambda:"0 (unbounded)",skew:v=>2/Math.sqrt(v.alpha),example:"Example: the total of 3 independent Exponential(rate 2) waits is Gamma(shape 3, rate 2).",guide:"α sets the shape. λ is the rate, not the scale. If your notes use the scale θ, use λ = 1/θ."},
+chisq:{name:"Chi-squared",kind:"continuous",desc:"A special gamma distribution: the sum of squares of ν independent standard normal variables.",support:"Support: x > 0.",formula:"f(x) = x<sup>ν/2−1</sup> e<sup>−x/2</sup> / (2<sup>ν/2</sup> Γ(ν/2)), x > 0",note:"χ²(ν) = Gamma(shape ν/2, rate 1/2). Mean = ν and variance = 2ν.",params:[["nu","Degrees of freedom ν",4,1,30,1]],mean:v=>v.nu,variance:v=>2*v.nu,mode:v=>v.nu>=2?v.nu-2:"0 (unbounded)",skew:v=>Math.sqrt(8/v.nu),example:"Example: if Z₁, …, Z₅ are independent N(0, 1), then Z₁² + … + Z₅² ~ χ²(5).",guide:"ν is the degrees of freedom: the number of squared standard normals being added."},
+uniform:{name:"Uniform",kind:"continuous",desc:"Every point in [a, b] has the same density, so probability is proportional to interval length.",support:"Support: a ≤ x ≤ b, with b > a.",formula:"f(x) = 1/(b − a) for a ≤ x ≤ b, and 0 otherwise",note:"Mean = (a + b)/2 and variance = (b − a)²/12.",params:[["a","Lower bound a",0,-5,9.9,.1],["b","Upper bound b",5,-4.9,10,.1]],mean:v=>(v.a+v.b)/2,variance:v=>(v.b-v.a)**2/12,mode:()=>"Any x in [a, b]",skew:()=>0,example:"Example: an arrival time uniform between 0 and 10 minutes is equally likely in any two intervals of equal length.",guide:"a and b are the lower and upper endpoints. b must be greater than a."},
+beta:{name:"Beta",kind:"continuous",desc:"A flexible distribution on [0, 1], often used to model an unknown probability or proportion.",support:"Support: 0 < x < 1.",formula:"f(x) = x<sup>α−1</sup>(1 − x)<sup>β−1</sup> / B(α, β), 0 < x < 1",note:"B(α, β) = Γ(α)Γ(β)/Γ(α + β). Mean = α/(α + β). Variance = αβ / [(α + β)²(α + β + 1)].",params:[["alpha","Shape α",2,.2,10,.1],["beta","Shape β",5,.2,10,.1]],mean:v=>v.alpha/(v.alpha+v.beta),variance:v=>v.alpha*v.beta/((v.alpha+v.beta)**2*(v.alpha+v.beta+1)),mode:v=>v.alpha>1&&v.beta>1?(v.alpha-1)/(v.alpha+v.beta-2):v.alpha<=1&&v.beta>1?"0 (boundary)":v.beta<=1&&v.alpha>1?"1 (boundary)":v.alpha<1&&v.beta<1?"0 and 1 (U-shape)":"Any x in (0, 1)",skew:v=>2*(v.beta-v.alpha)*Math.sqrt(v.alpha+v.beta+1)/((v.alpha+v.beta+2)*Math.sqrt(v.alpha*v.beta)),example:"Example: a Beta distribution can describe uncertainty about an unknown success probability, with α and β setting its shape.",guide:"α pulls the density towards 1 and β pulls it towards 0. Both must be positive."},
+lognormal:{name:"Lognormal",kind:"continuous",desc:"A positive variable X is lognormal when ln(X) follows a normal distribution.",support:"Support: x > 0.",formula:"f(x) = 1/(xσ√(2π)) · exp(−(ln x − μ)<sup>2</sup> / (2σ<sup>2</sup>))",note:"μ and σ are the mean and standard deviation of ln(X), not of X. E[X] = e<sup>μ+σ²/2</sup> and Var(X) = (e<sup>σ²</sup> − 1) e<sup>2μ+σ²</sup>.",params:[["mu","Log-mean μ",0,-2,2,.1],["sigma","Log-SD σ",.5,.1,1.5,.1]],mean:v=>Math.exp(v.mu+v.sigma**2/2),variance:v=>(Math.exp(v.sigma**2)-1)*Math.exp(2*v.mu+v.sigma**2),mode:v=>Math.exp(v.mu-v.sigma**2),skew:v=>(Math.exp(v.sigma**2)+2)*Math.sqrt(Math.exp(v.sigma**2)-1),example:"Example: positive, right-skewed quantities such as incomes, sizes or durations are often modelled as lognormal.",guide:"μ and σ describe the underlying normal variable ln(X). σ must be positive."}
+};
+const discrete=["bernoulli","binomial","poisson","negbin","geometric"],continuous=["standard","normal","exponential","gamma","chisq","uniform","beta","lognormal"];
+const fmt=x=>typeof x==="string"?x:!Number.isFinite(x)?"—":(x!==0&&Math.abs(x)<1e-4)||Math.abs(x)>=1e7?x.toExponential(2):String(+x.toFixed(4));
+const clean=n=>+n.toFixed(6);
+
+function chooseCategory(c){category=c;$("discTab").classList.toggle("on",c==="discrete");$("contTab").classList.toggle("on",c==="continuous");$("discTab").setAttribute("aria-pressed",c==="discrete");$("contTab").setAttribute("aria-pressed",c==="continuous");select((c==="discrete"?discrete:continuous)[c==="continuous"?1:1])}
+function renderTabs(){const el=$("distTabs");el.textContent="";(category==="discrete"?discrete:continuous).forEach(k=>{const b=document.createElement("button");b.className="btn"+(k===current?" on":"");b.textContent=D[k].name;b.type="button";b.setAttribute("aria-pressed",k===current);b.onclick=()=>select(k);el.appendChild(b)})}
+function select(k){
+current=k;const d=D[k];values={};
+$("graphTitle").textContent=d.name;$("graphKind").textContent=d.kind==="discrete"?"Probability mass function":"Probability density function";
+$("definition").textContent=d.desc;$("support").textContent=d.support;$("example").textContent=d.example;
+$("formula").innerHTML=d.formula;$("formulaNote").innerHTML=d.note;$("parameterGuide").textContent=d.guide;
+$("formulaKind").textContent=d.kind==="discrete"?"Mass function":"Density function";
+$("legendText").textContent=d.kind==="discrete"?"Probability of each whole number":"Density (area under the curve is probability)";
+const box=$("controls");box.textContent="";
+if(!d.params.length){const p=document.createElement("p");p.className="small";p.textContent="No parameters: μ = 0 and σ = 1 are fixed.";box.appendChild(p)}
+d.params.forEach(([key,label,def,min,max,step])=>{
+values[key]=def;const w=document.createElement("div");w.className="ctl";
+const lab=document.createElement("label");lab.textContent=label;lab.htmlFor="in-"+key;
+const row=document.createElement("div");row.className="ctlrow";
+const rng=document.createElement("input");rng.type="range";Object.assign(rng,{min,max,step,value:def});rng.setAttribute("aria-label",label+" slider");
+const num=document.createElement("input");num.type="number";num.id="in-"+key;Object.assign(num,{min,max,step,value:def});
+const apply=raw=>{let n=Number(raw);if(raw===""||!Number.isFinite(n))return false;n=Math.max(min,Math.min(max,n));if(Number.isInteger(step))n=Math.round(n);values[key]=clean(n);return true};
+rng.oninput=()=>{apply(rng.value);num.value=values[key];draw()};
+num.oninput=()=>{if(apply(num.value)){rng.value=values[key];draw()}};
+num.onchange=()=>{if(!apply(num.value))values[key]=def;num.value=values[key];rng.value=values[key];draw()};
+row.append(rng,num);w.append(lab,row);box.appendChild(w)});
+$("caution").textContent={negbin:"Convention: X counts failures before the r-th success.",geometric:"Convention: X counts failures before the first success.",gamma:"Gamma uses the rate λ. Chi-squared is Gamma(ν/2, rate 1/2).",chisq:"Chi-squared is Gamma(ν/2, rate 1/2).",lognormal:"μ and σ describe ln(X), not X itself.",normal:"Gaussian means normal.",standard:"Standard normal is the case μ = 0, σ = 1.",exponential:"Rate form: the mean wait is 1/λ.",beta:"If α or β is below 1 the density is unbounded at an end, so the graph is cut off at the top.",uniform:"b must be greater than a."}[k]||"Formulae use the parameter convention shown on this page.";
+renderTabs();draw()}
+
+function logGamma(z){const c=[676.5203681218851,-1259.1392167224028,771.3234287776531,-176.6150291621406,12.507343278686905,-.13857109526572012,9.984369578019572e-6,1.5056327351493116e-7];if(z<.5)return Math.log(Math.PI/Math.sin(Math.PI*z))-logGamma(1-z);z-=1;let x=.99999999999980993;for(let i=0;i<8;i++)x+=c[i]/(z+i+1);const t=z+7.5;return .5*Math.log(2*Math.PI)+(z+.5)*Math.log(t)-t+Math.log(x)}
+const lchoose=(n,r)=>logGamma(n+1)-logGamma(r+1)-logGamma(n-r+1);
+function pmf(x,v){switch(current){
+case"bernoulli":return x===1?v.p:1-v.p;
+case"binomial":return Math.exp(lchoose(v.n,x)+x*Math.log(v.p)+(v.n-x)*Math.log(1-v.p));
+case"poisson":return Math.exp(-v.lambda+x*Math.log(v.lambda)-logGamma(x+1));
+case"negbin":return Math.exp(lchoose(x+v.r-1,x)+v.r*Math.log(v.p)+x*Math.log(1-v.p));
+case"geometric":return v.p*Math.pow(1-v.p,x)}}
+function pdf(x,v){const S=Math.sqrt(2*Math.PI);switch(current){
+case"standard":return Math.exp(-x*x/2)/S;
+case"normal":return Math.exp(-(((x-v.mu)/v.sigma)**2)/2)/(v.sigma*S);
+case"exponential":return x<0?0:v.lambda*Math.exp(-v.lambda*x);
+case"gamma":return x<=0?0:Math.exp(v.alpha*Math.log(v.lambda)-logGamma(v.alpha)+(v.alpha-1)*Math.log(x)-v.lambda*x);
+case"chisq":return x<=0?0:Math.exp((v.nu/2-1)*Math.log(x)-x/2-(v.nu/2)*Math.LN2-logGamma(v.nu/2));
+case"uniform":return x>=v.a&&x<=v.b?1/(v.b-v.a):0;
+case"beta":return x<=0||x>=1?0:Math.exp((v.alpha-1)*Math.log(x)+(v.beta-1)*Math.log(1-x)+logGamma(v.alpha+v.beta)-logGamma(v.alpha)-logGamma(v.beta));
+case"lognormal":return x<=0?0:Math.exp(-(((Math.log(x)-v.mu)/v.sigma)**2)/2)/(x*v.sigma*S)}}
+function ticks(min,max,n,int){let raw=(max-min)/n,p=Math.pow(10,Math.floor(Math.log10(raw))),f=raw/p,s=(f<1.5?1:f<3?2:f<7?5:10)*p;if(int)s=Math.max(1,Math.round(s));const out=[];for(let t=Math.ceil(min/s-1e-9)*s;t<=max+1e-9;t+=s)out.push(+t.toPrecision(10));return out}
+
+function draw(){
+const d=D[current],v=values,err=$("error");
+if(current==="uniform"&&!(v.b>v.a)){err.hidden=false;err.textContent="Upper bound b must be greater than lower bound a.";return}
+err.hidden=true;
+const w=canvas.clientWidth,h=canvas.clientHeight,r=window.devicePixelRatio||1;
+canvas.width=w*r;canvas.height=h*r;ctx.setTransform(r,0,0,r,0,0);ctx.clearRect(0,0,w,h);
+let xs=[],ys=[],xmin,xmax,unbounded=false,disc=d.kind==="discrete";
+if(disc){
+let hi;switch(current){case"bernoulli":hi=1;break;case"binomial":hi=v.n;break;
+case"poisson":hi=Math.ceil(v.lambda+5*Math.sqrt(v.lambda)+3);break;
+case"negbin":hi=Math.ceil(d.mean(v)+5*Math.sqrt(d.variance(v))+2);break;
+case"geometric":hi=Math.ceil(Math.log(.002)/Math.log(1-v.p));break}
+hi=Math.min(current==="binomial"||current==="bernoulli"?hi:300,Math.max(current==="bernoulli"?1:8,hi));
+for(let x=0;x<=hi;x++){xs.push(x);ys.push(pmf(x,v))}xmin=-.5;xmax=hi+.5}
+else{
+switch(current){
+case"standard":xmin=-4;xmax=4;break;
+case"normal":xmin=v.mu-4*v.sigma;xmax=v.mu+4*v.sigma;break;
+case"exponential":xmin=0;xmax=6/v.lambda;break;
+case"gamma":xmin=0;xmax=(v.alpha+5*Math.sqrt(v.alpha)+2)/v.lambda;unbounded=v.alpha<1;break;
+case"chisq":xmin=0;xmax=v.nu+5*Math.sqrt(2*v.nu)+2;unbounded=v.nu<2&&v.nu!==2&&v.nu<2;break;
+case"uniform":{const p=(v.b-v.a)*.15;xmin=v.a-p;xmax=v.b+p;break}
+case"beta":xmin=-.04;xmax=1.04;unbounded=v.alpha<1||v.beta<1;break;
+case"lognormal":xmin=v.sigma>.7?0:Math.exp(v.mu-3*v.sigma);xmax=Math.exp(v.mu+2.8*v.sigma);break}
+if(current==="uniform"){const y=1/(v.b-v.a);xs=[xmin,v.a,v.a,v.b,v.b,xmax];ys=[0,0,y,y,0,0]}
+else for(let i=0;i<=400;i++){let x=xmin+(xmax-xmin)*i/400;if(i===0&&xmin===0)x=xmax*1e-4;xs.push(x);ys.push(pdf(x,v))}}
+const body=unbounded?ys.slice(6,-6):ys;let ymax=(Math.max(...body)||1)*1.12;
+const L=54,R=14,T=14,B=40,pw=w-L-R,ph=h-T-B,X=x=>L+(x-xmin)/(xmax-xmin)*pw,Y=y=>T+ph-y/ymax*ph;
+ctx.font="12px system-ui,sans-serif";ctx.lineWidth=1;
+ctx.textAlign="right";ctx.textBaseline="middle";
+for(const t of ticks(0,ymax,4,false)){const py=Y(t);ctx.strokeStyle="#e6eaf2";ctx.beginPath();ctx.moveTo(L,py);ctx.lineTo(w-R,py);ctx.stroke();ctx.fillStyle="#5b667d";ctx.fillText(fmt(t),L-8,py)}
+ctx.textAlign="center";ctx.textBaseline="top";
+const xt=ticks(disc?0:xmin,xmax,Math.max(3,Math.min(8,Math.floor(pw/70))),disc);
+for(const t of xt){if(t<xmin||t>xmax)continue;ctx.fillStyle="#5b667d";ctx.fillText(fmt(t),X(t),T+ph+9);ctx.strokeStyle="#9aa5ba";ctx.beginPath();ctx.moveTo(X(t),T+ph);ctx.lineTo(X(t),T+ph+4);ctx.stroke()}
+ctx.strokeStyle="#9aa5ba";ctx.beginPath();ctx.moveTo(L,T);ctx.lineTo(L,T+ph);ctx.lineTo(w-R,T+ph);ctx.stroke();
+ctx.save();ctx.beginPath();ctx.rect(L,T,pw,ph+1);ctx.clip();
+if(disc){const bw=Math.max(1,pw/(xmax-xmin)*.72);ctx.fillStyle="#2b50d6";xs.forEach((x,i)=>{const py=Y(ys[i]);ctx.fillRect(X(x)-bw/2,py,bw,T+ph-py)})}
+else{const path=()=>{ctx.beginPath();xs.forEach((x,i)=>i?ctx.lineTo(X(x),Y(ys[i])):ctx.moveTo(X(x),Y(ys[i])))};
+path();ctx.lineTo(X(xs[xs.length-1]),T+ph);ctx.lineTo(X(xs[0]),T+ph);ctx.closePath();ctx.fillStyle="rgba(43,80,214,.14)";ctx.fill();
+path();ctx.strokeStyle="#2b50d6";ctx.lineWidth=2.5;ctx.lineJoin="round";ctx.stroke()}
+ctx.restore();
+const m=d.mean(v);
+if(typeof m==="number"&&m>=xmin&&m<=xmax){ctx.strokeStyle="#d9480f";ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(X(m),T);ctx.lineTo(X(m),T+ph);ctx.stroke();ctx.setLineDash([])}
+const sup=disc?(current==="bernoulli"?"{0, 1}":current==="binomial"?"0, 1, …, n":"0, 1, 2, …"):{standard:"(−∞, ∞)",normal:"(−∞, ∞)",exponential:"[0, ∞)",gamma:"(0, ∞)",chisq:"(0, ∞)",uniform:"[a, b]",beta:"(0, 1)",lognormal:"(0, ∞)"}[current];
+$("stats").innerHTML=[["Mean",fmt(d.mean(v))],["Variance",fmt(d.variance(v))],["Standard deviation",fmt(Math.sqrt(d.variance(v)))],["Mode",fmt(d.mode(v))],["Skewness",fmt(d.skew(v))],["Support",sup]].map(a=>`<div class="stat"><span>${a[0]}</span><b>${a[1]}</b></div>`).join("")}
+$("discTab").onclick=()=>chooseCategory("discrete");$("contTab").onclick=()=>chooseCategory("continuous");
+window.addEventListener("resize",draw);
+chooseCategory("discrete");
+})();
+</script>
+</body>
+</html>
