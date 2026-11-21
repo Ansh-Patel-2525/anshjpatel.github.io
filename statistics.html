@@ -61,6 +61,31 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 .guidecard b{display:block;margin-bottom:3px}
 @media(max-width:900px){.layout,.content{grid-template-columns:1fr}.guidegrid{grid-template-columns:1fr 1fr}}
 @media(max-width:560px){.guidegrid{grid-template-columns:1fr}canvas{height:280px}.page{padding-top:20px}}
+[hidden]{display:none!important}
+.tw{overflow-x:auto}
+.ftab{width:100%;border-collapse:collapse}
+.ftab th{text-align:left;font-size:13px;color:var(--muted);font-weight:600;padding:8px 12px;border-bottom:2px solid var(--line)}
+.ftab td{padding:13px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+.ftab tr:last-child td{border-bottom:0}
+.ftab td:first-child{font-weight:600;width:170px}
+.ftab td.fx{font:italic 19px/1.5 var(--serif)}
+.ftab td.val{text-align:right;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;white-space:nowrap}
+.ftab td.val.t{white-space:normal;font-size:13px;text-align:left}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 3px;font-size:.93em}
+.fr i{font-style:inherit;padding:0 4px;line-height:1.35}.fr i:first-child{border-bottom:1.5px solid currentColor}
+.rt{border-top:1.5px solid currentColor;padding:0 2px}
+.bc{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;border:solid currentColor;border-width:0 1.5px;border-radius:7px;padding:0 6px;margin:0 3px;line-height:1.25;font-size:.9em}
+.bc i{font-style:inherit}
+.crow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.crow input{width:96px}
+select,textarea{border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--text)}
+select{min-height:38px;padding:7px 9px}
+.result{margin-left:auto;text-align:right}.result b{font:700 26px var(--serif);color:var(--accent)}
+textarea{width:100%;min-height:230px;padding:10px;font:14px/1.5 ui-monospace,Consolas,monospace;resize:vertical;margin:8px 0}
+.tiles{grid-template-columns:repeat(3,1fr);margin-bottom:14px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+@media(max-width:900px){.two{grid-template-columns:1fr}}
+@media(max-width:700px){.ftab td:first-child{width:auto}.ftab td.fx{font-size:16px}}
 </style>
 </head>
 <body>
@@ -69,25 +94,31 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 <nav aria-label="Main navigation"><a class="nl" href="widgets.html">← Back to Widgets</a><a class="nl home" href="index.html">⌂ Home</a></nav>
 </header>
 <main class="page">
-<h1>Probability distributions</h1>
-<p class="sub">Pick a distribution, change its parameters, and watch the graph and summary statistics update. Each distribution comes with its definition, formula and a worked example.</p>
-<div class="row tabs main" role="group" aria-label="Distribution type">
+<h1>Probability distributions, made visual</h1>
+<p class="sub">Explore 13 probability distributions with live graphs, formulas and a probability calculator, or paste in your own data to get its mean, standard deviation and more.</p>
+<div class="row tabs main" role="group" aria-label="Section">
 <button class="btn on" id="discTab" type="button">Discrete</button>
 <button class="btn" id="contTab" type="button">Continuous</button>
+<button class="btn" id="dataTab" type="button">Data analyser</button>
 </div>
+<div id="distView">
 <div class="row tabs" id="distTabs" role="group" aria-label="Choose a distribution"></div>
 <div class="layout">
 <section>
 <div class="card">
-<div class="stagehead"><h2 id="graphTitle">Binomial</h2><span class="pill" id="graphKind">Probability mass function</span></div>
+<div class="stagehead"><h2 id="graphTitle">Binomial</h2><span class="pill" id="graphKind"></span></div>
 <canvas id="plot" role="img" aria-label="Probability distribution graph"></canvas>
 <div class="legend"><span><i class="sw"></i><span id="legendText"></span></span><span><i class="sw m"></i>Mean</span></div>
 </div>
-<div class="content">
-<div class="card"><div class="k">Definition</div><h3>What it models</h3><p id="definition"></p><p class="small" id="support" style="margin-top:8px"></p><div class="example" id="example"></div></div>
-<div class="card"><div class="k" id="formulaKind">Formula</div><h3>The formula</h3><div class="formula" id="formula"></div><p class="small" id="formulaNote" style="margin-top:10px"></p></div>
+<div class="card" style="margin-top:18px">
+<h3>Probability calculator</h3>
+<p class="small">Pick a question and the matching region is highlighted on the graph.</p>
+<div class="crow">
+<select id="cMode" aria-label="Probability type"><option value="le">P(X ≤ a)</option><option value="ge">P(X ≥ a)</option><option value="bt">P(a ≤ X ≤ b)</option><option value="eq">P(X = a)</option></select>
+<input id="cA" type="number" step="any" aria-label="a"><span id="cAnd" class="small">and</span><input id="cB" type="number" step="any" aria-label="b">
+<div class="result" id="cOut"></div>
 </div>
-<div class="card" style="margin-top:18px"><h3>What the parameters mean</h3><p id="parameterGuide"></p></div>
+</div>
 </section>
 <aside class="card">
 <h3>Parameters</h3>
@@ -99,7 +130,41 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 <div class="note" id="caution"></div>
 </aside>
 </div>
-<section class="guide">
+<div class="card" style="margin-top:18px">
+<h3>Formulas and current values</h3>
+<div class="tw"><table class="ftab"><thead><tr><th>Quantity</th><th>Formula</th><th style="text-align:right">With your parameters</th></tr></thead><tbody id="ftab"></tbody></table></div>
+<p class="small" id="formulaNote" style="margin-top:10px"></p>
+</div>
+<div class="two">
+<div class="card"><h3>What it models</h3><p id="definition"></p><p class="small" id="support" style="margin-top:8px"></p><div class="example" id="example"></div></div>
+<div class="card"><h3>What the parameters mean</h3><p id="parameterGuide"></p></div>
+</div>
+</div>
+<div id="dataView" hidden>
+<div class="layout">
+<section>
+<div class="card">
+<div class="stats tiles" id="dtiles"></div>
+<canvas id="hist" role="img" aria-label="Histogram and box plot of your data"></canvas>
+<p class="small" style="margin-top:8px">Histogram (Sturges bin count) with a box plot underneath. Box = Q1 to Q3, thick line = median, dashed orange line = mean, dots = outliers.</p>
+</div>
+</section>
+<aside class="card">
+<h3>Your data</h3>
+<p class="small">Separate numbers with spaces, commas or new lines.</p>
+<textarea id="dataIn" aria-label="Your data">12, 15, 11, 18, 14, 16, 13, 19, 15, 17
+14, 12, 20, 16, 15, 13, 18, 14, 16, 45</textarea>
+<div class="row"><button class="btn" id="dataLoad" type="button">Load example</button><button class="btn" id="dataClear" type="button">Clear</button></div>
+<p class="small" id="dataStatus" style="margin-top:10px"></p>
+</aside>
+</div>
+<div class="card" style="margin-top:18px">
+<h3>Statistics and formulas</h3>
+<div class="tw"><table class="ftab"><thead><tr><th>Statistic</th><th>Formula</th><th style="text-align:right">Your data</th></tr></thead><tbody id="dtab"></tbody></table></div>
+<p class="small" style="margin-top:10px">Quartiles use linear interpolation (the same as Excel’s QUARTILE.INC). Skewness and kurtosis are the sample-adjusted versions G₁ and G₂, and kurtosis is excess kurtosis (a normal distribution gives 0). Outliers are values outside Q1 − 1.5·IQR and Q3 + 1.5·IQR.</p>
+</div>
+</div>
+<section class="guide" id="guide">
 <h2>How to choose a distribution</h2>
 <div class="guidegrid">
 <div class="guidecard"><b>Bernoulli / Binomial</b><p class="small">One yes/no trial, or the number of successes in a fixed number of independent trials.</p></div>
@@ -115,7 +180,7 @@ hr{border:0;border-top:1px solid var(--line);margin:16px 0}
 <script>
 (() => {
 const $=id=>document.getElementById(id),canvas=$("plot"),ctx=canvas.getContext("2d");
-let category="discrete",current="binomial",values={};
+let category="discrete",current="binomial",values={},sel=null;
 /* params: [key,label,default,min,max,step] */
 const D={
 bernoulli:{name:"Bernoulli",kind:"discrete",desc:"A single trial with two outcomes: success (1) with probability p, or failure (0) with probability 1 − p.",support:"Support: x ∈ {0, 1}.",formula:"P(X = x) = p<sup>x</sup>(1 − p)<sup>1−x</sup>, x ∈ {0, 1}",note:"Equivalently, P(X = 1) = p and P(X = 0) = 1 − p.",params:[["p","Success probability p",.35,.01,.99,.01]],mean:v=>v.p,variance:v=>v.p*(1-v.p),mode:v=>v.p>.5?"1":v.p<.5?"0":"0 and 1",skew:v=>(1-2*v.p)/Math.sqrt(v.p*(1-v.p)),example:"Example: a component is defective with probability 0.02. Let X = 1 if it is defective and 0 otherwise.",guide:"p is the probability of success on this single trial."},
@@ -136,14 +201,115 @@ const discrete=["bernoulli","binomial","poisson","negbin","geometric"],continuou
 const fmt=x=>typeof x==="string"?x:!Number.isFinite(x)?"—":(x!==0&&Math.abs(x)<1e-4)||Math.abs(x)>=1e7?x.toExponential(2):String(+x.toFixed(4));
 const clean=n=>+n.toFixed(6);
 
-function chooseCategory(c){category=c;$("discTab").classList.toggle("on",c==="discrete");$("contTab").classList.toggle("on",c==="continuous");$("discTab").setAttribute("aria-pressed",c==="discrete");$("contTab").setAttribute("aria-pressed",c==="continuous");select((c==="discrete"?discrete:continuous)[c==="continuous"?1:1])}
+
+const F=(n,d)=>`<span class="fr"><i>${n}</i><i>${d}</i></span>`,P=x=>`<sup>${x}</sup>`,R=x=>`√<span class="rt">${x}</span>`,C=(n,k)=>`<span class="bc"><i>${n}</i><i>${k}</i></span>`;
+const FM={
+bernoulli:{pdf:`P(X = x) = p${P("x")}(1 − p)${P("1−x")},  x = 0, 1`,mean:"p",var:"p(1 − p)",sd:R("p(1 − p)"),skew:F("1 − 2p",R("p(1 − p)")),mode:"1 if p > ½, 0 if p < ½"},
+binomial:{pdf:`P(X = x) = ${C("n","x")} p${P("x")}(1 − p)${P("n−x")}`,mean:"np",var:"np(1 − p)",sd:R("np(1 − p)"),skew:F("1 − 2p",R("np(1 − p)")),mode:"⌊(n + 1)p⌋"},
+poisson:{pdf:`P(X = x) = ${F("e"+P("−λ")+" λ"+P("x"),"x!")}`,mean:"λ",var:"λ",sd:R("λ"),skew:F("1",R("λ")),mode:"⌊λ⌋"},
+negbin:{pdf:`P(X = x) = ${C("x + r − 1","x")} p${P("r")}(1 − p)${P("x")}`,mean:F("r(1 − p)","p"),var:F("r(1 − p)","p"+P("2")),sd:F(R("r(1 − p)"),"p"),skew:F("2 − p",R("r(1 − p)")),mode:`⌊${F("(r − 1)(1 − p)","p")}⌋ if r > 1, else 0`},
+geometric:{pdf:`P(X = x) = (1 − p)${P("x")} p`,mean:F("1 − p","p"),var:F("1 − p","p"+P("2")),sd:F(R("1 − p"),"p"),skew:F("2 − p",R("1 − p")),mode:"0"},
+normal:{pdf:`f(x) = ${F("1","σ"+R("2π"))} exp(−${F("(x − μ)"+P("2"),"2σ"+P("2"))})`,mean:"μ",var:"σ"+P("2"),sd:"σ",skew:"0",mode:"μ"},
+standard:{pdf:`φ(z) = ${F("1",R("2π"))} exp(−${F("z"+P("2"),"2")})`,mean:"0",var:"1",sd:"1",skew:"0",mode:"0"},
+exponential:{pdf:`f(x) = λe${P("−λx")},  x ≥ 0`,mean:F("1","λ"),var:F("1","λ"+P("2")),sd:F("1","λ"),skew:"2",mode:"0"},
+gamma:{pdf:`f(x) = ${F("λ"+P("α")+" x"+P("α−1")+" e"+P("−λx"),"Γ(α)")},  x > 0`,mean:F("α","λ"),var:F("α","λ"+P("2")),sd:F(R("α"),"λ"),skew:F("2",R("α")),mode:`${F("α − 1","λ")} if α ≥ 1, else 0`},
+chisq:{pdf:`f(x) = ${F("x"+P("ν/2−1")+" e"+P("−x/2"),"2"+P("ν/2")+" Γ(ν/2)")},  x > 0`,mean:"ν",var:"2ν",sd:R("2ν"),skew:R("8/ν"),mode:"ν − 2 if ν ≥ 2, else 0"},
+uniform:{pdf:`f(x) = ${F("1","b − a")},  a ≤ x ≤ b`,mean:F("a + b","2"),var:F("(b − a)"+P("2"),"12"),sd:F("b − a",R("12")),skew:"0",mode:"every x in [a, b]"},
+beta:{pdf:`f(x) = ${F("x"+P("α−1")+"(1 − x)"+P("β−1"),"B(α, β)")},  0 < x < 1`,mean:F("α","α + β"),var:F("αβ","(α + β)"+P("2")+"(α + β + 1)"),sd:R(F("αβ","(α + β)"+P("2")+"(α + β + 1)")),skew:F("2(β − α)"+R("α + β + 1"),"(α + β + 2)"+R("αβ")),mode:`${F("α − 1","α + β − 2")} if α, β > 1`},
+lognormal:{pdf:`f(x) = ${F("1","xσ"+R("2π"))} exp(−${F("(ln x − μ)"+P("2"),"2σ"+P("2"))})`,mean:"e"+P("μ + σ²/2"),var:"(e"+P("σ²")+" − 1) e"+P("2μ + σ²"),sd:R("(e"+P("σ²")+" − 1) e"+P("2μ + σ²")),skew:"(e"+P("σ²")+" + 2)"+R("e"+P("σ²")+" − 1"),mode:"e"+P("μ − σ²")}
+};
+function rowsHTML(rows){return rows.map(r=>`<tr><td>${r[0]}</td><td class="fx">${r[1]}</td><td class="val${r[3]?" t":""}">${r[2]}</td></tr>`).join("")}
+function buildTable(){const d=D[current],v=values,f=FM[current];
+$("ftab").innerHTML=rowsHTML([[d.kind==="discrete"?"Mass function":"Density function",f.pdf,"see graph",1],["Mean",`E[X] = ${f.mean}`,fmt(d.mean(v))],["Variance",`Var(X) = ${f.var}`,fmt(d.variance(v))],["Standard deviation",`σ = ${f.sd}`,fmt(Math.sqrt(d.variance(v)))],["Skewness",`γ₁ = ${f.skew}`,fmt(d.skew(v))],["Mode",f.mode,fmt(d.mode(v))]])}
+
+function cdf(x,v){const d=D[current];
+if(d.kind==="discrete"){if(x<0)return 0;const hi=Math.min(Math.floor(x),current==="bernoulli"?1:current==="binomial"?v.n:20000);let s=0;for(let k=0;k<=hi;k++)s+=pmf(k,v);return Math.min(1,s)}
+let lo=0,mode="cube";
+switch(current){case"standard":lo=-12;mode="plain";break;case"normal":lo=v.mu-12*v.sigma;mode="plain";break;case"uniform":lo=v.a;mode="plain";break;case"beta":mode="beta";break}
+if(x<=lo)return 0;if(current==="uniform"&&x>=v.b)return 1;if(current==="beta"&&x>=1)return 1;
+const N=20000;let s=0;
+if(mode==="plain"){const h=(x-lo)/N;for(let i=0;i<N;i++)s+=pdf(lo+(i+.5)*h,v)*h}
+else if(mode==="cube"){const U=Math.cbrt(x-lo),h=U/N;for(let i=0;i<N;i++){const u=(i+.5)*h;s+=pdf(lo+u*u*u,v)*3*u*u*h}}
+else{const T=Math.acos(1-2*x)/Math.PI,h=T/N;for(let i=0;i<N;i++){const t=(i+.5)*h;s+=pdf((1-Math.cos(Math.PI*t))/2,v)*Math.PI*Math.sin(Math.PI*t)/2*h}}
+return Math.min(1,s)}
+function calc(){
+const d=D[current],v=values,disc=d.kind==="discrete",m=$("cMode").value,a=parseFloat($("cA").value),b=parseFloat($("cB").value),out=$("cOut");
+$("cB").hidden=$("cAnd").hidden=m!=="bt";sel=null;
+if(!Number.isFinite(a)||(m==="bt"&&!Number.isFinite(b))){out.textContent="Enter a number";return}
+let p,lo,hi;const Cd=x=>cdf(x,v);
+if(m==="le"){lo=-Infinity;hi=a;p=Cd(a)}
+else if(m==="ge"){lo=a;hi=Infinity;p=disc?1-Cd(Math.ceil(a)-1):1-Cd(a)}
+else if(m==="eq"){lo=hi=a;p=Number.isInteger(a)?Cd(a)-Cd(a-1):0}
+else{if(b<a){out.textContent="b must be at least a";return}lo=a;hi=b;p=disc?Cd(b)-Cd(Math.ceil(a)-1):Cd(b)-Cd(a)}
+p=Math.max(0,Math.min(1,p));sel={lo,hi};
+out.innerHTML=`<b>${+p.toFixed(5)}</b><div class="small">${(p*100).toFixed(2)}%</div>`}
+
+const qt=(s,p)=>{const i=(s.length-1)*p,l=Math.floor(i);return s[l]+(s[Math.min(l+1,s.length-1)]-s[l])*(i-l)};
+function analyse(){
+const raw=$("dataIn").value.split(/[\s,;]+/).filter(Boolean),a=raw.map(Number).filter(Number.isFinite),bad=raw.length-a.length,n=a.length;
+$("dataStatus").textContent=raw.length?`${n} value${n===1?"":"s"} read`+(bad?`, ${bad} ignored because they are not numbers`:""):"No data yet. Paste some numbers above.";
+if(!n){$("dtab").innerHTML="";$("dtiles").innerHTML="";drawHist([],null);return}
+const s=[...a].sort((x,y)=>x-y),sum=a.reduce((p,c)=>p+c,0),m=sum/n,ss=a.reduce((p,c)=>p+(c-m)**2,0),
+med=qt(s,.5),q1=qt(s,.25),q3=qt(s,.75),iqr=q3-q1,mn=s[0],mx=s[n-1],pv=ss/n,sv=n>1?ss/(n-1):NaN,sd=Math.sqrt(sv),
+z=sd>0?a.map(x=>(x-m)/sd):null,
+sk=n>=3&&z?n/((n-1)*(n-2))*z.reduce((p,c)=>p+c**3,0):NaN,
+ku=n>=4&&z?n*(n+1)/((n-1)*(n-2)*(n-3))*z.reduce((p,c)=>p+c**4,0)-3*(n-1)**2/((n-2)*(n-3)):NaN,
+gm=a.every(x=>x>0)?Math.exp(a.reduce((p,c)=>p+Math.log(c),0)/n):NaN,
+fl=q1-1.5*iqr,fh=q3+1.5*iqr,out=s.filter(x=>x<fl||x>fh),
+fq=new Map();a.forEach(x=>fq.set(x,(fq.get(x)||0)+1));let top=0;fq.forEach(c=>{if(c>top)top=c});
+md=top>1?[...fq].filter(e=>e[1]===top).map(e=>e[0]).sort((x,y)=>x-y):[];
+const na=(x,msg)=>Number.isFinite(x)?fmt(x):msg,list=l=>l.length?l.slice(0,6).map(fmt).join(", ")+(l.length>6?", …":""):"none";
+const zf=F("x − x̄","s");
+$("dtiles").innerHTML=[["Count",n],["Mean",m],["Median",med],["Sample SD",na(sd,"needs n ≥ 2")],["Min",mn],["Max",mx]].map(t=>`<div class="stat"><span>${t[0]}</span><b>${typeof t[1]==="number"?fmt(t[1]):t[1]}</b></div>`).join("");
+$("dtab").innerHTML=rowsHTML([
+["Count","n",n],["Sum",`Σx = x₁ + x₂ + … + xₙ`,fmt(sum)],
+["Mean",`x̄ = ${F("Σx","n")}`,fmt(m)],
+["Median","middle value of the sorted data (average of the middle two if n is even)",fmt(med),1],
+["Mode","most frequent value(s)",md.length?list(md):"none (no repeats)",1],
+["Minimum and maximum","smallest and largest value",`${fmt(mn)} and ${fmt(mx)}`],
+["Range","max − min",fmt(mx-mn)],
+["First quartile Q1","value at position 0.25(n − 1) of the sorted data",fmt(q1)],
+["Third quartile Q3","value at position 0.75(n − 1) of the sorted data",fmt(q3)],
+["Interquartile range","IQR = Q3 − Q1",fmt(iqr)],
+["Sum of squares",`SS = Σ(x − x̄)${P("2")}`,fmt(ss)],
+["Population variance",`σ${P("2")} = ${F("SS","n")}`,fmt(pv)],
+["Population SD",`σ = ${R("σ"+P("2"))}`,fmt(Math.sqrt(pv))],
+["Sample variance",`s${P("2")} = ${F("SS","n − 1")}`,na(sv,"needs n ≥ 2"),n<2],
+["Sample SD",`s = ${R("s"+P("2"))}`,na(sd,"needs n ≥ 2"),n<2],
+["Standard error of the mean",`SE = ${F("s",R("n"))}`,na(sd/Math.sqrt(n),"needs n ≥ 2"),n<2],
+["Coefficient of variation",`CV = ${F("s","|x̄|")} × 100%`,na(sd/Math.abs(m)*100,"needs n ≥ 2 and mean ≠ 0"),!Number.isFinite(sd/Math.abs(m))],
+["Skewness",`G₁ = ${F("n","(n − 1)(n − 2)")} Σ(${zf})${P("3")}`,na(sk,"needs n ≥ 3 and some spread"),!Number.isFinite(sk)],
+["Excess kurtosis",`G₂ = ${F("n(n + 1)","(n − 1)(n − 2)(n − 3)")} Σ(${zf})${P("4")} − ${F("3(n − 1)"+P("2"),"(n − 2)(n − 3)")}`,na(ku,"needs n ≥ 4 and some spread"),!Number.isFinite(ku)],
+["Geometric mean",`(x₁ x₂ … xₙ)${P("1/n")}`,na(gm,"needs all values > 0"),!Number.isFinite(gm)],
+["Outlier fences","Q1 − 1.5 × IQR and Q3 + 1.5 × IQR",`${fmt(fl)} and ${fmt(fh)}`],
+["Outliers","values outside the fences",list(out),1]]);
+drawHist(a,{min:mn,max:mx,q1,q3,med,mean:m,fl,fh,s,out})}
+function drawHist(a,o){const c=$("hist"),g=c.getContext("2d"),w=c.clientWidth,h=c.clientHeight,r=window.devicePixelRatio||1;c.width=w*r;c.height=h*r;g.setTransform(r,0,0,r,0,0);g.clearRect(0,0,w,h);if(!o)return;
+const k=Math.max(1,Math.ceil(Math.log2(a.length)+1)),flat=o.max===o.min,lo=flat?o.min-.5:o.min,hi=flat?o.max+.5:o.max,bw=(hi-lo)/k,cnt=Array(k).fill(0);
+a.forEach(x=>cnt[Math.min(k-1,Math.floor((x-lo)/bw))]++);
+const L=46,R=14,T=12,pw=w-L-R,ph=h-T-96,X=x=>L+(x-lo)/(hi-lo)*pw,ymax=Math.max(...cnt)*1.1,Y=y=>T+ph-y/ymax*ph,by=T+ph+28,bh=20,ax=T+ph+54;
+g.font="12px system-ui,sans-serif";g.textAlign="right";g.textBaseline="middle";g.lineWidth=1;
+for(const t of ticks(0,ymax,4,true)){g.strokeStyle="#e6eaf2";g.beginPath();g.moveTo(L,Y(t));g.lineTo(w-R,Y(t));g.stroke();g.fillStyle="#5b667d";g.fillText(fmt(t),L-8,Y(t))}
+g.fillStyle="#2b50d6";cnt.forEach((n,i)=>g.fillRect(X(lo+i*bw)+1,Y(n),Math.max(1,pw/k-2),T+ph-Y(n)));
+g.strokeStyle="#9aa5ba";g.beginPath();g.moveTo(L,T);g.lineTo(L,T+ph);g.lineTo(w-R,T+ph);g.moveTo(L,ax);g.lineTo(w-R,ax);g.stroke();
+g.textAlign="center";g.textBaseline="top";
+for(const t of ticks(lo,hi,Math.max(3,Math.min(8,Math.floor(pw/70))),false)){g.fillStyle="#5b667d";g.fillText(fmt(t),X(t),ax+8);g.beginPath();g.moveTo(X(t),ax);g.lineTo(X(t),ax+4);g.stroke()}
+const lw=o.s.find(x=>x>=o.fl),hw=o.s.slice().reverse().find(x=>x<=o.fh);
+g.strokeStyle="#2b50d6";g.lineWidth=1.5;g.beginPath();g.moveTo(X(lw),by);g.lineTo(X(o.q1),by);g.moveTo(X(o.q3),by);g.lineTo(X(hw),by);g.moveTo(X(lw),by-6);g.lineTo(X(lw),by+6);g.moveTo(X(hw),by-6);g.lineTo(X(hw),by+6);g.stroke();
+g.fillStyle="#e6ebfd";g.fillRect(X(o.q1),by-bh/2,X(o.q3)-X(o.q1),bh);g.strokeRect(X(o.q1),by-bh/2,X(o.q3)-X(o.q1),bh);
+g.lineWidth=3.5;g.beginPath();g.moveTo(X(o.med),by-bh/2);g.lineTo(X(o.med),by+bh/2);g.stroke();
+g.fillStyle="#fff";g.lineWidth=1.5;o.out.forEach(x=>{g.beginPath();g.arc(X(x),by,4,0,7);g.fill();g.stroke()});
+g.strokeStyle="#d9480f";g.lineWidth=2;g.setLineDash([6,4]);g.beginPath();g.moveTo(X(o.mean),T);g.lineTo(X(o.mean),by+bh/2+4);g.stroke();g.setLineDash([])}
+
+function chooseCategory(c){category=c;for(const[id,k]of[["discTab","discrete"],["contTab","continuous"],["dataTab","data"]]){$(id).classList.toggle("on",c===k);$(id).setAttribute("aria-pressed",c===k)}
+$("distView").hidden=$("guide").hidden=c==="data";$("dataView").hidden=c!=="data";
+if(c==="data"){analyse();return}select((c==="discrete"?discrete:continuous)[1])}
 function renderTabs(){const el=$("distTabs");el.textContent="";(category==="discrete"?discrete:continuous).forEach(k=>{const b=document.createElement("button");b.className="btn"+(k===current?" on":"");b.textContent=D[k].name;b.type="button";b.setAttribute("aria-pressed",k===current);b.onclick=()=>select(k);el.appendChild(b)})}
 function select(k){
 current=k;const d=D[k];values={};
 $("graphTitle").textContent=d.name;$("graphKind").textContent=d.kind==="discrete"?"Probability mass function":"Probability density function";
 $("definition").textContent=d.desc;$("support").textContent=d.support;$("example").textContent=d.example;
-$("formula").innerHTML=d.formula;$("formulaNote").innerHTML=d.note;$("parameterGuide").textContent=d.guide;
-$("formulaKind").textContent=d.kind==="discrete"?"Mass function":"Density function";
+$("formulaNote").innerHTML=d.note;$("parameterGuide").textContent=d.guide;
 $("legendText").textContent=d.kind==="discrete"?"Probability of each whole number":"Density (area under the curve is probability)";
 const box=$("controls");box.textContent="";
 if(!d.params.length){const p=document.createElement("p");p.className="small";p.textContent="No parameters: μ = 0 and σ = 1 are fixed.";box.appendChild(p)}
@@ -159,6 +325,9 @@ num.oninput=()=>{if(apply(num.value)){rng.value=values[key];draw()}};
 num.onchange=()=>{if(!apply(num.value))values[key]=def;num.value=values[key];rng.value=values[key];draw()};
 row.append(rng,num);w.append(lab,row);box.appendChild(w)});
 $("caution").textContent={negbin:"Convention: X counts failures before the r-th success.",geometric:"Convention: X counts failures before the first success.",gamma:"Gamma uses the rate λ. Chi-squared is Gamma(ν/2, rate 1/2).",chisq:"Chi-squared is Gamma(ν/2, rate 1/2).",lognormal:"μ and σ describe ln(X), not X itself.",normal:"Gaussian means normal.",standard:"Standard normal is the case μ = 0, σ = 1.",exponential:"Rate form: the mean wait is 1/λ.",beta:"If α or β is below 1 the density is unbounded at an end, so the graph is cut off at the top.",uniform:"b must be greater than a."}[k]||"Formulae use the parameter convention shown on this page.";
+const isD=d.kind==="discrete",rd=x=>isD?Math.round(x):+x.toFixed(2),dm=d.mean(values);
+$("cA").value=rd(dm);$("cB").value=rd(dm+Math.sqrt(d.variance(values)));
+const eo=$("cMode").options[3];eo.hidden=eo.disabled=!isD;if(!isD&&$("cMode").value==="eq")$("cMode").value="le";
 renderTabs();draw()}
 
 function logGamma(z){const c=[676.5203681218851,-1259.1392167224028,771.3234287776531,-176.6150291621406,12.507343278686905,-.13857109526572012,9.984369578019572e-6,1.5056327351493116e-7];if(z<.5)return Math.log(Math.PI/Math.sin(Math.PI*z))-logGamma(1-z);z-=1;let x=.99999999999980993;for(let i=0;i<8;i++)x+=c[i]/(z+i+1);const t=z+7.5;return .5*Math.log(2*Math.PI)+(z+.5)*Math.log(t)-t+Math.log(x)}
@@ -183,7 +352,7 @@ function ticks(min,max,n,int){let raw=(max-min)/n,p=Math.pow(10,Math.floor(Math.
 function draw(){
 const d=D[current],v=values,err=$("error");
 if(current==="uniform"&&!(v.b>v.a)){err.hidden=false;err.textContent="Upper bound b must be greater than lower bound a.";return}
-err.hidden=true;
+err.hidden=true;calc();
 const w=canvas.clientWidth,h=canvas.clientHeight,r=window.devicePixelRatio||1;
 canvas.width=w*r;canvas.height=h*r;ctx.setTransform(r,0,0,r,0,0);ctx.clearRect(0,0,w,h);
 let xs=[],ys=[],xmin,xmax,unbounded=false,disc=d.kind==="discrete";
@@ -216,17 +385,22 @@ const xt=ticks(disc?0:xmin,xmax,Math.max(3,Math.min(8,Math.floor(pw/70))),disc);
 for(const t of xt){if(t<xmin||t>xmax)continue;ctx.fillStyle="#5b667d";ctx.fillText(fmt(t),X(t),T+ph+9);ctx.strokeStyle="#9aa5ba";ctx.beginPath();ctx.moveTo(X(t),T+ph);ctx.lineTo(X(t),T+ph+4);ctx.stroke()}
 ctx.strokeStyle="#9aa5ba";ctx.beginPath();ctx.moveTo(L,T);ctx.lineTo(L,T+ph);ctx.lineTo(w-R,T+ph);ctx.stroke();
 ctx.save();ctx.beginPath();ctx.rect(L,T,pw,ph+1);ctx.clip();
-if(disc){const bw=Math.max(1,pw/(xmax-xmin)*.72);ctx.fillStyle="#2b50d6";xs.forEach((x,i)=>{const py=Y(ys[i]);ctx.fillRect(X(x)-bw/2,py,bw,T+ph-py)})}
+if(disc){const bw=Math.max(1,pw/(xmax-xmin)*.72);xs.forEach((x,i)=>{const py=Y(ys[i]);ctx.fillStyle=!sel||(x>=sel.lo&&x<=sel.hi)?"#2b50d6":"#c3cff5";ctx.fillRect(X(x)-bw/2,py,bw,T+ph-py)})}
 else{const path=()=>{ctx.beginPath();xs.forEach((x,i)=>i?ctx.lineTo(X(x),Y(ys[i])):ctx.moveTo(X(x),Y(ys[i])))};
 path();ctx.lineTo(X(xs[xs.length-1]),T+ph);ctx.lineTo(X(xs[0]),T+ph);ctx.closePath();ctx.fillStyle="rgba(43,80,214,.14)";ctx.fill();
+if(sel){const x0=X(Math.max(sel.lo,xmin)),x1=X(Math.min(sel.hi,xmax));if(x1>x0){ctx.save();ctx.beginPath();ctx.rect(x0,T,x1-x0,ph);ctx.clip();path();ctx.lineTo(X(xs[xs.length-1]),T+ph);ctx.lineTo(X(xs[0]),T+ph);ctx.closePath();ctx.fillStyle="rgba(43,80,214,.4)";ctx.fill();ctx.restore()}}
 path();ctx.strokeStyle="#2b50d6";ctx.lineWidth=2.5;ctx.lineJoin="round";ctx.stroke()}
 ctx.restore();
 const m=d.mean(v);
 if(typeof m==="number"&&m>=xmin&&m<=xmax){ctx.strokeStyle="#d9480f";ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(X(m),T);ctx.lineTo(X(m),T+ph);ctx.stroke();ctx.setLineDash([])}
 const sup=disc?(current==="bernoulli"?"{0, 1}":current==="binomial"?"0, 1, …, n":"0, 1, 2, …"):{standard:"(−∞, ∞)",normal:"(−∞, ∞)",exponential:"[0, ∞)",gamma:"(0, ∞)",chisq:"(0, ∞)",uniform:"[a, b]",beta:"(0, 1)",lognormal:"(0, ∞)"}[current];
-$("stats").innerHTML=[["Mean",fmt(d.mean(v))],["Variance",fmt(d.variance(v))],["Standard deviation",fmt(Math.sqrt(d.variance(v)))],["Mode",fmt(d.mode(v))],["Skewness",fmt(d.skew(v))],["Support",sup]].map(a=>`<div class="stat"><span>${a[0]}</span><b>${a[1]}</b></div>`).join("")}
-$("discTab").onclick=()=>chooseCategory("discrete");$("contTab").onclick=()=>chooseCategory("continuous");
-window.addEventListener("resize",draw);
+$("stats").innerHTML=[["Mean",fmt(d.mean(v))],["Variance",fmt(d.variance(v))],["Standard deviation",fmt(Math.sqrt(d.variance(v)))],["Mode",fmt(d.mode(v))],["Skewness",fmt(d.skew(v))],["Support",sup]].map(a=>`<div class="stat"><span>${a[0]}</span><b>${a[1]}</b></div>`).join("");buildTable()}
+$("discTab").onclick=()=>chooseCategory("discrete");$("contTab").onclick=()=>chooseCategory("continuous");$("dataTab").onclick=()=>chooseCategory("data");
+["cMode","cA","cB"].forEach(id=>$(id).addEventListener("input",draw));
+$("dataIn").addEventListener("input",analyse);
+$("dataLoad").onclick=()=>{$("dataIn").value="12, 15, 11, 18, 14, 16, 13, 19, 15, 17\n14, 12, 20, 16, 15, 13, 18, 14, 16, 45";analyse()};
+$("dataClear").onclick=()=>{$("dataIn").value="";analyse();$("dataIn").focus()};
+window.addEventListener("resize",()=>category==="data"?analyse():draw());
 chooseCategory("discrete");
 })();
 </script>
