@@ -91,8 +91,88 @@ button.mini.wide{width:100%;margin-top:8px}
 .sw{width:26px;height:26px;border:2px solid rgba(255,255,255,.35);border-radius:50%;cursor:pointer;padding:0}
 .sw.sel{border-color:#fff;box-shadow:0 0 0 2px var(--sun)}
 .acash{font-size:18px;margin-bottom:6px;opacity:.9}.acash b{color:var(--mint);font-family:var(--display);font-weight:400;font-size:24px}
-.arow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.1)}
-.arow b{font-size:20px;display:block}.arow small{display:block;font-size:15px;opacity:.7;font-weight:500}
+/* ---------- polished armory layout ---------- */
+
+.arow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 112px;
+  align-items: center;
+  gap: 16px;
+  padding: 13px 12px;
+  margin: 7px 0;
+  min-height: 76px;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 10px;
+  background: rgba(255,255,255,.035);
+  transition: background .2s, border-color .2s, transform .2s;
+  box-sizing: border-box;
+}
+
+.arow:hover {
+  background: rgba(40,210,255,.075);
+  border-color: rgba(40,210,255,.35);
+  transform: translateY(-1px);
+}
+
+.arow > div {
+  min-width: 0;
+}
+
+.arow b {
+  display: block;
+  font-size: 17px;
+  line-height: 1.25;
+  font-weight: 800;
+  margin-bottom: 5px;
+  color: #fff;
+}
+
+.arow small {
+  display: block;
+  font-size: 12px;
+  line-height: 1.45;
+  opacity: .68;
+  font-weight: 500;
+}
+
+.arow button {
+  width: 112px;
+  min-width: 112px;
+  min-height: 38px;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.arow button:disabled {
+  opacity: .55;
+  cursor: default;
+  transform: none;
+}
+
+@media(max-width:600px) {
+  .arow {
+    grid-template-columns: minmax(0, 1fr) 96px;
+    gap: 9px;
+    padding: 11px 9px;
+    min-height: 70px;
+  }
+
+  .arow b {
+    font-size: 15px;
+  }
+
+  .arow small {
+    font-size: 11px;
+  }
+
+  .arow button {
+    width: 96px;
+    min-width: 96px;
+    font-size: 11px;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+}
 .keys{display:grid;grid-template-columns:repeat(2,1fr);gap:4px 22px;margin:22px 0 0;font-size:16px;font-weight:600}
 .keys div{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid rgba(255,255,255,.18);padding-bottom:3px}
 .keys kbd{font-family:var(--ui);font-weight:700;color:var(--sun)}
@@ -1067,26 +1147,52 @@ const AVOPT={
 const avDefault={skin:1,hairStyle:1,hairCol:1,outfit:0,shirt:0,pants:0,acc:0};
 const av=Object.assign({},avDefault);
 const WEAPONS=[
-  {id:'fists',name:'Fists',type:'melee',dmg:1,rate:0.42,range:2.6,price:0,desc:'Classic. Knocks pedestrians flat.'},
+  {id:'fists',name:'Fists',type:'melee',dmg:1,rate:0.42,range:2.6,price:0,desc:'Knocks pedestrians flat.'},
   {id:'sword',name:'Neon Blade',type:'melee',dmg:2,rate:0.48,range:3.8,price:0,desc:'Wide swing. Dents cars too.'},
-  {id:'pistol',name:'Pistol',type:'gun',dmg:8,rate:0.26,mag:12,reload:1.1,spread:0.02,pellets:1,range:70,price:0,desc:'12 rounds. Tap to fire. Right-click to zoom.'},
-  {id:'smg',name:'SMG',type:'gun',auto:true,dmg:5,rate:0.075,mag:30,reload:1.6,spread:0.05,pellets:1,range:60,price:10,desc:'Full auto spray. 30 rounds.'},
-  {id:'shotgun',name:'Shotgun',type:'gun',dmg:9,rate:0.8,mag:6,reload:2.0,spread:0.13,pellets:7,range:34,price:15,desc:'Seven pellets. Close range.'},
-  {id:'rocket',name:'Rocket Launcher',type:'rocket',dmg:150,rate:1.2,mag:1,reload:2.4,range:80,price:30,desc:'Big boom. Mind the blast.'},
-  {id:'bazooka',name:'Bazooka',type:'rocket',dmg:300,rad:17,spd:55,rate:1.8,mag:1,reload:3.2,range:90,price:50,desc:'Huge blast radius. Slow reload.'},
-  {id:'grenade',name:'Grenade',type:'grenade',dmg:200,rate:0.9,mag:3,reload:1.6,range:40,price:12,desc:'Lobbed, bounces, then boom.'},
-  {id:'rail',name:'Rail Gun',type:'rail',dmg:60,rate:1.1,mag:4,reload:2.2,range:160,price:40,desc:'Pierces cars and people. Walls stop it.'},
-  {id:'sniper',name:'Sniper Rifle',type:'gun',scope:true,dmg:100,rate:1.4,mag:5,reload:2.6,spread:0.07,pellets:1,range:300,price:35,desc:'Hold right-click to scope. 3 zoom levels. One shot wrecks a car.'}
+  {id:'pistol',name:'Pistol',type:'gun',dmg:8,rate:0.26,mag:12,reload:1.1,spread:0.02,pellets:1,range:70,price:0,desc:'Classic.'},
+  {id:'smg',name:'SMG',type:'gun',auto:true,dmg:5,rate:0.075,mag:30,reload:1.6,spread:0.05,pellets:1,range:60,price:10,desc:'Full auto spray.'},
+  {id:'shotgun',name:'Shotgun',type:'gun',dmg:9,rate:0.8,mag:6,reload:2.0,spread:0.13,pellets:7,range:34,price:15,desc:'Close range.'},
+  {id:'rocket',name:'Rocket Launcher',type:'rocket',dmg:150,rate:1.2,mag:1,reload:2.4,range:80,price:30,desc:'Big boom. '},
+  {id:'bazooka',name:'Bazooka',type:'rocket',dmg:300,rad:17,spd:55,rate:1.8,mag:1,reload:3.2,range:90,price:50,desc:'Huge blast radius.'},
+  {id:'grenade',name:'Grenade',type:'grenade',dmg:200,rate:0.9,mag:3,reload:1.6,range:40,price:12,desc:'Bomb?'},
+  {id:'rail',name:'Rail Gun',type:'rail',dmg:60,rate:1.1,mag:4,reload:2.2,range:160,price:40,desc:'Pierces cars and people.'},
+  {id:'sniper',name:'Sniper Rifle',type:'gun',scope:true,dmg:100,rate:1.4,mag:5,reload:2.6,spread:0.07,pellets:1,range:300,price:35,desc:'Hold right-click to scope.'}
 ];
 let cash=500,owned=['fists','sword','pistol'],wIdx=2;
 const ammo={};WEAPONS.forEach(w=>{ammo[w.id]=w.mag||0;});
-const SKINS=[
-  {id:'mogul',name:'Rocket Mogul',cost:500,desc:'Sleek white flight suit, rocket crest and a glowing visor band.'},
-  {id:'knight',name:'Shadow Knight',cost:1000,desc:'Dark cowl, flowing cape, armored chest and a gold utility belt.'},
-  {id:'chip',name:'Chip Baron',cost:2000,desc:'Black leather jacket with glowing green circuit lines and silver hair.'},
-  {id:'magnate',name:'Gold Magnate',cost:5000,desc:'Gold three-piece suit, top hat, monocle and a cane.'},
-  {id:'harlequin',name:'Harlequin King',cost:10000,desc:'Two-tone jester suit, belled hat and a painted grin.'}
+const SKINS = [
+  {
+    id: 'batman',
+    name: 'Batman',
+    cost: 50,
+    desc: 'The Dark Knight'
+  },
+  {
+    id: 'superman',
+    name: 'Superman',
+    cost: 75,
+    desc: 'The Man of Steel.'
+  },
+  {
+    id: 'joker',
+    name: 'The Joker',
+    cost: 100,
+    desc: 'Gotham’s clown prince.'
+  },
+  {
+    id: 'trump',
+    name: 'Donald Trump',
+    cost: 100,
+    desc: 'The unmistakable look.'
+  },
+  {
+    id: 'shadow',
+    name: 'Lord Shadow',
+    cost: 150,
+    desc: 'The Eminence in Shadow.'
+  }
 ];
+
 const SKIN_BY_ID={};SKINS.forEach(k=>{SKIN_BY_ID[k.id]=k;});
 let ownedSkins=[];
 const SAVE_KEY='metromayhem.save.v2';
@@ -1119,60 +1225,456 @@ function figure(o){
   g.userData.legL=legL;g.userData.legR=legR;g.userData.armL=armL;g.userData.armR=armR;g.userData.torso=t;
   return g;
 }
+
+
+
 function makeSkinAvatar(id){
-  const bas=c=>new THREE.MeshBasicMaterial({color:c});
+  const basic = c => new THREE.MeshBasicMaterial({color:c});
+  const metal = c => new THREE.MeshStandardMaterial({
+    color:c, roughness:0.42, metalness:0.55
+  });
+
+  const sphere = (x,y,z,sx,sy,sz,mat,parent=g) => {
+    const m=new THREE.Mesh(new THREE.SphereGeometry(1,16,12),mat);
+    m.position.set(x,y,z);
+    m.scale.set(sx,sy,sz);
+    parent.add(m);
+    return m;
+  };
+
+  const cone = (x,y,z,r,h,mat,parent=g,rot=0) => {
+    const m=new THREE.Mesh(new THREE.ConeGeometry(r,h,8),mat);
+    m.position.set(x,y,z);
+    m.rotation.z=rot;
+    parent.add(m);
+    return m;
+  };
+
+  const cyl = (x,y,z,r1,r2,h,mat,parent=g) => {
+    const m=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,12),mat);
+    m.position.set(x,y,z);
+    parent.add(m);
+    return m;
+  };
+
   let g;
-  if(id==='mogul'){
-    g=figure({skin:0xf0c8a0,top:0xf2f4fa,pants:0xdfe3ee,shoe:0x9aa0b0});
-    const hair=lam(0x2a2018);box(0.36,0.1,0.36,hair,0,1.76,-0.01,g);box(0.36,0.2,0.1,hair,0,1.66,-0.14,g);
-    box(0.36,0.07,0.06,bas(0x4de0ff),0,1.64,0.16,g);
-    box(0.52,0.08,0.34,lam(0x202028),0,1.42,0,g);
-    box(0.12,0.3,0.02,lam(0xff6a2a),0,1.1,0.16,g);box(0.22,0.06,0.02,lam(0xff6a2a),0,0.96,0.16,g);box(0.08,0.1,0.02,lam(0xffffff),0,1.3,0.16,g);
-    box(0.5,0.08,0.34,bas(0x4de0ff),0,0.8,0,g);
-    box(0.2,0.1,0.2,lam(0xb8bdca),-0.33,1.42,0,g);box(0.2,0.1,0.2,lam(0xb8bdca),0.33,1.42,0,g);
-  }else if(id==='knight'){
-    g=figure({skin:0xe8b890,top:0x1b1d26,pants:0x1b1d26,shoe:0x0c0c10});
-    const cw=lam(0x14161e);
-    box(0.4,0.22,0.4,cw,0,1.71,-0.01,g);box(0.4,0.5,0.12,cw,0,1.55,-0.18,g);box(0.06,0.3,0.3,cw,0.19,1.62,0,g);box(0.06,0.3,0.3,cw,-0.19,1.62,0,g);
-    box(0.08,0.035,0.02,bas(0xffffff),-0.07,1.66,0.185,g);box(0.08,0.035,0.02,bas(0xffffff),0.07,1.66,0.185,g);
-    const sp=new THREE.Mesh(spikeG,cw);sp.position.set(0,1.92,0);sp.scale.set(2,1.4,2);g.add(sp);
-    const cape=box(0.64,1.15,0.06,lam(0x0c0d14),0,1.0,-0.23,g);cape.rotation.x=0.12;box(0.68,0.14,0.22,lam(0x0c0d14),0,1.5,-0.2,g);
-    box(0.4,0.3,0.04,lam(0x3a3f50),0,1.15,0.17,g);const em=box(0.15,0.15,0.02,lam(0xe8b82a),0,1.15,0.2,g);em.rotation.z=0.785;
-    box(0.54,0.09,0.36,lam(0xd8a82a),0,0.78,0,g);box(0.1,0.12,0.1,lam(0xd8a82a),-0.16,0.76,0.18,g);box(0.1,0.12,0.1,lam(0xd8a82a),0.16,0.76,0.18,g);
-    [g.userData.armL,g.userData.armR].forEach(p=>box(0.16,0.17,0.18,lam(0x3a3f50),0,-0.5,0,p));
-  }else if(id==='chip'){
-    g=figure({skin:0xe0b898,top:0x15151a,pants:0x1a1a22,shoe:0x15151a});
-    const gr=bas(0x38ff7a);
-    box(0.36,0.1,0.36,lam(0xd8dde8),0,1.76,-0.01,g);box(0.36,0.2,0.1,lam(0xd8dde8),0,1.66,-0.14,g);
-    box(0.34,0.07,0.06,lam(0x101018),0,1.64,0.16,g);box(0.09,0.05,0.02,gr,-0.08,1.64,0.19,g);box(0.09,0.05,0.02,gr,0.08,1.64,0.19,g);
-    box(0.06,0.7,0.02,lam(0x2a2a30),-0.15,1.05,0.16,g);box(0.06,0.7,0.02,lam(0x2a2a30),0.15,1.05,0.16,g);
-    box(0.28,0.03,0.02,gr,0,1.22,0.17,g);box(0.03,0.3,0.02,gr,-0.08,1.1,0.17,g);box(0.03,0.2,0.02,gr,0.08,0.98,0.17,g);
-    box(0.13,0.13,0.02,lam(0x0a2a14),0,1.02,0.17,g);box(0.07,0.07,0.02,gr,0,1.02,0.185,g);
-    [g.userData.armL,g.userData.armR].forEach(p=>{box(0.03,0.28,0.17,gr,0,-0.18,0,p);});
-  }else if(id==='magnate'){
-    g=figure({skin:0xf0c8a0,top:0xd8a82a,pants:0xc89a20,shoe:0x15151a});
-    box(0.18,0.5,0.02,lam(0xffffff),0,1.1,0.16,g);box(0.06,0.45,0.02,lam(0xb01818),0,1.05,0.17,g);
-    box(0.52,0.04,0.52,lam(0x111114),0,1.77,0,g);box(0.32,0.36,0.32,lam(0x111114),0,1.96,0,g);box(0.33,0.07,0.33,lam(0xe8c040),0,1.84,0,g);
-    box(0.17,0.03,0.03,lam(0xffffff),0,1.55,0.16,g);
-    box(0.08,0.08,0.02,bas(0xffd84a),0.07,1.64,0.185,g);box(0.015,0.2,0.01,bas(0xffd84a),0.1,1.5,0.18,g);
-    box(0.5,0.05,0.3,lam(0xf0d060),0,1.36,0.02,g);
-    const ac=g.userData.armL;box(0.04,1.05,0.04,lam(0x3a2a1a),0,-0.62,0.12,ac);const kn=new THREE.Mesh(afroG,lam(0xf0d060));kn.scale.set(0.2,0.2,0.2);kn.position.set(0,-0.1,0.12);ac.add(kn);
-  }else{ // harlequin
-    const red=lam(0xd02a3a),gold=lam(0xe8b82a),pur=lam(0x6a2a9a);
-    g=figure({skin:0xf8f4f0,top:0xd02a3a,pants:0x6a2a9a,shoe:0x2a1a3a});
-    g.userData.torso.material=red;box(0.25,0.71,0.31,gold,0.125,1.05,0,g);
-    g.userData.armL.children.slice(0,2).forEach(m=>{m.material=red;});g.userData.armR.children.slice(0,2).forEach(m=>{m.material=gold;});
-    g.userData.legR.children[0].material=gold;g.userData.legL.children[0].material=pur;
-    box(0.4,0.1,0.4,pur,0,1.76,0,g);
-    [[-1,red],[1,gold]].forEach(a=>{const c=new THREE.Mesh(spikeG,a[1]);c.scale.set(2,2.6,2);c.position.set(a[0]*0.17,1.95,0);c.rotation.z=-a[0]*0.7;g.add(c);
-      const b=new THREE.Mesh(afroG,gold===a[1]?red:gold);b.scale.set(0.2,0.2,0.2);b.position.set(a[0]*0.4,2.23,0);g.add(b);});
-    box(0.56,0.1,0.38,lam(0xffffff),0,1.42,0,g);box(0.58,0.03,0.4,red,0,1.46,0,g);
-    box(0.18,0.03,0.03,bas(0xd02a3a),0,1.55,0.17,g);box(0.03,0.05,0.03,bas(0xd02a3a),-0.095,1.575,0.17,g);box(0.03,0.05,0.03,bas(0xd02a3a),0.095,1.575,0.17,g);
-    const e1=box(0.08,0.08,0.03,lam(0x000000),-0.07,1.65,0.16,g),e2=box(0.08,0.08,0.03,lam(0x000000),0.07,1.65,0.16,g);e1.rotation.z=e2.rotation.z=0.785;
+
+  // --------------------------------------------------
+  // BATMAN
+  // --------------------------------------------------
+  if(id==='batman'){
+    const black=lam(0x10131c);
+    const armour=metal(0x252b38);
+    const dark=lam(0x080a10);
+    const gold=metal(0xd6a52e);
+    const yellow=basic(0xffd34e);
+    const skin=0xc99570;
+
+    g=figure({
+      skin,
+      top:0x171b27,
+      pants:0x11141d,
+      shoe:0x08090e
+    });
+
+    // Flowing bat cape
+    const cape=new THREE.Mesh(
+      new THREE.BoxGeometry(0.76,1.13,0.09,1,3,1),
+      black
+    );
+    cape.position.set(0,1.02,-0.24);
+    cape.rotation.x=0.09;
+    g.add(cape);
+
+    // Scalloped cape tips
+    for(let i=-2;i<=2;i++){
+      cone(i*0.14,0.42,-0.25,0.11,0.29,black,g,Math.PI);
+    }
+
+    // Armoured chest
+    box(0.46,0.55,0.09,armour,0,1.13,0.17,g);
+    box(0.37,0.09,0.04,black,0,1.39,0.23,g);
+
+    // Bat symbol
+    const bat=lam(0xf1c84b);
+    box(0.30,0.075,0.025,bat,0,1.2,0.235,g);
+    box(0.10,0.13,0.025,bat,0,1.17,0.25,g);
+    cone(-0.13,1.22,0.25,0.09,0.12,bat,g,Math.PI/2);
+    cone(0.13,1.22,0.25,0.09,0.12,bat,g,-Math.PI/2);
+
+    // Utility belt
+    box(0.51,0.10,0.37,gold,0,0.78,0,g);
+    for(let i=-2;i<=2;i++){
+      box(0.065,0.08,0.025,black,i*0.105,0.78,0.195,g);
+    }
+
+    // Cowl and ears
+    box(0.39,0.20,0.39,dark,0,1.72,0,g);
+    box(0.39,0.31,0.13,dark,0,1.57,-0.15,g);
+
+    cone(-0.145,1.98,0,dark===black?0.09:0.09,0.38,black,g,-0.16);
+    cone(0.145,1.98,0,0.09,0.38,black,g,0.16);
+
+    // Narrow glowing white eye slits
+    box(0.095,0.035,0.025,yellow,-0.075,1.65,0.205,g);
+    box(0.095,0.035,0.025,yellow,0.075,1.65,0.205,g);
+
+    // Armoured gauntlets
+    [g.userData.armL,g.userData.armR].forEach((p,i)=>{
+      box(0.16,0.18,0.18,armour,0,-0.51,0,p);
+      for(let k=0;k<3;k++){
+        box(0.025,0.16,0.035,gold,(k-1)*0.045,-0.52,0.105,p);
+      }
+    });
+
+    // Knee armour
+    box(0.20,0.15,0.22,armour,-0.12,0.34,0.015,g);
+    box(0.20,0.15,0.22,armour,0.12,0.34,0.015,g);
   }
-  g.traverse(o=>{if(o.isMesh)o.castShadow=true;});
+
+  // --------------------------------------------------
+  // SUPERMAN
+  // --------------------------------------------------
+  else if(id==='superman'){
+    const blue=lam(0x0750a8);
+    const brightBlue=basic(0x1689e8);
+    const red=lam(0xc91e2c);
+    const gold=metal(0xffd34d);
+    const dark=lam(0x101827);
+
+    g=figure({
+      skin:0xe7b991,
+      top:0x0750a8,
+      pants:0x073b7b,
+      shoe:0x8c1723
+    });
+
+    // Large flowing red cape
+    const cape=new THREE.Mesh(
+      new THREE.BoxGeometry(0.78,1.18,0.08,1,3,1),
+      red
+    );
+    cape.position.set(0,1.02,-0.25);
+    cape.rotation.x=0.08;
+    g.add(cape);
+
+    // Gold collar
+    box(0.48,0.12,0.35,gold,0,1.43,0,g);
+
+    // Chest panel
+    box(0.43,0.45,0.055,blue,0,1.15,0.18,g);
+
+    // Iconic shield outline
+    const shield=new THREE.Mesh(
+      new THREE.CylinderGeometry(0.20,0.16,0.045,5),
+      gold
+    );
+    shield.position.set(0,1.22,0.235);
+    shield.rotation.set(Math.PI/2,0,Math.PI);
+    g.add(shield);
+
+    const shieldInner=new THREE.Mesh(
+      new THREE.CylinderGeometry(0.16,0.13,0.05,5),
+      red
+    );
+    shieldInner.position.set(0,1.22,0.27);
+    shieldInner.rotation.set(Math.PI/2,0,Math.PI);
+    g.add(shieldInner);
+
+    // Stylised S on the shield
+    box(0.18,0.045,0.018,gold,0,1.26,0.302,g);
+    box(0.13,0.045,0.018,gold,0,1.19,0.302,g);
+    box(0.045,0.11,0.018,gold,0.07,1.225,0.302,g);
+    box(0.045,0.11,0.018,gold,-0.07,1.225,0.302,g);
+
+    // Red belt
+    box(0.51,0.09,0.34,red,0,0.78,0,g);
+    box(0.11,0.10,0.035,gold,0,0.78,0.19,g);
+
+    // Red boots
+    box(0.21,0.27,0.23,red,-0.12,0.16,0,g);
+    box(0.21,0.27,0.23,red,0.12,0.16,0,g);
+
+    // Hair
+    const hair=lam(0x17151a);
+    box(0.37,0.11,0.37,hair,0,1.77,-0.01,g);
+    box(0.37,0.16,0.10,hair,0,1.68,-0.14,g);
+    box(0.12,0.11,0.08,hair,0.13,1.72,0.12,g);
+
+    // Signature front curl
+    const curl=new THREE.Mesh(
+      new THREE.SphereGeometry(0.075,12,10),
+      hair
+    );
+    curl.position.set(0.015,1.69,0.205);
+    g.add(curl);
+
+    // Wrist details
+    [g.userData.armL,g.userData.armR].forEach(p=>{
+      box(0.15,0.13,0.17,red,0,-0.52,0,p);
+    });
+
+    // Shoulder accents
+    box(0.19,0.13,0.22,brightBlue,-0.34,1.35,0,g);
+    box(0.19,0.13,0.22,brightBlue,0.34,1.35,0,g);
+  }
+
+  // --------------------------------------------------
+  // THE JOKER
+  // --------------------------------------------------
+  else if(id==='joker'){
+    const purple=lam(0x542080);
+    const brightPurple=lam(0x782ca7);
+    const green=lam(0x35a83c);
+    const darkGreen=lam(0x126326);
+    const red=basic(0xe52337);
+    const white=lam(0xf4f0e8);
+    const black=lam(0x17121d);
+
+    g=figure({
+      skin:0xf2eee8,
+      top:0x542080,
+      pants:0x381451,
+      shoe:0x17121d
+    });
+
+    // Purple jacket
+    box(0.53,0.66,0.12,purple,0,1.08,0.17,g);
+    box(0.15,0.42,0.04,white,-0.09,1.14,0.25,g);
+    box(0.15,0.42,0.04,white,0.09,1.14,0.25,g);
+
+    // Bright waistcoat and buttons
+    box(0.19,0.42,0.035,brightPurple,0,1.08,0.285,g);
+    for(let i=0;i<3;i++){
+      sphere(0,1.22-i*0.12,0.31,0.018,0.018,0.012,red);
+    }
+
+    // Green tie
+    box(0.055,0.32,0.035,green,0,1.16,0.32,g);
+    const tieTip=new THREE.Mesh(
+      new THREE.ConeGeometry(0.045,0.12,4),
+      green
+    );
+    tieTip.position.set(0,0.97,0.32);
+    tieTip.rotation.z=Math.PI;
+    g.add(tieTip);
+
+    // Green hair, deliberately wild
+    sphere(0,1.76,-0.015,0.23,0.16,0.20,green);
+    for(let i=-2;i<=2;i++){
+      cone(i*0.12,1.92,-0.015,0.11,0.28,green,g,i*0.22);
+    }
+    cone(-0.18,1.82,0.08,0.09,0.25,darkGreen,g,-0.7);
+    cone(0.18,1.82,0.08,0.09,0.25,green,g,0.7);
+
+    // Pale face details
+    sphere(0,1.59,0.16,0.14,0.07,0.035,white);
+
+    // Dark eyes
+    box(0.075,0.045,0.025,black,-0.075,1.65,0.19,g);
+    box(0.075,0.045,0.025,black,0.075,1.65,0.19,g);
+
+    // Red eyebrows
+    box(0.09,0.025,0.025,red,-0.075,1.71,0.19,g);
+    box(0.09,0.025,0.025,red,0.075,1.71,0.19,g);
+
+    // Exaggerated red grin
+    box(0.22,0.035,0.025,red,0,1.53,0.195,g);
+    box(0.035,0.09,0.025,red,-0.105,1.57,0.195,g);
+    box(0.035,0.09,0.025,red,0.105,1.57,0.195,g);
+
+    // Cheek scars
+    box(0.045,0.11,0.025,red,-0.14,1.57,0.18,g);
+    box(0.045,0.11,0.025,red,0.14,1.57,0.18,g);
+
+    // Flower on lapel
+    sphere(0.20,1.34,0.27,0.055,0.055,0.025,green);
+    sphere(0.20,1.34,0.30,0.025,0.025,0.018,red);
+
+    // Jacket tails
+    box(0.16,0.30,0.12,purple,-0.19,0.72,-0.01,g);
+    box(0.16,0.30,0.12,purple,0.19,0.72,-0.01,g);
+
+    // Purple gloves
+    [g.userData.armL,g.userData.armR].forEach(p=>{
+      box(0.15,0.14,0.17,green,0,-0.52,0,p);
+    });
+  }
+
+  // --------------------------------------------------
+  // DONALD TRUMP
+  // --------------------------------------------------
+  else if(id==='trump'){
+    const navy=lam(0x101b39);
+    const suit=lam(0x172748);
+    const white=lam(0xf5f3ec);
+    const red=lam(0xc91e30);
+    const gold=lam(0xd6a52e);
+    const hair=lam(0xe6a928);
+    const skin=0xf0c49b;
+
+    g=figure({
+      skin,
+      top:0x172748,
+      pants:0x101b39,
+      shoe:0x090b12
+    });
+
+    // Tailored navy suit jacket
+    box(0.53,0.66,0.12,navy,0,1.08,0.17,g);
+    box(0.17,0.48,0.035,white,0,1.12,0.245,g);
+
+    // Lapels
+    box(0.14,0.32,0.035,suit,-0.15,1.25,0.25,g).rotation.z=-0.28;
+    box(0.14,0.32,0.035,suit,0.15,1.25,0.25,g).rotation.z=0.28;
+
+    // Bright red tie
+    box(0.065,0.37,0.035,red,0,1.13,0.29,g);
+    const knot=box(0.09,0.08,0.04,red,0,1.35,0.29,g);
+    knot.rotation.z=0.785;
+    cone(0,0.91,0.29,0.045,0.13,red,g,Math.PI);
+
+    // White shirt collar
+    box(0.19,0.08,0.04,white,0,1.40,0.25,g);
+
+    // Gold tie pin
+    sphere(0,1.06,0.32,0.025,0.025,0.015,gold);
+
+    // Distinctive blond combover
+    sphere(0,1.77,-0.015,0.22,0.10,0.20,hair);
+    box(0.36,0.10,0.34,hair,0,1.76,-0.06,g);
+    box(0.40,0.11,0.12,hair,0.04,1.71,-0.14,g);
+    box(0.12,0.12,0.27,hair,0.17,1.68,-0.03,g);
+
+    // Swept fringe across forehead
+    const fringe=box(0.30,0.075,0.12,hair,-0.03,1.73,0.13,g);
+    fringe.rotation.z=-0.17;
+
+    // Face and eyebrows
+    box(0.08,0.025,0.025,lam(0x8d602f),-0.075,1.67,0.19,g);
+    box(0.08,0.025,0.025,lam(0x8d602f),0.075,1.67,0.19,g);
+
+    // Eyes
+    box(0.045,0.035,0.025,lam(0x252020),-0.075,1.63,0.19,g);
+    box(0.045,0.035,0.025,lam(0x252020),0.075,1.63,0.19,g);
+
+    // Mouth
+    box(0.12,0.025,0.025,lam(0x985c52),0,1.53,0.19,g);
+
+    // Flag pin
+    box(0.065,0.035,0.025,white,-0.18,1.35,0.28,g);
+    box(0.025,0.035,0.025,red,-0.18,1.35,0.30,g);
+
+    // Gold cufflinks
+    [g.userData.armL,g.userData.armR].forEach(p=>{
+      sphere(0,-0.52,0.10,0.035,0.035,0.025,gold,p);
+    });
+
+    // Suit buttons
+    for(let i=0;i<2;i++){
+      sphere(0.17,1.13-i*0.12,0.245,0.018,0.018,0.012,gold);
+    }
+  }
+
+  // --------------------------------------------------
+  // LORD SHADOW - EMINENCE IN SHADOW
+  // --------------------------------------------------
+  else{
+    const black=lam(0x090b14);
+    const cloak=lam(0x111421);
+    const armour=metal(0x24283b);
+    const purple=lam(0x5423a5);
+    const violet=basic(0x9c42ff);
+    const red=basic(0xff163e);
+    const silver=metal(0x777e9a);
+
+    g=figure({
+      skin:0xe8c9bb,
+      top:0x111421,
+      pants:0x090b14,
+      shoe:0x05060b
+    });
+
+    // Long dark cloak
+    const cape=new THREE.Mesh(
+      new THREE.BoxGeometry(0.82,1.25,0.10,1,4,1),
+      cloak
+    );
+    cape.position.set(0,0.96,-0.25);
+    cape.rotation.x=0.08;
+    g.add(cape);
+
+    // Purple inner cape lining
+    const lining=box(0.58,0.93,0.025,purple,0,0.96,-0.19,g);
+    lining.rotation.x=0.08;
+
+    // Hood and high collar
+    box(0.49,0.20,0.32,black,0,1.43,-0.05,g);
+    box(0.44,0.27,0.12,cloak,0,1.51,0.08,g);
+
+    // Black layered shoulder armour
+    box(0.28,0.18,0.29,armour,-0.31,1.39,0,g);
+    box(0.28,0.18,0.29,armour,0.31,1.39,0,g);
+
+    // Purple armour chest
+    box(0.45,0.47,0.10,armour,0,1.12,0.18,g);
+    box(0.27,0.30,0.035,purple,0,1.16,0.245,g);
+
+    // Glowing purple chest emblem
+    const emblem=box(0.17,0.17,0.025,violet,0,1.17,0.27,g);
+    emblem.rotation.z=Math.PI/4;
+    box(0.045,0.22,0.035,black,0,1.17,0.29,g);
+
+    // Purple energy lines on armour
+    box(0.025,0.37,0.025,violet,-0.17,1.12,0.25,g);
+    box(0.025,0.37,0.025,violet,0.17,1.12,0.25,g);
+    box(0.30,0.025,0.025,violet,0,0.96,0.25,g);
+
+    // Dark waist belt
+    box(0.52,0.10,0.35,black,0,0.77,0,g);
+    box(0.12,0.11,0.04,purple,0,0.77,0.19,g);
+
+    // Silver hair swept backwards
+    sphere(0,1.76,-0.045,0.23,0.13,0.22,silver);
+    for(let i=-2;i<=2;i++){
+      cone(i*0.085,1.84,-0.04,0.075,0.23,silver,g,i*0.24);
+    }
+    box(0.38,0.08,0.20,silver,0,1.72,-0.12,g);
+
+    // Face shadow and crimson eyes
+    box(0.38,0.15,0.12,black,0,1.63,0.12,g);
+    box(0.095,0.035,0.025,red,-0.075,1.64,0.19,g);
+    box(0.095,0.035,0.025,red,0.075,1.64,0.19,g);
+
+    // Purple forearm armour
+    [g.userData.armL,g.userData.armR].forEach(p=>{
+      box(0.17,0.19,0.18,armour,0,-0.50,0,p);
+      box(0.12,0.035,0.19,violet,0,-0.48,0.10,p);
+    });
+
+    // Long dark boots
+    box(0.21,0.28,0.23,black,-0.12,0.17,0,g);
+    box(0.21,0.28,0.23,black,0.12,0.17,0,g);
+
+    // Cloak clasp
+    sphere(0,1.46,0.18,0.065,0.065,0.035,violet);
+    sphere(0,1.46,0.21,0.027,0.027,0.018,black);
+  }
+
+  // --------------------------------------------------
+  // FINAL MODEL SETUP
+  // --------------------------------------------------
+  g.traverse(o=>{
+    if(o.isMesh){
+      o.castShadow=true;
+      o.receiveShadow=true;
+    }
+  });
+
   return g;
 }
+
+
 function makeAvatar(a){
   if(activeSkin&&SKIN_BY_ID[activeSkin])return makeSkinAvatar(activeSkin);
   const g=new THREE.Group();g.rotation.order='YXZ';
